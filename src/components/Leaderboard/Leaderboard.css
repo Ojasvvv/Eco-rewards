@@ -1,6 +1,6 @@
 .leaderboard-page-container {
   min-height: 100vh;
-  background: var(--background);
+  background: var(--background-gradient);
 }
 
 .leaderboard-main {
@@ -38,10 +38,11 @@
 .leaderboard-hero {
   text-align: center;
   padding: 48px 20px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
   border-radius: 24px;
   margin-bottom: 40px;
   color: white;
+  box-shadow: var(--shadow-xl);
 }
 
 .leaderboard-hero h1 {
@@ -96,13 +97,14 @@
   display: flex;
   gap: 24px;
   align-items: flex-start;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--border);
 }
 
 .leaderboard-item-full:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-2xl);
+  border-color: var(--primary);
 }
 
 .leaderboard-item-full.top-three {
@@ -191,7 +193,7 @@
   background: var(--surface);
   border-radius: 20px;
   padding: 40px 32px;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
 }
 
@@ -212,14 +214,17 @@
 .footer-card {
   text-align: center;
   padding: 24px;
-  background: var(--surface);
+  background: var(--background);
   border-radius: 16px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border);
 }
 
 .footer-card:hover {
   transform: translateY(-4px);
-  background: var(--primary-light);
+  background: var(--accent-light);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
 }
 
 .footer-icon {

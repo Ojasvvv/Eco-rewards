@@ -635,7 +635,7 @@ const Dashboard = () => {
                     <div className="brand-logo">🍕</div>
                     <h4>Domino's Pizza</h4>
                   </div>
-                  <span className="coupon-cost">30 rewards</span>
+                  <span className="coupon-cost">30 points</span>
                 </div>
                 <div className="coupon-offer">
                   <p className="offer-title">20% OFF</p>
@@ -652,7 +652,7 @@ const Dashboard = () => {
                     }
                   }}
                 >
-                  {rewards >= 30 ? 'Redeem Now' : `Need ${30 - rewards} more rewards`}
+                  {rewards >= 30 ? 'Redeem Now' : `Need ${30 - rewards} more points`}
                 </button>
               </div>
 
@@ -662,7 +662,7 @@ const Dashboard = () => {
                     <div className="brand-logo">☕</div>
                     <h4>Starbucks</h4>
                   </div>
-                  <span className="coupon-cost">20 rewards</span>
+                  <span className="coupon-cost">20 points</span>
                 </div>
                 <div className="coupon-offer">
                   <p className="offer-title">Free Tall Drink</p>
@@ -679,7 +679,7 @@ const Dashboard = () => {
                     }
                   }}
                 >
-                  {rewards >= 20 ? 'Redeem Now' : `Need ${20 - rewards} more rewards`}
+                  {rewards >= 20 ? 'Redeem Now' : `Need ${20 - rewards} more points`}
                 </button>
               </div>
 
@@ -689,7 +689,7 @@ const Dashboard = () => {
                     <div className="brand-logo">🍔</div>
                     <h4>McDonald's</h4>
                   </div>
-                  <span className="coupon-cost">15 rewards</span>
+                  <span className="coupon-cost">15 points</span>
                 </div>
                 <div className="coupon-offer">
                   <p className="offer-title">Free Medium Fries</p>
@@ -706,7 +706,7 @@ const Dashboard = () => {
                     }
                   }}
                 >
-                  {rewards >= 15 ? 'Redeem Now' : `Need ${15 - rewards} more rewards`}
+                  {rewards >= 15 ? 'Redeem Now' : `Need ${15 - rewards} more points`}
                 </button>
               </div>
 
@@ -716,7 +716,7 @@ const Dashboard = () => {
                     <div className="brand-logo">🍗</div>
                     <h4>KFC</h4>
                   </div>
-                  <span className="coupon-cost">25 rewards</span>
+                  <span className="coupon-cost">25 points</span>
                 </div>
                 <div className="coupon-offer">
                   <p className="offer-title">$5 OFF</p>
@@ -733,7 +733,7 @@ const Dashboard = () => {
                     }
                   }}
                 >
-                  {rewards >= 25 ? 'Redeem Now' : `Need ${25 - rewards} more rewards`}
+                  {rewards >= 25 ? 'Redeem Now' : `Need ${25 - rewards} more points`}
                 </button>
               </div>
 
@@ -743,7 +743,7 @@ const Dashboard = () => {
                     <div className="brand-logo">🥪</div>
                     <h4>Subway</h4>
                   </div>
-                  <span className="coupon-cost">10 rewards</span>
+                  <span className="coupon-cost">10 points</span>
                 </div>
                 <div className="coupon-offer">
                   <p className="offer-title">Buy 1 Get 1</p>
@@ -760,7 +760,7 @@ const Dashboard = () => {
                     }
                   }}
                 >
-                  {rewards >= 10 ? 'Redeem Now' : `Need ${10 - rewards} more rewards`}
+                  {rewards >= 10 ? 'Redeem Now' : `Need ${10 - rewards} more points`}
                 </button>
               </div>
 
@@ -770,7 +770,7 @@ const Dashboard = () => {
                     <div className="brand-logo">🍕</div>
                     <h4>Pizza Hut</h4>
                   </div>
-                  <span className="coupon-cost">35 rewards</span>
+                  <span className="coupon-cost">35 points</span>
                 </div>
                 <div className="coupon-offer">
                   <p className="offer-title">25% OFF</p>
@@ -787,7 +787,7 @@ const Dashboard = () => {
                     }
                   }}
                 >
-                  {rewards >= 35 ? 'Redeem Now' : `Need ${35 - rewards} more rewards`}
+                  {rewards >= 35 ? 'Redeem Now' : `Need ${35 - rewards} more points`}
                 </button>
               </div>
             </div>

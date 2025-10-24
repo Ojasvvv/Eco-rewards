@@ -10,17 +10,23 @@
   --primary-light: #d1fae5;
   --secondary: #6366f1;
   --secondary-dark: #4f46e5;
-  --background: #ffffff;
-  --surface: #f9fafb;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --border: #e5e7eb;
+  --background: #f8f9fa;
+  --background-gradient: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --text-primary: #1a202c;
+  --text-secondary: #718096;
+  --border: #e2e8f0;
+  --accent: #8b5cf6;
+  --accent-light: #f3e8ff;
   --error: #ef4444;
   --success: #10b981;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --warning: #f59e0b;
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.14), 0 4px 6px -2px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.16), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
   
   /* Smooth transitions */
   --transition-fast: 0.15s ease;
@@ -35,17 +41,23 @@
   --primary-light: #065f46;
   --secondary: #818cf8;
   --secondary-dark: #6366f1;
-  --background: #0a0e1a;
-  --surface: #151b2e;
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --border: #1e293b;
+  --background: #0f1419;
+  --background-gradient: linear-gradient(180deg, #0f1419 0%, #1a1f2e 100%);
+  --surface: #1a202c;
+  --surface-elevated: #252d3d;
+  --text-primary: #f7fafc;
+  --text-secondary: #a0aec0;
+  --border: #2d3748;
+  --accent: #a78bfa;
+  --accent-light: #1e1b4b;
   --error: #f87171;
   --success: #34d399;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -1px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.6);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 10px 10px -5px rgba(0, 0, 0, 0.7);
+  --warning: #fbbf24;
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.6), 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.7), 0 2px 4px -1px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.8), 0 4px 6px -2px rgba(0, 0, 0, 0.7);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.9), 0 10px 10px -5px rgba(0, 0, 0, 0.8);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.95);
 }
 
 /* Dark theme specific overrides */

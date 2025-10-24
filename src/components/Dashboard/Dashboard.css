@@ -1,16 +1,18 @@
 .dashboard-container {
   min-height: 100vh;
-  background: var(--background);
+  background: var(--background-gradient);
 }
 
 /* Header */
 .dashboard-header {
-  background: var(--surface);
+  background: var(--surface-elevated);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .header-content {
@@ -431,14 +433,15 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--border);
 }
 
 .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary);
 }
 
 .stat-icon {
@@ -484,10 +487,10 @@
   background: var(--surface);
   border-radius: 20px;
   padding: 32px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-xl);
   width: 100%;
   max-width: 600px;
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
 }
 
 .code-header {
@@ -684,14 +687,15 @@
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--border);
 }
 
 .activity-item:hover {
   transform: translateX(4px);
   box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
 }
 
 .activity-icon {
@@ -961,14 +965,15 @@
   background: var(--surface);
   border-radius: 16px;
   padding: 20px;
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--border);
 }
 
 .leaderboard-item:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary);
 }
 
 .leaderboard-rank {
@@ -1056,14 +1061,15 @@
   padding: 24px;
   text-align: center;
   position: relative;
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--border);
 }
 
 .disposal-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--accent);
 }
 
 .disposal-step {
