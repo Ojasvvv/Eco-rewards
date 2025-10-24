@@ -1,11 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
+import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import './Leaderboard.css';
 
 const Leaderboard = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
+  const { t } = useLanguage();
 
   const handleLogout = async () => {
     try {
@@ -14,6 +19,33 @@ const Leaderboard = () => {
     } catch (error) {
       console.error('Error logging out:', error);
     }
+  };
+
+  const [showReport, setShowReport] = React.useState(false);
+  const [reportType, setReportType] = React.useState('');
+  const [reportDetails, setReportDetails] = React.useState('');
+
+  const handleReport = () => {
+    setShowReport(true);
+  };
+
+  const handleSubmitReport = (e) => {
+    e.preventDefault();
+    
+    if (!reportType || !reportDetails.trim()) {
+      alert(t('selectIssueError'));
+      return;
+    }
+
+    // TODO: Send report to backend/database
+    console.log('Report submitted:', { type: reportType, details: reportDetails, user: user?.email });
+    
+    alert(t('thankYouReport'));
+    
+    // Reset form
+    setShowReport(false);
+    setReportType('');
+    setReportDetails('');
   };
 
   const cities = [
@@ -105,6 +137,61 @@ const Leaderboard = () => {
 
   return (
     <div className="leaderboard-page-container">
+      {/* Report Modal */}
+      {showReport && (
+        <div className="modal-overlay" onClick={() => setShowReport(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>🚨 {t('reportIssue')}</h2>
+              <button className="modal-close" onClick={() => setShowReport(false)}>×</button>
+            </div>
+            
+            <form onSubmit={handleSubmitReport} className="report-form">
+              <div className="form-group">
+                <label htmlFor="reportType">{t('whatToReport')}</label>
+                <select 
+                  id="reportType"
+                  value={reportType} 
+                  onChange={(e) => setReportType(e.target.value)}
+                  className="form-select"
+                  required
+                >
+                  <option value="">{t('selectIssue')}</option>
+                  <option value="broken">🔧 {t('brokenDustbin')}</option>
+                  <option value="full">🗑️ {t('fullDustbin')}</option>
+                  <option value="technical">⚙️ {t('technicalIssue')}</option>
+                  <option value="qr_code">📱 {t('qrProblem')}</option>
+                  <option value="location">📍 {t('locationIssue')}</option>
+                  <option value="other">💬 {t('other')}</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="reportDetails">{t('elaborate')}</label>
+                <textarea
+                  id="reportDetails"
+                  value={reportDetails}
+                  onChange={(e) => setReportDetails(e.target.value)}
+                  className="form-textarea"
+                  placeholder={t('describeProblem')}
+                  rows="6"
+                  required
+                />
+              </div>
+
+              <div className="form-actions">
+                <button type="button" onClick={() => setShowReport(false)} className="btn-cancel">
+                  {t('cancel')}
+                </button>
+                <button type="submit" className="btn-submit">
+                  {t('submitReport')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="dashboard-header">
         <div className="header-content">
@@ -118,11 +205,12 @@ const Leaderboard = () => {
           </div>
           
           <div className="header-right">
+            <LanguageSelector />
             <button onClick={() => navigate('/dashboard')} className="back-btn">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              <span>Back</span>
+              <span>{t('back')}</span>
             </button>
             <div className="user-profile">
               <img 
@@ -138,6 +226,22 @@ const Leaderboard = () => {
               />
               <span className="user-name">{user?.displayName?.split(' ')[0] || 'User'}</span>
             </div>
+            <button onClick={toggleTheme} className="theme-toggle-btn" title={isDark ? "Light mode" : "Dark mode"}>
+              {isDark ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              )}
+            </button>
+            <button onClick={handleReport} className="report-btn" title="Report an issue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </button>
             <button onClick={handleLogout} className="logout-btn">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -150,20 +254,20 @@ const Leaderboard = () => {
       {/* Main Content */}
       <main className="leaderboard-main">
         <div className="leaderboard-hero">
-          <h1>🌍 City Sustainability Leaderboard</h1>
-          <p>Celebrating cities whose citizens are making the biggest environmental impact</p>
+          <h1>🌍 {t('cityLeaderboard')}</h1>
+          <p>{t('cityLeaderboardSub')}</p>
           <div className="hero-stats">
             <div className="hero-stat">
               <span className="hero-stat-value">14,065 kg</span>
-              <span className="hero-stat-label">Waste Recycled This Month</span>
+              <span className="hero-stat-label">{t('wasteRecycledMonth')}</span>
             </div>
             <div className="hero-stat">
               <span className="hero-stat-value">28,540</span>
-              <span className="hero-stat-label">Active Users</span>
+              <span className="hero-stat-label">{t('activeUsers')}</span>
             </div>
             <div className="hero-stat">
               <span className="hero-stat-value">487</span>
-              <span className="hero-stat-label">Smart Dustbins</span>
+              <span className="hero-stat-label">{t('smartDustbins')}</span>
             </div>
           </div>
         </div>
@@ -182,11 +286,11 @@ const Leaderboard = () => {
                 <h3>{city.name}</h3>
                 <div className="company-stats-grid">
                   <div className="company-stat">
-                    <span className="stat-label">Participation</span>
+                    <span className="stat-label">{t('participation')}</span>
                     <span className="stat-value-large">{city.percentage}%</span>
                   </div>
                   <div className="company-stat">
-                    <span className="stat-label">Waste Diverted</span>
+                    <span className="stat-label">{t('wasteDiverted')}</span>
                     <span className="stat-value-large">{city.waste}</span>
                   </div>
                 </div>
@@ -207,22 +311,22 @@ const Leaderboard = () => {
         </div>
 
         <div className="leaderboard-footer">
-          <h3>Why This Matters</h3>
+          <h3>{t('whyMatters')}</h3>
           <div className="footer-cards">
             <div className="footer-card">
               <div className="footer-icon">🌍</div>
-              <h4>Cities Thrive</h4>
-              <p>Cities with high EcoRewards participation see cleaner streets, reduced pollution, and improved quality of life for all residents.</p>
+              <h4>{t('citiesThrive')}</h4>
+              <p>{t('citiesThriveDesc')}</p>
             </div>
             <div className="footer-card">
               <div className="footer-icon">♻️</div>
-              <h4>Real Impact</h4>
-              <p>Every kilogram of waste recycled prevents harmful methane emissions and reduces landfill pollution, making our cities healthier.</p>
+              <h4>{t('realImpact')}</h4>
+              <p>{t('realImpactDesc')}</p>
             </div>
             <div className="footer-card">
               <div className="footer-icon">🎁</div>
-              <h4>Win-Win Model</h4>
-              <p>Citizens get rewards by using smart dustbins in public places while helping their city become cleaner and more sustainable for future generations.</p>
+              <h4>{t('winWin')}</h4>
+              <p>{t('winWinDesc')}</p>
             </div>
           </div>
         </div>

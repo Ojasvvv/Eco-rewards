@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
+import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [dustbinCode, setDustbinCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,6 +23,9 @@ const Dashboard = () => {
   const [currentStep, setCurrentStep] = useState('');
   const [userLocation, setUserLocation] = useState(null);
   const [showRewards, setShowRewards] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [reportType, setReportType] = useState('');
+  const [reportDetails, setReportDetails] = useState('');
   const [outletRewards, setOutletRewards] = useState(() => {
     // Load outlet-specific rewards from localStorage
     const saved = localStorage.getItem(`outlet_rewards_${user?.uid}`);
@@ -56,17 +64,40 @@ const Dashboard = () => {
     }
   };
 
+  const handleReport = () => {
+    setShowReport(true);
+  };
+
+  const handleSubmitReport = (e) => {
+    e.preventDefault();
+    
+    if (!reportType || !reportDetails.trim()) {
+      alert(t('selectIssueError'));
+      return;
+    }
+
+    // TODO: Send report to backend/database
+    console.log('Report submitted:', { type: reportType, details: reportDetails, user: user?.email });
+    
+    alert(t('thankYouReport'));
+    
+    // Reset form
+    setShowReport(false);
+    setReportType('');
+    setReportDetails('');
+  };
+
   const handleSubmitCode = async (e) => {
     e.preventDefault();
     
     if (!dustbinCode.trim()) {
-      setError('Please enter a dustbin code');
+      setError(t('enterDustbinCode'));
       return;
     }
 
     // Check daily limit
     if (!checkDailyLimit()) {
-      setError('❌ Daily limit reached! You can only use dustbins 2 times per day. Come back tomorrow! 🌟');
+      setError(t('dailyLimitReached'));
       return;
     }
 
@@ -77,7 +108,7 @@ const Dashboard = () => {
 
     try {
       // Step 1: Get user location
-      setSuccess('📍 Checking your location...');
+      setSuccess(`📍 ${t('checkingLocation')}`);
       const location = await getUserLocation();
       setUserLocation(location);
       
@@ -89,13 +120,13 @@ const Dashboard = () => {
       const distance = calculateDistance(location, dustbinLocation);
       
       if (distance > 0.1) { // More than 100 meters
-        setError(`❌ You're too far from the dustbin (${Math.round(distance * 1000)}m away). Please get closer.`);
+        setError(`❌ ${t('tooFar')} (${Math.round(distance * 1000)}m away). ${t('getCloser')}`);
         setLoading(false);
         setCurrentStep('');
         return;
       }
       
-      setSuccess(`📍 Location verified. Verifying code...`);
+      setSuccess(`📍 ${t('locationVerified')}`);
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Step 2: Open dustbin
@@ -122,7 +153,7 @@ const Dashboard = () => {
         [dustbinInfo.outletId]: (prev[dustbinInfo.outletId] || 0) + pointsEarned
       }));
       
-      setSuccess(`🎉 Congratulations! You earned ${pointsEarned} rewards! Redeem them for coupons.`);
+      setSuccess(`🎉 ${t('success')}! ${t('earnedPoints')} ${pointsEarned} ${t('points')}!`);
       setDustbinCode('');
       
       setTimeout(() => {
@@ -213,11 +244,12 @@ const Dashboard = () => {
           </div>
           
           <div className="header-right">
+            <LanguageSelector />
             <button onClick={() => setShowRewards(!showRewards)} className="rewards-btn">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
               </svg>
-              <span className="rewards-btn-text">My Rewards</span>
+              <span className="rewards-btn-text">{t('myRewards')}</span>
             </button>
             <div className="user-profile">
               <img 
@@ -233,6 +265,22 @@ const Dashboard = () => {
               />
               <span className="user-name">{user?.displayName?.split(' ')[0] || 'User'}</span>
             </div>
+            <button onClick={toggleTheme} className="theme-toggle-btn" title={isDark ? "Light mode" : "Dark mode"}>
+              {isDark ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              )}
+            </button>
+            <button onClick={handleReport} className="report-btn" title="Report an issue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </button>
             <button onClick={handleLogout} className="logout-btn">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -242,13 +290,68 @@ const Dashboard = () => {
         </div>
       </header>
 
+      {/* Report Modal */}
+      {showReport && (
+        <div className="modal-overlay" onClick={() => setShowReport(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>🚨 {t('reportIssue')}</h2>
+              <button className="modal-close" onClick={() => setShowReport(false)}>×</button>
+            </div>
+            
+            <form onSubmit={handleSubmitReport} className="report-form">
+              <div className="form-group">
+                <label htmlFor="reportType">{t('whatToReport')}</label>
+                <select 
+                  id="reportType"
+                  value={reportType} 
+                  onChange={(e) => setReportType(e.target.value)}
+                  className="form-select"
+                  required
+                >
+                  <option value="">{t('selectIssue')}</option>
+                  <option value="broken">🔧 {t('brokenDustbin')}</option>
+                  <option value="full">🗑️ {t('fullDustbin')}</option>
+                  <option value="technical">⚙️ {t('technicalIssue')}</option>
+                  <option value="qr_code">📱 {t('qrProblem')}</option>
+                  <option value="location">📍 {t('locationIssue')}</option>
+                  <option value="other">💬 {t('other')}</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="reportDetails">{t('elaborate')}</label>
+                <textarea
+                  id="reportDetails"
+                  value={reportDetails}
+                  onChange={(e) => setReportDetails(e.target.value)}
+                  className="form-textarea"
+                  placeholder={t('describeProblem')}
+                  rows="6"
+                  required
+                />
+              </div>
+
+              <div className="form-actions">
+                <button type="button" onClick={() => setShowReport(false)} className="btn-cancel">
+                  {t('cancel')}
+                </button>
+                <button type="submit" className="btn-submit">
+                  {t('submitReport')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="dashboard-main">
         <div className="dashboard-content">
           {/* Welcome Section */}
           <section className="welcome-section animate-slideUp">
-            <h2>Welcome back, {user?.displayName?.split(' ')[0] || 'Eco Warrior'}! 👋</h2>
-            <p>Scan a dustbin QR code and enter the code below to earn rewards</p>
+            <h2>{t('welcomeBack')}, {user?.displayName?.split(' ')[0] || 'Eco Warrior'}! 👋</h2>
+            <p>{t('scanQRPrompt')}</p>
           </section>
 
           {/* Stats Cards */}
@@ -260,7 +363,7 @@ const Dashboard = () => {
                 </svg>
               </div>
               <div className="stat-info">
-                <p className="stat-label">Rewards</p>
+                <p className="stat-label">{t('myRewards')}</p>
                 <p className="stat-value">{rewards}</p>
               </div>
             </div>
@@ -272,7 +375,7 @@ const Dashboard = () => {
                 </svg>
               </div>
               <div className="stat-info">
-                <p className="stat-label">Total Deposits</p>
+                <p className="stat-label">{t('scanHistory')}</p>
                 <p className="stat-value">{Math.floor(rewards / 10)}</p>
               </div>
             </div>
@@ -284,7 +387,7 @@ const Dashboard = () => {
                 </svg>
               </div>
               <div className="stat-info">
-                <p className="stat-label">Redeemable Rewards</p>
+                <p className="stat-label">{t('myRewards')}</p>
                 <p className="stat-value">{Math.floor(rewards / 10)}</p>
               </div>
             </div>
@@ -294,8 +397,8 @@ const Dashboard = () => {
           <section className="code-section animate-slideUp">
             <div className="code-card">
               <div className="code-header">
-                <h3>Enter Dustbin Code</h3>
-                <p>Found on the QR code sticker</p>
+                <h3>{t('enterCode')}</h3>
+                <p>{t('scanQRPrompt')}</p>
               </div>
 
               <form onSubmit={handleSubmitCode} className="code-form">
@@ -309,7 +412,7 @@ const Dashboard = () => {
                     type="text"
                     value={dustbinCode}
                     onChange={(e) => setDustbinCode(e.target.value.toUpperCase())}
-                    placeholder="e.g., DB-12345"
+                    placeholder={t('enterCodePlaceholder')}
                     className="code-input"
                     maxLength="20"
                     disabled={loading}
@@ -342,31 +445,29 @@ const Dashboard = () => {
                   {loading ? (
                     <>
                       <div className="spinner-small"></div>
-                      Opening Dustbin...
+                      {t('submit')}...
                     </>
                   ) : (
                     <>
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      Submit Code
+                      {t('submit')}
                     </>
                   )}
                 </button>
               </form>
 
               <div className="code-help">
-                <p>💡 <strong>How it works:</strong></p>
+                <p>💡 <strong>{t('howItWorks')}:</strong></p>
                 <ol>
-                  <li>Find an EcoRewards smart dustbin in public places (malls, food courts, etc.)</li>
-                  <li>Scan the QR code on the dustbin</li>
-                  <li>Enter the dustbin code shown (e.g., ECO-12345)</li>
-                  <li>Be within 100m of the dustbin location</li>
-                  <li>Deposit your trash when the lid opens</li>
-                  <li>Earn 10 rewards instantly!</li>
+                  <li>{t('step1Desc')}</li>
+                  <li>{t('step2Desc')}</li>
+                  <li>{t('step3Desc')}</li>
+                  <li>{t('step4Desc')}</li>
                 </ol>
                 <p className="code-help-highlight">
-                  ⚠️ Strict Limit: Maximum 2 dustbin uses per day per user
+                  ⚠️ {t('usageLimit')}: {t('usageLimitDesc')}
                 </p>
               </div>
             </div>
@@ -376,11 +477,11 @@ const Dashboard = () => {
           <section className="leaderboard-preview animate-slideUp">
             <div className="leaderboard-preview-header">
               <div className="leaderboard-title-section">
-                <h3>🌍 Cities Making a Difference</h3>
-                <p className="section-subtitle">See which cities are leading the sustainability revolution</p>
+                <h3>🌍 {t('citiesLeading')}</h3>
+                <p className="section-subtitle">{t('citiesLeadingSub')}</p>
               </div>
               <button className="view-all-btn" onClick={() => navigate('/leaderboard')}>
-                View Full Leaderboard →
+                {t('viewLeaderboard')} →
               </button>
             </div>
             <div className="leaderboard-list">
@@ -395,7 +496,7 @@ const Dashboard = () => {
                     <div className="progress-fill" style={{width: '87%'}}></div>
                   </div>
                   <p className="leaderboard-description">
-                    Indore leads with 87% recycling participation! Citizens have collectively prevented over 2,450 kg of waste from polluting the environment this month. 🌱
+                    Indore leads with 87% {t('participation')}! 2,450 kg {t('wasteDiverted')}. 🌱
                   </p>
                 </div>
               </div>
@@ -411,7 +512,7 @@ const Dashboard = () => {
                     <div className="progress-fill" style={{width: '76%', background: 'linear-gradient(90deg, #4F46E5 0%, #7C3AED 100%)'}}></div>
                   </div>
                   <p className="leaderboard-description">
-                    Vijaywada residents are making an extraordinary impact! 76% participation has helped recycle 1,890 kg of waste, setting a great example for others. ♻️
+                    Vijaywada 76% {t('participation')}! 1,890 kg {t('wasteDiverted')}. ♻️
                   </p>
                 </div>
               </div>
@@ -427,7 +528,7 @@ const Dashboard = () => {
                     <div className="progress-fill" style={{width: '68%', background: 'linear-gradient(90deg, #F59E0B 0%, #EF4444 100%)'}}></div>
                   </div>
                   <p className="leaderboard-description">
-                    Guntur citizens are leading by example! Their 68% adoption rate has contributed to recycling 1,530 kg of waste, proving that every action counts. 🌍
+                    Guntur 68% {t('participation')}! 1,530 kg {t('wasteDiverted')}. 🌍
                   </p>
                 </div>
               </div>
@@ -435,59 +536,59 @@ const Dashboard = () => {
             </div>
             <div className="view-all-btn-container">
               <button className="view-all-btn-secondary" onClick={() => navigate('/leaderboard')}>
-                See More Cities →
+                {t('seeMoreCities')} →
               </button>
             </div>
           </section>
 
           {/* Trash Disposal Info */}
           <section className="disposal-section animate-slideUp">
-            <h3>♻️ What Happens to Your Trash?</h3>
+            <h3>♻️ {t('whatHappens')}</h3>
             <div className="disposal-grid">
               <div className="disposal-card">
                 <div className="disposal-step">1</div>
                 <div className="disposal-icon">🗑️</div>
-                <h4>Collection</h4>
-                <p>Your waste is collected from our smart dustbins and sorted immediately at the source.</p>
+                <h4>{t('collection')}</h4>
+                <p>{t('collectionDesc')}</p>
               </div>
               
               <div className="disposal-card">
                 <div className="disposal-step">2</div>
                 <div className="disposal-icon">🔄</div>
-                <h4>Recycling</h4>
-                <p>Recyclable materials are sent to certified recycling facilities where they're processed and given new life.</p>
+                <h4>{t('sorting')}</h4>
+                <p>{t('sortingDesc')}</p>
               </div>
               
               <div className="disposal-card">
                 <div className="disposal-step">3</div>
                 <div className="disposal-icon">🌱</div>
-                <h4>Composting</h4>
-                <p>Organic waste is composted and used to enrich soil, creating a circular economy for nutrients.</p>
+                <h4>{t('recycling')}</h4>
+                <p>{t('recyclingDesc')}</p>
               </div>
               
               <div className="disposal-card">
                 <div className="disposal-step">4</div>
                 <div className="disposal-icon">⚡</div>
-                <h4>Energy Recovery</h4>
-                <p>Non-recyclable waste is converted to energy through eco-friendly waste-to-energy processes.</p>
+                <h4>{t('energyRecovery')}</h4>
+                <p>{t('energyRecoveryDesc')}</p>
               </div>
             </div>
             
             <div className="disposal-stats">
               <div className="stats-disclaimer">
-                <p>📊 Note: Statistics shown are placeholder values for demonstration purposes</p>
+                <p>📊 {t('statsNote')}</p>
               </div>
               <div className="disposal-stat">
                 <span className="stat-number">87%</span>
-                <span className="stat-text">Waste Diverted from Landfills</span>
+                <span className="stat-text">{t('wasteFromLandfills')}</span>
               </div>
               <div className="disposal-stat">
                 <span className="stat-number">2,340+</span>
-                <span className="stat-text">Tons Recycled This Month</span>
+                <span className="stat-text">{t('tonsRecycled')}</span>
               </div>
               <div className="disposal-stat">
                 <span className="stat-number">92%</span>
-                <span className="stat-text">Reduction in Harmful Emissions</span>
+                <span className="stat-text">{t('emissionsReduction')}</span>
               </div>
             </div>
           </section>
@@ -500,7 +601,7 @@ const Dashboard = () => {
         <div className="rewards-modal animate-fadeIn" onClick={() => setShowRewards(false)}>
           <div className="rewards-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="rewards-modal-header">
-              <h2>My Rewards</h2>
+              <h2>{t('myRewards')}</h2>
               <button className="close-btn" onClick={() => setShowRewards(false)}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -509,7 +610,7 @@ const Dashboard = () => {
             </div>
 
             <div className="rewards-balance">
-              <span className="balance-label">Available Rewards</span>
+              <span className="balance-label">{t('myRewards')}</span>
               <span className="balance-value">{rewards}</span>
             </div>
 

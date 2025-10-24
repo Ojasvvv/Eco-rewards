@@ -1,6 +1,6 @@
 .leaderboard-page-container {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%);
+  background: var(--background);
 }
 
 .leaderboard-main {
@@ -89,7 +89,7 @@
 }
 
 .leaderboard-item-full {
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 28px;
   box-shadow: var(--shadow-md);
@@ -97,6 +97,7 @@
   gap: 24px;
   align-items: flex-start;
   transition: all 0.3s ease;
+  border: 1px solid var(--border);
 }
 
 .leaderboard-item-full:hover {
@@ -187,10 +188,11 @@
 
 /* Footer Section */
 .leaderboard-footer {
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 40px 32px;
   box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
 }
 
 .leaderboard-footer h3 {
