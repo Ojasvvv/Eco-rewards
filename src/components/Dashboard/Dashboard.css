@@ -1583,6 +1583,17 @@
   padding: 12px 24px;
   border-radius: 50px;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reward-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.reward-badge:active {
+  transform: scale(0.98);
 }
 
 .reward-emoji {

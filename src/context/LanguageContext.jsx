@@ -112,7 +112,7 @@ const translations = {
     // Messages
     thankYouReport: "Thank you for your report!\n\nWe have received your feedback and will address it soon.",
     selectIssueError: "Please select an issue type and provide details.",
-    dailyLimitReached: "Daily limit reached! You can only use dustbins 2 times per day. Come back tomorrow!",
+    dailyLimitReached: "Daily limit reached! You can only use dustbins 5 times per day. Come back tomorrow!",
     enterDustbinCode: "Please enter a dustbin code",
     checkingLocation: "Checking your location...",
     locationVerified: "Location verified. Verifying code...",
@@ -222,7 +222,7 @@ const translations = {
     // Messages
     thankYouReport: "आपकी रिपोर्ट के लिए धन्यवाद!\n\nहमें आपकी प्रतिक्रिया मिल गई है और जल्द ही इसे हल किया जाएगा।",
     selectIssueError: "कृपया समस्या का प्रकार चुनें और विवरण दें।",
-    dailyLimitReached: "दैनिक सीमा पूरी हो गई! आप प्रतिदिन केवल 2 बार डस्टबिन का उपयोग कर सकते हैं। कल वापस आएं!",
+    dailyLimitReached: "दैनिक सीमा पूरी हो गई! आप प्रतिदिन केवल 5 बार डस्टबिन का उपयोग कर सकते हैं। कल वापस आएं!",
     enterDustbinCode: "कृपया डस्टबिन कोड डालें",
     checkingLocation: "आपका स्थान जांचा जा रहा है...",
     locationVerified: "स्थान सत्यापित। कोड जांचा जा रहा है...",
@@ -332,7 +332,7 @@ const translations = {
     // Messages
     thankYouReport: "మీ నివేదిక కోసం ధన్యవాదాలు!\n\nమేము మీ అభిప్రాయాన్ని అందుకున్నాము మరియు త్వరలో దానిని పరిష్కరిస్తాము।",
     selectIssueError: "దయచేసి సమస్య రకాన్ని ఎంచుకోండి మరియు వివరాలు ఇవ్వండి।",
-    dailyLimitReached: "రోజువారీ పరిమితి చేరుకుంది! మీరు రోజుకు కేవలం 2 సార్లు మాత్రమే డస్ట్‌బిన్‌లను ఉపయోగించవచ్చు। రేపు తిరిగి రండి!",
+    dailyLimitReached: "రోజువారీ పరిమితి చేరుకుంది! మీరు రోజుకు కేవలం 5 సార్లు మాత్రమే డస్ట్‌బిన్‌లను ఉపయోగించవచ్చు। రేపు తిరిగి రండి!",
     enterDustbinCode: "దయచేసి డస్ట్‌బిన్ కోడ్ ఎంటర్ చేయండి",
     checkingLocation: "మీ స్థానాన్ని తనిఖీ చేస్తోంది...",
     locationVerified: "స్థానం ధృవీకరించబడింది। కోడ్ తనిఖీ చేస్తోంది...",
@@ -442,7 +442,7 @@ const translations = {
     // Messages
     thankYouReport: "உங்கள் புகாருக்கு நன்றி!\n\nஎங்களுக்கு உங்கள் கருத்து கிடைத்துள்ளது, விரைவில் அதைத் தீர்ப்போம்.",
     selectIssueError: "தயவுசெய்து சிக்கல் வகையைத் தேர்ந்தெடுத்து விவரங்களை வழங்கவும்.",
-    dailyLimitReached: "தினசரி வரம்பு அடைந்தது! நீங்கள் ஒரு நாளைக்கு 2 முறை மட்டுமே டஸ்ட்பின்களைப் பயன்படுத்த முடியும். நாளை மீண்டும் வாருங்கள்!",
+    dailyLimitReached: "தினசரி வரம்பு அடைந்தது! நீங்கள் ஒரு நாளைக்கு 5 முறை மட்டுமே டஸ்ட்பின்களைப் பயன்படுத்த முடியும். நாளை மீண்டும் வாருங்கள்!",
     enterDustbinCode: "தயவுசெய்து டஸ்ட்பின் குறியீட்டை உள்ளிடவும்",
     checkingLocation: "உங்கள் இடத்தைச் சரிபார்க்கிறது...",
     locationVerified: "இடம் சரிபார்க்கப்பட்டது। குறியீடு சரிபார்க்கப்படுகிறது...",

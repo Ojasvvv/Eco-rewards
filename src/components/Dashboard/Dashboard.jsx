@@ -49,7 +49,7 @@ const Dashboard = () => {
     const usage = localStorage.getItem(usageKey);
     const count = usage ? parseInt(usage, 10) : 0;
     
-    if (count >= 2) {
+    if (count >= 5) {
       return false;
     }
     
@@ -807,7 +807,7 @@ const Dashboard = () => {
             <div className="congrats-icon">🎉</div>
             <h2 className="congrats-title">{t('congratulations')}</h2>
             <p className="congrats-message">{t('welcomeReward')}</p>
-            <div className="reward-badge">
+            <div className="reward-badge" onClick={() => setShowCongratsPopup(false)}>
               <span className="reward-emoji">💰</span>
               <span className="reward-points">+10</span>
             </div>
