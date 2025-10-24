@@ -4,13 +4,14 @@ import './Onboarding.css';
 
 const Onboarding = ({ onComplete }) => {
   const { language, changeLanguage, t } = useLanguage();
-  const [currentStep, setCurrentStep] = useState(language ? 1 : 0);
+  // Always start from language selection (step 0) on onboarding
+  const [currentStep, setCurrentStep] = useState(0);
 
   const languages = [
-    { code: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
-    { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
-    { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' }
+    { code: 'en', name: 'English', nativeName: 'English', flag: '🇬🇧' },
+    { code: 'hi', name: 'हिन्दी', nativeName: 'Hindi', flag: '🇮🇳' },
+    { code: 'te', name: 'తెలుగు', nativeName: 'Telugu', flag: '🇮🇳' },
+    { code: 'ta', name: 'தமிழ்', nativeName: 'Tamil', flag: '🇮🇳' }
   ];
 
   const tutorialSteps = [
@@ -140,7 +141,10 @@ const Onboarding = ({ onComplete }) => {
                 className="language-card"
               >
                 <span className="language-flag">{lang.flag}</span>
-                <span className="language-name">{lang.name}</span>
+                <div className="language-names">
+                  <span className="language-name">{lang.name}</span>
+                  <span className="language-name-english">{lang.nativeName}</span>
+                </div>
               </button>
             ))}
           </div>

@@ -58,6 +58,8 @@
   right: 0;
   bottom: 0;
   z-index: 999;
+  /* Allow touch events to pass through on mobile */
+  pointer-events: auto;
 }
 
 .language-dropdown {
@@ -181,6 +183,9 @@
     will-change: scroll-position;
     /* Reduce rendering load */
     contain: layout style paint;
+    /* Ensure touch events work properly */
+    touch-action: pan-y;
+    overscroll-behavior: contain;
   }
 
   .language-option {

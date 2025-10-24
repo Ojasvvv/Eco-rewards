@@ -61,6 +61,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .rewards-btn {
@@ -95,6 +96,13 @@
   padding: 6px 12px 6px 6px;
   background: var(--surface);
   border-radius: 24px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.user-profile:hover {
+  background: var(--primary-light);
 }
 
 .user-avatar {
@@ -103,6 +111,7 @@
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--primary);
+  cursor: pointer;
 }
 
 .user-name {
@@ -131,6 +140,57 @@
 }
 
 .logout-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Profile Menu (Mobile) */
+.profile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 998;
+  display: none;
+}
+
+.profile-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-xl);
+  z-index: 999;
+  min-width: 160px;
+  overflow: hidden;
+  animation: dropdownSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: none;
+}
+
+.profile-menu-logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.profile-menu-logout:hover {
+  background: #fee2e2;
+  color: var(--error);
+}
+
+.profile-menu-logout svg {
   width: 20px;
   height: 20px;
 }
@@ -670,6 +730,39 @@
     display: none;
   }
 
+  .header-right {
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .header-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-logo svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Hide desktop logout button on mobile */
+  .logout-btn {
+    display: none;
+  }
+
+  /* Show profile menu on mobile */
+  .profile-menu-overlay {
+    display: block;
+  }
+
+  .profile-menu {
+    display: block;
+  }
+
+  .user-profile {
+    cursor: pointer;
+  }
+
   .welcome-section h2 {
     font-size: 24px;
   }
@@ -719,14 +812,12 @@
 }
 
 @media (max-width: 480px) {
-  .header-logo {
-    width: 36px;
-    height: 36px;
+  .header-content {
+    padding: 10px 12px;
   }
 
-  .header-logo svg {
-    width: 20px;
-    height: 20px;
+  .header-right {
+    gap: 6px;
   }
 
   .user-avatar {
@@ -735,8 +826,26 @@
   }
 
   .logout-btn, .report-btn, .theme-toggle-btn {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .logout-btn svg, .report-btn svg, .theme-toggle-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .rewards-btn {
+    padding: 8px;
+  }
+
+  .rewards-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .user-profile {
+    padding: 4px 8px 4px 4px;
   }
 
   .welcome-section h2 {
