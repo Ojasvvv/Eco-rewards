@@ -53,10 +53,39 @@
   background-clip: text;
 }
 
+.header-left h1 {
+  cursor: pointer;
+}
+
 .header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+}
+
+.rewards-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.rewards-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.rewards-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
 .user-profile {
@@ -525,6 +554,528 @@
 
   .code-card {
     padding: 20px;
+  }
+}
+
+/* Company Leaderboard Section */
+.leaderboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.leaderboard-section h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.section-subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin-top: -10px;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.leaderboard-item {
+  display: flex;
+  gap: 16px;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+}
+
+.leaderboard-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.leaderboard-rank {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.leaderboard-content {
+  flex: 1;
+}
+
+.leaderboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.leaderboard-header h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.leaderboard-percentage {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--surface);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+
+.leaderboard-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Trash Disposal Section */
+.disposal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.disposal-section h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.disposal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.disposal-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  position: relative;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+}
+
+.disposal-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.disposal-step {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.disposal-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.disposal-card h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.disposal-card p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.disposal-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding: 32px;
+  border-radius: 16px;
+}
+
+.disposal-stat {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-number {
+  font-size: 36px;
+  font-weight: 800;
+  color: white;
+}
+
+.stat-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+/* Rewards Modal */
+.rewards-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.rewards-modal-content {
+  background: white;
+  border-radius: 24px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+}
+
+.rewards-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border);
+}
+
+.rewards-modal-header h2 {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.close-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-secondary);
+}
+
+.close-btn:hover {
+  background: #fee2e2;
+  color: var(--error);
+}
+
+.close-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.rewards-balance {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding: 24px 32px;
+  border-radius: 16px;
+  margin-bottom: 32px;
+}
+
+.balance-label {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+.balance-value {
+  font-size: 48px;
+  font-weight: 800;
+  color: white;
+}
+
+.coupons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.coupon-card {
+  background: white;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.coupon-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.coupon-card.dominos {
+  border-color: #0078AE;
+}
+
+.coupon-card.starbucks {
+  border-color: #00704A;
+}
+
+.coupon-card.mcdonalds {
+  border-color: #FFC72C;
+}
+
+.coupon-card.kfc {
+  border-color: #E4002B;
+}
+
+.coupon-card.subway {
+  border-color: #008C15;
+}
+
+.coupon-card.pizzahut {
+  border-color: #EE3124;
+}
+
+.coupon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.coupon-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo {
+  font-size: 32px;
+}
+
+.coupon-brand h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.coupon-cost {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--surface);
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.coupon-offer {
+  text-align: center;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: 12px;
+}
+
+.offer-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.offer-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.redeem-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.redeem-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.redeem-btn:disabled {
+  background: var(--border);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+/* Mobile specific ordering */
+@media (max-width: 768px) {
+  .dashboard-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .welcome-section {
+    order: 1;
+  }
+
+  .code-section {
+    order: 2;
+  }
+
+  .stats-grid {
+    order: 3;
+  }
+
+  .leaderboard-section {
+    order: 4;
+  }
+
+  .disposal-section {
+    order: 5;
+  }
+
+  .activity-section {
+    order: 6;
+  }
+
+  .rewards-btn-text {
+    display: none;
+  }
+
+  .rewards-btn {
+    padding: 10px;
+  }
+
+  .rewards-modal-content {
+    padding: 24px 20px;
+  }
+
+  .rewards-balance {
+    padding: 20px 24px;
+  }
+
+  .balance-value {
+    font-size: 36px;
+  }
+
+  .coupons-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .leaderboard-section h3,
+  .disposal-section h3 {
+    font-size: 20px;
+  }
+
+  .section-subtitle {
+    font-size: 14px;
+  }
+
+  .disposal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .disposal-stats {
+    grid-template-columns: 1fr;
+    padding: 24px;
+  }
+
+  .stat-number {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaderboard-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .leaderboard-rank {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .leaderboard-header {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .rewards-modal-content {
+    padding: 20px 16px;
+  }
+
+  .rewards-modal-header h2 {
+    font-size: 24px;
+  }
+
+  .rewards-balance {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .balance-value {
+    font-size: 32px;
   }
 }
 
