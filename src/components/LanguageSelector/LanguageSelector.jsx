@@ -27,7 +27,6 @@ const LanguageSelector = () => {
         onClick={() => setIsOpen(!isOpen)}
         title="Change Language"
       >
-        <span className="lang-flag">{currentLang.flag}</span>
         <span className="lang-code">{currentLang.code.toUpperCase()}</span>
         <svg 
           className={`chevron ${isOpen ? 'open' : ''}`} 
@@ -49,7 +48,6 @@ const LanguageSelector = () => {
                 className={`language-option ${lang.code === language ? 'active' : ''}`}
                 onClick={() => handleSelect(lang.code)}
               >
-                <span className="option-flag">{lang.flag}</span>
                 <div className="option-text">
                   <span className="option-native">{lang.nativeName}</span>
                   <span className="option-name">{lang.name}</span>
