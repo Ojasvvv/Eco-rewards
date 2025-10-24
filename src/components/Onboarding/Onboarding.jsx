@@ -115,7 +115,7 @@ const Onboarding = ({ onComplete }) => {
   };
 
   const handleComplete = () => {
-    localStorage.setItem('onboardingComplete', 'true');
+    // Don't save to localStorage anymore - we want to show it every session
     onComplete();
   };
 

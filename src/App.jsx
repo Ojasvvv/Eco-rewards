@@ -14,15 +14,19 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user has completed onboarding
-    const onboardingComplete = localStorage.getItem('onboardingComplete');
-    if (!onboardingComplete) {
+    // Clear old localStorage flag if it exists
+    localStorage.removeItem('onboardingComplete');
+    
+    // Check if user should see onboarding (session-based, shows after every login)
+    const shouldShowOnboarding = sessionStorage.getItem('shouldShowOnboarding');
+    if (shouldShowOnboarding === 'true') {
       setShowOnboarding(true);
     }
     setIsLoading(false);
   }, []);
 
   const handleOnboardingComplete = () => {
+    sessionStorage.removeItem('shouldShowOnboarding');
     setShowOnboarding(false);
   };
 

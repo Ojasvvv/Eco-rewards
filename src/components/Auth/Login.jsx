@@ -23,7 +23,10 @@ const Login = () => {
       setError('');
       setLoading(true);
       await signInWithGoogle();
-      navigate('/dashboard');
+      // Set flag to show onboarding after login
+      sessionStorage.setItem('shouldShowOnboarding', 'true');
+      // Reload to show onboarding
+      window.location.href = '/dashboard';
     } catch (error) {
       setError('Failed to sign in. Please try again.');
       console.error(error);
