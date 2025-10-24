@@ -7,10 +7,10 @@ const LanguageSelector = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const languages = [
-    { code: 'en', name: 'English', nativeName: 'English', flag: '🇬🇧' },
-    { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳' },
-    { code: 'te', name: 'Telugu', nativeName: 'తెలుగు', flag: '🇮🇳' },
-    { code: 'ta', name: 'Tamil', nativeName: 'தமிழ்', flag: '🇮🇳' }
+    { code: 'en', name: 'English', nativeName: 'English', flag: 'GB' },
+    { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: 'IN' },
+    { code: 'te', name: 'Telugu', nativeName: 'తెలుగు', flag: 'IN' },
+    { code: 'ta', name: 'Tamil', nativeName: 'தமிழ்', flag: 'IN' }
   ];
 
   const currentLang = languages.find(lang => lang.code === language) || languages[0];

@@ -364,7 +364,7 @@ const Dashboard = () => {
               </div>
               <div className="stat-info">
                 <p className="stat-label">{t('myRewards')}</p>
-                <p className="stat-value">{rewards}</p>
+                <p className="stat-value">{rewards} {t('points')}</p>
               </div>
             </div>
 
@@ -611,7 +611,7 @@ const Dashboard = () => {
 
             <div className="rewards-balance">
               <span className="balance-label">{t('myRewards')}</span>
-              <span className="balance-value">{rewards}</span>
+              <span className="balance-value">{rewards} {t('points')}</span>
             </div>
 
             <div className="coupons-grid">

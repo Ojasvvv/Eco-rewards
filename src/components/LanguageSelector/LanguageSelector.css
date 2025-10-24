@@ -26,7 +26,13 @@
 }
 
 .lang-flag {
-  font-size: 18px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 6px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
 }
 
 .lang-code {
@@ -103,7 +109,13 @@
 }
 
 .option-flag {
-  font-size: 24px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
   flex-shrink: 0;
 }
 
@@ -139,12 +151,16 @@
   }
 
   .lang-flag {
-    font-size: 16px;
+    font-size: 11px;
+    padding: 2px 4px;
   }
 
   .language-dropdown {
     right: 0;
     left: auto;
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
