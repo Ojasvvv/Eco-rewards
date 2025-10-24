@@ -32,6 +32,7 @@ const Dashboard = () => {
     return saved ? JSON.parse(saved) : {};
   });
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showCongratsPopup, setShowCongratsPopup] = useState(false);
 
   // Save rewards to localStorage whenever they change
   useEffect(() => {
@@ -157,9 +158,13 @@ const Dashboard = () => {
       setSuccess(`🎉 ${t('success')}! ${t('earnedPoints')} ${pointsEarned} ${t('points')}!`);
       setDustbinCode('');
       
+      // Show congratulations popup
+      setShowCongratsPopup(true);
+      
       setTimeout(() => {
         setSuccess('');
         setCurrentStep('');
+        setShowCongratsPopup(false);
       }, 4000);
       
     } catch (err) {
@@ -790,6 +795,21 @@ const Dashboard = () => {
                   {rewards >= 35 ? 'Redeem Now' : `Need ${35 - rewards} more points`}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Congratulations Popup */}
+      {showCongratsPopup && (
+        <div className="congrats-popup-overlay" onClick={() => setShowCongratsPopup(false)}>
+          <div className="congrats-popup" onClick={(e) => e.stopPropagation()}>
+            <div className="congrats-icon">🎉</div>
+            <h2 className="congrats-title">{t('congratulations')}</h2>
+            <p className="congrats-message">{t('welcomeReward')}</p>
+            <div className="reward-badge">
+              <span className="reward-emoji">💰</span>
+              <span className="reward-points">+10</span>
             </div>
           </div>
         </div>

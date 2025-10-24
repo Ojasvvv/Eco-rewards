@@ -145,7 +145,7 @@ const Login = () => {
             </div>
 
             <p className="privacy-text">
-              By continuing, you agree to help make the world a cleaner place. Your data is secure and never shared.
+              By continuing, you agree to help make the world a cleaner place.
             </p>
           </div>
         </div>

@@ -35,9 +35,25 @@ const Onboarding = ({ onComplete }) => {
       )
     },
     {
-      icon: '🗑️',
+      icon: '⌨️',
       title: 'tutorialStep2Title',
       description: 'tutorialStep2Desc',
+      illustration: (
+        <div className="illustration">
+          <div className="code-input-animation">
+            <div className="input-field">
+              <div className="input-text">DBN001</div>
+              <div className="cursor-blink"></div>
+            </div>
+            <div className="keyboard-icon">⌨️</div>
+          </div>
+        </div>
+      )
+    },
+    {
+      icon: '🗑️',
+      title: 'tutorialStep3Title',
+      description: 'tutorialStep3Desc',
       illustration: (
         <div className="illustration">
           <div className="dustbin-animation">
@@ -54,8 +70,8 @@ const Onboarding = ({ onComplete }) => {
     },
     {
       icon: '🎁',
-      title: 'tutorialStep3Title',
-      description: 'tutorialStep3Desc',
+      title: 'tutorialStep4Title',
+      description: 'tutorialStep4Desc',
       illustration: (
         <div className="illustration">
           <div className="rewards-animation">
@@ -76,8 +92,8 @@ const Onboarding = ({ onComplete }) => {
     },
     {
       icon: '🌍',
-      title: 'tutorialStep4Title',
-      description: 'tutorialStep4Desc',
+      title: 'tutorialStep5Title',
+      description: 'tutorialStep5Desc',
       illustration: (
         <div className="illustration">
           <div className="impact-animation">
