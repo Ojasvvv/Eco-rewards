@@ -24,22 +24,38 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Set persistence to LOCAL (cached in browser)
-    setPersistence(auth, browserLocalPersistence)
-      .then(() => {
+    let unsubscribe;
+    
+    // Set persistence FIRST, then listen for auth changes
+    const initAuth = async () => {
+      try {
+        // Set persistence to LOCAL (cached in browser)
+        await setPersistence(auth, browserLocalPersistence);
         console.log('Auth persistence set to LOCAL');
-      })
-      .catch((error) => {
+        
+        // Now listen for auth state changes
+        unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+          console.log('Auth state changed:', currentUser ? 'User logged in' : 'No user');
+          setUser(currentUser);
+          setLoading(false);
+        });
+      } catch (error) {
         console.error('Error setting persistence:', error);
-      });
+        // Still set up the listener even if persistence fails
+        unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+          setUser(currentUser);
+          setLoading(false);
+        });
+      }
+    };
 
-    // Listen for auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
+    initAuth();
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   const signInWithGoogle = async () => {
