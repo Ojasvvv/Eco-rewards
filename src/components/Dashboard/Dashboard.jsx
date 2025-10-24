@@ -372,12 +372,12 @@ const Dashboard = () => {
             </div>
           </section>
 
-          {/* Company Leaderboard Preview */}
+          {/* City Leaderboard Preview */}
           <section className="leaderboard-preview animate-slideUp">
             <div className="leaderboard-preview-header">
               <div className="leaderboard-title-section">
-                <h3>🌍 Companies Making a Difference</h3>
-                <p className="section-subtitle">See which brands are leading the sustainability revolution</p>
+                <h3>🌍 Cities Making a Difference</h3>
+                <p className="section-subtitle">See which cities are leading the sustainability revolution</p>
               </div>
               <button className="view-all-btn" onClick={() => navigate('/leaderboard')}>
                 View Full Leaderboard →
@@ -388,14 +388,14 @@ const Dashboard = () => {
                 <div className="leaderboard-rank">1</div>
                 <div className="leaderboard-content">
                   <div className="leaderboard-header">
-                    <h4>🍕 Domino's Pizza</h4>
-                    <span className="leaderboard-percentage">60%</span>
+                    <h4>🏙️ Indore</h4>
+                    <span className="leaderboard-percentage">87%</span>
                   </div>
                   <div className="progress-bar">
-                    <div className="progress-fill" style={{width: '60%'}}></div>
+                    <div className="progress-fill" style={{width: '87%'}}></div>
                   </div>
                   <p className="leaderboard-description">
-                    60% of Domino's customers are using EcoRewards! Their collective effort has prevented over 850 kg of waste from polluting our environment this month. 🌱
+                    Indore leads with 87% recycling participation! Citizens have collectively prevented over 2,450 kg of waste from polluting the environment this month. 🌱
                   </p>
                 </div>
               </div>
@@ -404,14 +404,14 @@ const Dashboard = () => {
                 <div className="leaderboard-rank">2</div>
                 <div className="leaderboard-content">
                   <div className="leaderboard-header">
-                    <h4>☕ Starbucks</h4>
-                    <span className="leaderboard-percentage">48%</span>
+                    <h4>🏙️ Vijaywada</h4>
+                    <span className="leaderboard-percentage">76%</span>
                   </div>
                   <div className="progress-bar">
-                    <div className="progress-fill" style={{width: '48%', background: 'linear-gradient(90deg, #00704A 0%, #008248 100%)'}}></div>
+                    <div className="progress-fill" style={{width: '76%', background: 'linear-gradient(90deg, #4F46E5 0%, #7C3AED 100%)'}}></div>
                   </div>
                   <p className="leaderboard-description">
-                    Starbucks patrons are making an extraordinary impact! 48% participation has helped recycle 680 kg of waste, proving that every cup counts. ♻️
+                    Vijaywada residents are making an extraordinary impact! 76% participation has helped recycle 1,890 kg of waste, setting a great example for others. ♻️
                   </p>
                 </div>
               </div>
@@ -420,14 +420,14 @@ const Dashboard = () => {
                 <div className="leaderboard-rank">3</div>
                 <div className="leaderboard-content">
                   <div className="leaderboard-header">
-                    <h4>🍔 McDonald's</h4>
-                    <span className="leaderboard-percentage">42%</span>
+                    <h4>🏙️ Guntur</h4>
+                    <span className="leaderboard-percentage">68%</span>
                   </div>
                   <div className="progress-bar">
-                    <div className="progress-fill" style={{width: '42%', background: 'linear-gradient(90deg, #FFC72C 0%, #DA291C 100%)'}}></div>
+                    <div className="progress-fill" style={{width: '68%', background: 'linear-gradient(90deg, #F59E0B 0%, #EF4444 100%)'}}></div>
                   </div>
                   <p className="leaderboard-description">
-                    McDonald's customers are leading by example! Their 42% adoption rate demonstrates that fast food can go hand-in-hand with environmental responsibility. 🌍
+                    Guntur citizens are leading by example! Their 68% adoption rate has contributed to recycling 1,530 kg of waste, proving that every action counts. 🌍
                   </p>
                 </div>
               </div>
@@ -435,7 +435,7 @@ const Dashboard = () => {
             </div>
             <div className="view-all-btn-container">
               <button className="view-all-btn-secondary" onClick={() => navigate('/leaderboard')}>
-                See More Companies →
+                See More Cities →
               </button>
             </div>
           </section>

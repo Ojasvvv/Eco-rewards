@@ -16,76 +16,90 @@ const Leaderboard = () => {
     }
   };
 
-  const companies = [
+  const cities = [
     {
       rank: 1,
-      name: "🍕 Domino's Pizza",
-      percentage: 60,
-      waste: "850 kg",
-      gradient: 'linear-gradient(90deg, #0078AE 0%, #005A87 100%)'
+      name: "🏙️ Indore",
+      percentage: 87,
+      waste: "2,450 kg",
+      gradient: 'linear-gradient(90deg, #10b981 0%, #059669 100%)'
     },
     {
       rank: 2,
-      name: "☕ Starbucks",
-      percentage: 48,
-      waste: "680 kg",
-      gradient: 'linear-gradient(90deg, #00704A 0%, #008248 100%)'
+      name: "🏙️ Vijaywada",
+      percentage: 76,
+      waste: "1,890 kg",
+      gradient: 'linear-gradient(90deg, #4F46E5 0%, #7C3AED 100%)'
     },
     {
       rank: 3,
-      name: "🍔 McDonald's",
-      percentage: 42,
-      waste: "590 kg",
-      gradient: 'linear-gradient(90deg, #FFC72C 0%, #DA291C 100%)'
+      name: "🏙️ Guntur",
+      percentage: 68,
+      waste: "1,530 kg",
+      gradient: 'linear-gradient(90deg, #F59E0B 0%, #EF4444 100%)'
     },
     {
       rank: 4,
-      name: "🍗 KFC",
-      percentage: 35,
-      waste: "480 kg",
-      gradient: 'linear-gradient(90deg, #E4002B 0%, #F40009 100%)'
+      name: "🏙️ Pune",
+      percentage: 62,
+      waste: "1,380 kg",
+      gradient: 'linear-gradient(90deg, #0EA5E9 0%, #0284C7 100%)'
     },
     {
       rank: 5,
-      name: "🥪 Subway",
-      percentage: 31,
-      waste: "420 kg",
-      gradient: 'linear-gradient(90deg, #008C15 0%, #006B11 100%)'
+      name: "🏙️ Surat",
+      percentage: 58,
+      waste: "1,215 kg",
+      gradient: 'linear-gradient(90deg, #EC4899 0%, #DB2777 100%)'
     },
     {
       rank: 6,
-      name: "🍕 Pizza Hut",
-      percentage: 28,
-      waste: "375 kg",
-      gradient: 'linear-gradient(90deg, #EE3124 0%, #C41E3A 100%)'
+      name: "🏙️ Bhopal",
+      percentage: 54,
+      waste: "1,120 kg",
+      gradient: 'linear-gradient(90deg, #8B5CF6 0%, #7C3AED 100%)'
     },
     {
       rank: 7,
-      name: "🍟 Burger King",
-      percentage: 25,
-      waste: "340 kg",
-      gradient: 'linear-gradient(90deg, #EC1C24 0%, #F5A623 100%)'
+      name: "🏙️ Chandigarh",
+      percentage: 51,
+      waste: "980 kg",
+      gradient: 'linear-gradient(90deg, #14B8A6 0%, #0D9488 100%)'
     },
     {
       rank: 8,
-      name: "🌮 Taco Bell",
-      percentage: 22,
-      waste: "295 kg",
-      gradient: 'linear-gradient(90deg, #702082 0%, #A77BCA 100%)'
+      name: "🏙️ Coimbatore",
+      percentage: 47,
+      waste: "865 kg",
+      gradient: 'linear-gradient(90deg, #F97316 0%, #EA580C 100%)'
     },
     {
       rank: 9,
-      name: "☕ Dunkin'",
-      percentage: 19,
-      waste: "260 kg",
-      gradient: 'linear-gradient(90deg, #FF6600 0%, #DD0031 100%)'
+      name: "🏙️ Mysore",
+      percentage: 43,
+      waste: "750 kg",
+      gradient: 'linear-gradient(90deg, #06B6D4 0%, #0891B2 100%)'
     },
     {
       rank: 10,
-      name: "🍕 Papa John's",
-      percentage: 16,
-      waste: "215 kg",
-      gradient: 'linear-gradient(90deg, #CE0E2D 0%, #009639 100%)'
+      name: "🏙️ Jaipur",
+      percentage: 39,
+      waste: "690 kg",
+      gradient: 'linear-gradient(90deg, #A855F7 0%, #9333EA 100%)'
+    },
+    {
+      rank: 11,
+      name: "🏙️ Vadodara",
+      percentage: 36,
+      waste: "625 kg",
+      gradient: 'linear-gradient(90deg, #22C55E 0%, #16A34A 100%)'
+    },
+    {
+      rank: 12,
+      name: "🏙️ Nagpur",
+      percentage: 33,
+      waste: "570 kg",
+      gradient: 'linear-gradient(90deg, #EAB308 0%, #CA8A04 100%)'
     }
   ];
 
@@ -136,56 +150,56 @@ const Leaderboard = () => {
       {/* Main Content */}
       <main className="leaderboard-main">
         <div className="leaderboard-hero">
-          <h1>🌍 Company Sustainability Leaderboard</h1>
-          <p>Celebrating brands whose customers are making the biggest environmental impact</p>
+          <h1>🌍 City Sustainability Leaderboard</h1>
+          <p>Celebrating cities whose citizens are making the biggest environmental impact</p>
           <div className="hero-stats">
             <div className="hero-stat">
-              <span className="hero-stat-value">3,455 kg</span>
+              <span className="hero-stat-value">14,065 kg</span>
               <span className="hero-stat-label">Waste Recycled This Month</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-value">10,240</span>
+              <span className="hero-stat-value">28,540</span>
               <span className="hero-stat-label">Active Users</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-value">156</span>
+              <span className="hero-stat-value">487</span>
               <span className="hero-stat-label">Smart Dustbins</span>
             </div>
           </div>
         </div>
 
         <div className="leaderboard-content">
-          {companies.map((company, index) => (
-            <div key={company.rank} className={`leaderboard-item-full ${index < 3 ? 'top-three' : ''}`}>
+          {cities.map((city, index) => (
+            <div key={city.rank} className={`leaderboard-item-full ${index < 3 ? 'top-three' : ''}`}>
               <div className="rank-badge">
-                <span className="rank-number">#{company.rank}</span>
+                <span className="rank-number">#{city.rank}</span>
                 {index === 0 && <span className="rank-medal">🥇</span>}
                 {index === 1 && <span className="rank-medal">🥈</span>}
                 {index === 2 && <span className="rank-medal">🥉</span>}
               </div>
               
               <div className="company-info">
-                <h3>{company.name}</h3>
+                <h3>{city.name}</h3>
                 <div className="company-stats-grid">
                   <div className="company-stat">
                     <span className="stat-label">Participation</span>
-                    <span className="stat-value-large">{company.percentage}%</span>
+                    <span className="stat-value-large">{city.percentage}%</span>
                   </div>
                   <div className="company-stat">
                     <span className="stat-label">Waste Diverted</span>
-                    <span className="stat-value-large">{company.waste}</span>
+                    <span className="stat-value-large">{city.waste}</span>
                   </div>
                 </div>
                 
                 <div className="progress-bar-large">
-                  <div className="progress-fill-large" style={{width: `${company.percentage}%`, background: company.gradient}}></div>
+                  <div className="progress-fill-large" style={{width: `${city.percentage}%`, background: city.gradient}}></div>
                 </div>
                 
                 <p className="company-impact">
-                  {company.percentage >= 50 ? `🌟 Outstanding! ${company.name.split(' ')[1]} customers are environmental champions!` :
-                   company.percentage >= 35 ? `💚 Impressive! ${company.name.split(' ')[1]} community is making a real difference!` :
-                   company.percentage >= 25 ? `👏 Great progress! ${company.name.split(' ')[1]} is building sustainability momentum!` :
-                   `🌱 Growing strong! ${company.name.split(' ')[1]} is on the path to sustainability!`}
+                  {city.percentage >= 70 ? `🌟 Outstanding! ${city.name.split(' ')[1]} citizens are environmental champions!` :
+                   city.percentage >= 50 ? `💚 Impressive! ${city.name.split(' ')[1]} community is making a real difference!` :
+                   city.percentage >= 40 ? `👏 Great progress! ${city.name.split(' ')[1]} is building sustainability momentum!` :
+                   `🌱 Growing strong! ${city.name.split(' ')[1]} is on the path to sustainability!`}
                 </p>
               </div>
             </div>
@@ -197,19 +211,18 @@ const Leaderboard = () => {
           <div className="footer-cards">
             <div className="footer-card">
               <div className="footer-icon">🌍</div>
-              <h4>Outlets Benefit</h4>
-              <p>Customers return more often to outlets with EcoRewards dustbins, increasing foot traffic and sales by an average of 12%.</p>
+              <h4>Cities Thrive</h4>
+              <p>Cities with high EcoRewards participation see cleaner streets, reduced pollution, and improved quality of life for all residents.</p>
             </div>
             <div className="footer-card">
               <div className="footer-icon">♻️</div>
               <h4>Real Impact</h4>
-              <p>Every kilogram of waste recycled prevents harmful methane emissions and reduces landfill pollution.</p>
+              <p>Every kilogram of waste recycled prevents harmful methane emissions and reduces landfill pollution, making our cities healthier.</p>
             </div>
             <div className="footer-card">
               <div className="footer-icon">🎁</div>
-              <div className="footer-icon">🎁</div>
               <h4>Win-Win Model</h4>
-              <p>Customers get rewards at the same outlet where they recycled, driving repeat business while saving the planet.</p>
+              <p>Citizens get rewards at local outlets while helping their city become cleaner and more sustainable for future generations.</p>
             </div>
           </div>
         </div>
