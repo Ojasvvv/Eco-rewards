@@ -222,7 +222,7 @@ const Leaderboard = () => {
             <div className="footer-card">
               <div className="footer-icon">🎁</div>
               <h4>Win-Win Model</h4>
-              <p>Citizens get rewards at local outlets while helping their city become cleaner and more sustainable for future generations.</p>
+              <p>Citizens get rewards by using smart dustbins in public places while helping their city become cleaner and more sustainable for future generations.</p>
             </div>
           </div>
         </div>
