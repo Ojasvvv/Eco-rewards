@@ -72,6 +72,13 @@
   min-width: 200px;
   overflow: hidden;
   animation: dropdownSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Performance optimizations for smooth scrolling */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
 }
 
 @keyframes dropdownSlide {
@@ -94,9 +101,13 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
   text-align: left;
   color: var(--text-primary);
+  /* Performance optimizations */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: background-color;
 }
 
 .language-option:hover {
@@ -160,7 +171,25 @@
     left: auto;
     max-height: 60vh;
     overflow-y: auto;
+    overflow-x: hidden;
+    /* Enhanced smooth scrolling for mobile */
     -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    /* Force GPU acceleration */
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    will-change: scroll-position;
+    /* Reduce rendering load */
+    contain: layout style paint;
+  }
+
+  .language-option {
+    /* Reduce transition cost on mobile */
+    transition: background-color 0.15s ease;
+  }
+  
+  .language-option:active {
+    background: var(--primary-light);
   }
 }
 
