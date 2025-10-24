@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import Login from './components/Auth/Login';
 import Dashboard from './components/Dashboard/Dashboard';
+import Leaderboard from './components/Leaderboard/Leaderboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -16,6 +17,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/leaderboard" 
+            element={
+              <ProtectedRoute>
+                <Leaderboard />
               </ProtectedRoute>
             } 
           />

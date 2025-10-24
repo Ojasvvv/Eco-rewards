@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
@@ -10,10 +10,42 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
-  const [rewards, setRewards] = useState(0); // In real app, fetch from database
-  const [currentStep, setCurrentStep] = useState(''); // Track flow: location → opening → validating → rewarded
+  const [rewards, setRewards] = useState(() => {
+    // Load rewards from localStorage
+    const saved = localStorage.getItem(`rewards_${user?.uid}`);
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  const [currentStep, setCurrentStep] = useState('');
   const [userLocation, setUserLocation] = useState(null);
   const [showRewards, setShowRewards] = useState(false);
+  const [outletRewards, setOutletRewards] = useState(() => {
+    // Load outlet-specific rewards from localStorage
+    const saved = localStorage.getItem(`outlet_rewards_${user?.uid}`);
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  // Save rewards to localStorage whenever they change
+  useEffect(() => {
+    if (user?.uid) {
+      localStorage.setItem(`rewards_${user.uid}`, rewards.toString());
+      localStorage.setItem(`outlet_rewards_${user.uid}`, JSON.stringify(outletRewards));
+    }
+  }, [rewards, outletRewards, user]);
+
+  // Check daily usage limit
+  const checkDailyLimit = () => {
+    const today = new Date().toDateString();
+    const usageKey = `usage_${user?.uid}_${today}`;
+    const usage = localStorage.getItem(usageKey);
+    const count = usage ? parseInt(usage, 10) : 0;
+    
+    if (count >= 2) {
+      return false;
+    }
+    
+    localStorage.setItem(usageKey, (count + 1).toString());
+    return true;
+  };
 
   const handleLogout = async () => {
     try {
@@ -32,6 +64,12 @@ const Dashboard = () => {
       return;
     }
 
+    // Check daily limit
+    if (!checkDailyLimit()) {
+      setError('❌ Daily limit reached! You can only use dustbins 2 times per day. Come back tomorrow! 🌟');
+      return;
+    }
+
     setError('');
     setSuccess('');
     setLoading(true);
@@ -45,7 +83,8 @@ const Dashboard = () => {
       
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simulate dustbin location (in real app, fetch from API)
+      // Simulate dustbin location and get outlet info (in real app, fetch from API)
+      const dustbinInfo = getDustbinInfo(dustbinCode);
       const dustbinLocation = { lat: location.lat + 0.0001, lng: location.lng + 0.0001 };
       const distance = calculateDistance(location, dustbinLocation);
       
@@ -56,12 +95,12 @@ const Dashboard = () => {
         return;
       }
       
-      setSuccess(`📍 You are at ${location.name || 'your location'}. Verifying code...`);
+      setSuccess(`📍 Location verified. Verifying code...`);
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Step 2: Open dustbin
       setCurrentStep('opening');
-      setSuccess('🔓 Dustbin opened! Please deposit your trash.');
+      setSuccess(`🔓 Smart dustbin opened! Please deposit your trash.`);
       await new Promise(resolve => setTimeout(resolve, 3000));
       
       // Step 3: Validate trash deposit
@@ -72,16 +111,24 @@ const Dashboard = () => {
       setSuccess('✅ Trash validated successfully!');
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Step 4: Credit rewards
+      // Step 4: Credit rewards FOR THIS SPECIFIC OUTLET
       setCurrentStep('rewarded');
-      setRewards(prev => prev + 10);
-      setSuccess('🎉 Congratulations! You earned 10 rewards!');
+      const pointsEarned = 10;
+      setRewards(prev => prev + pointsEarned);
+      
+      // Track outlet-specific rewards
+      setOutletRewards(prev => ({
+        ...prev,
+        [dustbinInfo.outletId]: (prev[dustbinInfo.outletId] || 0) + pointsEarned
+      }));
+      
+      setSuccess(`🎉 Congratulations! You earned ${pointsEarned} rewards! Redeem them for coupons.`);
       setDustbinCode('');
       
       setTimeout(() => {
         setSuccess('');
         setCurrentStep('');
-      }, 3000);
+      }, 4000);
       
     } catch (err) {
       if (err.message === 'location_denied') {
@@ -94,6 +141,21 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Simulate getting dustbin info (in real app, fetch from backend)
+  const getDustbinInfo = (code) => {
+    const outlets = {
+      'DOM': { outlet: "Domino's Pizza", outletId: 'dominos' },
+      'SBX': { outlet: "Starbucks", outletId: 'starbucks' },
+      'MCD': { outlet: "McDonald's", outletId: 'mcdonalds' },
+      'KFC': { outlet: "KFC", outletId: 'kfc' },
+      'SUB': { outlet: "Subway", outletId: 'subway' },
+      'PHT': { outlet: "Pizza Hut", outletId: 'pizzahut' }
+    };
+    
+    const prefix = code.substring(0, 3).toUpperCase();
+    return outlets[prefix] || { outlet: "Partner Store", outletId: 'general' };
   };
 
   const getUserLocation = () => {
@@ -222,8 +284,8 @@ const Dashboard = () => {
                 </svg>
               </div>
               <div className="stat-info">
-                <p className="stat-label">Active Rewards</p>
-                <p className="stat-value">{Math.floor(rewards / 50)}</p>
+                <p className="stat-label">Redeemable Rewards</p>
+                <p className="stat-value">{Math.floor(rewards / 10)}</p>
               </div>
             </div>
           </div>
@@ -296,19 +358,31 @@ const Dashboard = () => {
               <div className="code-help">
                 <p>💡 <strong>How it works:</strong></p>
                 <ol>
+                  <li>Find an EcoRewards smart dustbin in public places (malls, food courts, etc.)</li>
                   <li>Scan the QR code on the dustbin</li>
-                  <li>Enter the code shown</li>
+                  <li>Enter the dustbin code shown (e.g., ECO-12345)</li>
+                  <li>Be within 100m of the dustbin location</li>
                   <li>Deposit your trash when the lid opens</li>
-                  <li>Earn reward points instantly!</li>
+                  <li>Earn 10 rewards instantly!</li>
                 </ol>
+                <p className="code-help-highlight">
+                  ⚠️ Strict Limit: Maximum 2 dustbin uses per day per user
+                </p>
               </div>
             </div>
           </section>
 
-          {/* Company Leaderboard */}
-          <section className="leaderboard-section animate-slideUp">
-            <h3>🌍 Companies Making a Difference</h3>
-            <p className="section-subtitle">See which brands are leading the sustainability revolution</p>
+          {/* Company Leaderboard Preview */}
+          <section className="leaderboard-preview animate-slideUp">
+            <div className="leaderboard-preview-header">
+              <div className="leaderboard-title-section">
+                <h3>🌍 Companies Making a Difference</h3>
+                <p className="section-subtitle">See which brands are leading the sustainability revolution</p>
+              </div>
+              <button className="view-all-btn" onClick={() => navigate('/leaderboard')}>
+                View Full Leaderboard →
+              </button>
+            </div>
             <div className="leaderboard-list">
               <div className="leaderboard-item">
                 <div className="leaderboard-rank">1</div>
@@ -321,7 +395,7 @@ const Dashboard = () => {
                     <div className="progress-fill" style={{width: '60%'}}></div>
                   </div>
                   <p className="leaderboard-description">
-                    60% of Domino's customers are using EcoRewards and actively contributing to a cleaner planet! Their collective effort has prevented over 2,500 kg of waste from polluting our environment. 🌱
+                    60% of Domino's customers are using EcoRewards! Their collective effort has prevented over 850 kg of waste from polluting our environment this month. 🌱
                   </p>
                 </div>
               </div>
@@ -337,7 +411,7 @@ const Dashboard = () => {
                     <div className="progress-fill" style={{width: '48%', background: 'linear-gradient(90deg, #00704A 0%, #008248 100%)'}}></div>
                   </div>
                   <p className="leaderboard-description">
-                    Starbucks patrons are making an extraordinary impact! 48% participation has helped recycle 1,800 kg of waste, proving that every cup can contribute to sustainability. ♻️
+                    Starbucks patrons are making an extraordinary impact! 48% participation has helped recycle 680 kg of waste, proving that every cup counts. ♻️
                   </p>
                 </div>
               </div>
@@ -358,21 +432,11 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="leaderboard-item">
-                <div className="leaderboard-rank">4</div>
-                <div className="leaderboard-content">
-                  <div className="leaderboard-header">
-                    <h4>🍗 KFC</h4>
-                    <span className="leaderboard-percentage">35%</span>
-                  </div>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{width: '35%', background: 'linear-gradient(90deg, #E4002B 0%, #F40009 100%)'}}></div>
-                  </div>
-                  <p className="leaderboard-description">
-                    KFC's community is making waves in sustainability! 35% participation shows their customers care about the planet as much as great taste. 🌟
-                  </p>
-                </div>
-              </div>
+            </div>
+            <div className="view-all-btn-container">
+              <button className="view-all-btn-secondary" onClick={() => navigate('/leaderboard')}>
+                See More Companies →
+              </button>
             </div>
           </section>
 
@@ -410,48 +474,24 @@ const Dashboard = () => {
             </div>
             
             <div className="disposal-stats">
+              <div className="stats-disclaimer">
+                <p>📊 Note: Statistics shown are placeholder values for demonstration purposes</p>
+              </div>
               <div className="disposal-stat">
-                <span className="stat-number">98%</span>
+                <span className="stat-number">87%</span>
                 <span className="stat-text">Waste Diverted from Landfills</span>
               </div>
               <div className="disposal-stat">
-                <span className="stat-number">5000+</span>
+                <span className="stat-number">2,340+</span>
                 <span className="stat-text">Tons Recycled This Month</span>
               </div>
               <div className="disposal-stat">
-                <span className="stat-number">Zero</span>
-                <span className="stat-text">Harmful Emissions</span>
+                <span className="stat-number">92%</span>
+                <span className="stat-text">Reduction in Harmful Emissions</span>
               </div>
             </div>
           </section>
 
-          {/* How to Use Rewards */}
-          <section className="activity-section animate-slideUp">
-            <h3>🎁 How to Use Your Rewards</h3>
-            <div className="activity-list">
-              <div className="activity-item">
-                <div className="activity-icon">🏪</div>
-                <div className="activity-info">
-                  <h4>Partner Store Discounts</h4>
-                  <p>Use your points for discounts at participating stores</p>
-                </div>
-              </div>
-              <div className="activity-item">
-                <div className="activity-icon">🎫</div>
-                <div className="activity-info">
-                  <h4>Special Offers</h4>
-                  <p>Get exclusive deals and early access to sales</p>
-                </div>
-              </div>
-              <div className="activity-item">
-                <div className="activity-icon">🌟</div>
-                <div className="activity-info">
-                  <h4>Leaderboard Prizes</h4>
-                  <p>Top recyclers win monthly prizes and recognition</p>
-                </div>
-              </div>
-            </div>
-          </section>
         </div>
       </main>
 
@@ -480,7 +520,7 @@ const Dashboard = () => {
                     <div className="brand-logo">🍕</div>
                     <h4>Domino's Pizza</h4>
                   </div>
-                  <span className="coupon-cost">50 rewards</span>
+                  <span className="coupon-cost">30 rewards</span>
                 </div>
                 <div className="coupon-offer">
                   <p className="offer-title">20% OFF</p>
@@ -488,16 +528,16 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="redeem-btn"
-                  disabled={rewards < 50}
+                  disabled={rewards < 30}
                   onClick={() => {
-                    if (rewards >= 50) {
-                      setRewards(prev => prev - 50);
+                    if (rewards >= 30) {
+                      setRewards(prev => prev - 30);
                       const code = `DOM${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nVisit: dominos.com/offers\nValid for 30 days`);
+                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Domino's\nValid for 30 days`);
                     }
                   }}
                 >
-                  {rewards >= 50 ? 'Redeem Now' : 'Not Enough Rewards'}
+                  {rewards >= 30 ? 'Redeem Now' : `Need ${30 - rewards} more rewards`}
                 </button>
               </div>
 
@@ -507,7 +547,7 @@ const Dashboard = () => {
                     <div className="brand-logo">☕</div>
                     <h4>Starbucks</h4>
                   </div>
-                  <span className="coupon-cost">40 rewards</span>
+                  <span className="coupon-cost">20 rewards</span>
                 </div>
                 <div className="coupon-offer">
                   <p className="offer-title">Free Tall Drink</p>
@@ -515,16 +555,16 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="redeem-btn"
-                  disabled={rewards < 40}
+                  disabled={rewards < 20}
                   onClick={() => {
-                    if (rewards >= 40) {
-                      setRewards(prev => prev - 40);
+                    if (rewards >= 20) {
+                      setRewards(prev => prev - 20);
                       const code = `SBX${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nVisit: starbucks.com/rewards\nValid for 30 days`);
+                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Starbucks\nValid for 30 days`);
                     }
                   }}
                 >
-                  {rewards >= 40 ? 'Redeem Now' : 'Not Enough Rewards'}
+                  {rewards >= 20 ? 'Redeem Now' : `Need ${20 - rewards} more rewards`}
                 </button>
               </div>
 
@@ -534,7 +574,7 @@ const Dashboard = () => {
                     <div className="brand-logo">🍔</div>
                     <h4>McDonald's</h4>
                   </div>
-                  <span className="coupon-cost">35 rewards</span>
+                  <span className="coupon-cost">15 rewards</span>
                 </div>
                 <div className="coupon-offer">
                   <p className="offer-title">Free Medium Fries</p>
@@ -542,16 +582,16 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="redeem-btn"
-                  disabled={rewards < 35}
+                  disabled={rewards < 15}
                   onClick={() => {
-                    if (rewards >= 35) {
-                      setRewards(prev => prev - 35);
+                    if (rewards >= 15) {
+                      setRewards(prev => prev - 15);
                       const code = `MCD${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nVisit: mcdonalds.com/offers\nValid for 30 days`);
+                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any McDonald's\nValid for 30 days`);
                     }
                   }}
                 >
-                  {rewards >= 35 ? 'Redeem Now' : 'Not Enough Rewards'}
+                  {rewards >= 15 ? 'Redeem Now' : `Need ${15 - rewards} more rewards`}
                 </button>
               </div>
 
@@ -561,7 +601,7 @@ const Dashboard = () => {
                     <div className="brand-logo">🍗</div>
                     <h4>KFC</h4>
                   </div>
-                  <span className="coupon-cost">45 rewards</span>
+                  <span className="coupon-cost">25 rewards</span>
                 </div>
                 <div className="coupon-offer">
                   <p className="offer-title">$5 OFF</p>
@@ -569,16 +609,16 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="redeem-btn"
-                  disabled={rewards < 45}
+                  disabled={rewards < 25}
                   onClick={() => {
-                    if (rewards >= 45) {
-                      setRewards(prev => prev - 45);
+                    if (rewards >= 25) {
+                      setRewards(prev => prev - 25);
                       const code = `KFC${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nVisit: kfc.com/offers\nValid for 30 days`);
+                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any KFC\nValid for 30 days`);
                     }
                   }}
                 >
-                  {rewards >= 45 ? 'Redeem Now' : 'Not Enough Rewards'}
+                  {rewards >= 25 ? 'Redeem Now' : `Need ${25 - rewards} more rewards`}
                 </button>
               </div>
 
@@ -588,7 +628,7 @@ const Dashboard = () => {
                     <div className="brand-logo">🥪</div>
                     <h4>Subway</h4>
                   </div>
-                  <span className="coupon-cost">30 rewards</span>
+                  <span className="coupon-cost">10 rewards</span>
                 </div>
                 <div className="coupon-offer">
                   <p className="offer-title">Buy 1 Get 1</p>
@@ -596,16 +636,16 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="redeem-btn"
-                  disabled={rewards < 30}
+                  disabled={rewards < 10}
                   onClick={() => {
-                    if (rewards >= 30) {
-                      setRewards(prev => prev - 30);
+                    if (rewards >= 10) {
+                      setRewards(prev => prev - 10);
                       const code = `SUB${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nVisit: subway.com/offers\nValid for 30 days`);
+                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Subway\nValid for 30 days`);
                     }
                   }}
                 >
-                  {rewards >= 30 ? 'Redeem Now' : 'Not Enough Rewards'}
+                  {rewards >= 10 ? 'Redeem Now' : `Need ${10 - rewards} more rewards`}
                 </button>
               </div>
 
@@ -615,7 +655,7 @@ const Dashboard = () => {
                     <div className="brand-logo">🍕</div>
                     <h4>Pizza Hut</h4>
                   </div>
-                  <span className="coupon-cost">55 rewards</span>
+                  <span className="coupon-cost">35 rewards</span>
                 </div>
                 <div className="coupon-offer">
                   <p className="offer-title">25% OFF</p>
@@ -623,16 +663,16 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="redeem-btn"
-                  disabled={rewards < 55}
+                  disabled={rewards < 35}
                   onClick={() => {
-                    if (rewards >= 55) {
-                      setRewards(prev => prev - 55);
+                    if (rewards >= 35) {
+                      setRewards(prev => prev - 35);
                       const code = `PHT${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nVisit: pizzahut.com/offers\nValid for 30 days`);
+                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Pizza Hut\nValid for 30 days`);
                     }
                   }}
                 >
-                  {rewards >= 55 ? 'Redeem Now' : 'Not Enough Rewards'}
+                  {rewards >= 35 ? 'Redeem Now' : `Need ${35 - rewards} more rewards`}
                 </button>
               </div>
             </div>
