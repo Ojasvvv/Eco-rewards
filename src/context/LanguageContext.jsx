@@ -58,7 +58,7 @@ const translations = {
     step4: "Earn Rewards",
     step4Desc: "Get instant rewards and points",
     usageLimit: "Usage Limit",
-    usageLimitDesc: "Strict Limit: Maximum 2 dustbin uses per day per user",
+    usageLimitDesc: "Strict Limit: Maximum 5 dustbin uses per day per user",
     citiesLeading: "Cities Making a Difference",
     citiesLeadingSub: "See which cities are leading the sustainability revolution",
     viewLeaderboard: "View Full Leaderboard",
