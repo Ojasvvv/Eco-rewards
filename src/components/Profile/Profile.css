@@ -1,19 +1,22 @@
 .profile-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--background-gradient);
   padding-bottom: 2rem;
+  transition: background 0.3s ease;
 }
 
 .profile-header {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--surface-elevated);
   padding: 1rem 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   position: sticky;
   top: 0;
   z-index: 100;
+  border-bottom: 1px solid var(--border);
+  transition: all 0.3s ease;
 }
 
 .back-btn {
@@ -27,11 +30,11 @@
   cursor: pointer;
   transition: background 0.3s;
   font-size: 1rem;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .back-btn:hover {
-  background: #f3f4f6;
+  background: var(--surface);
 }
 
 .back-btn svg {
@@ -41,7 +44,7 @@
 
 .profile-header h1 {
   font-size: 1.5rem;
-  color: #1f2937;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -56,10 +59,12 @@
 
 /* User Info Card */
 .user-info-card {
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
 }
 
 .user-info-header {
@@ -68,7 +73,7 @@
   gap: 1.5rem;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid var(--border);
 }
 
 .user-avatar-large {
@@ -81,12 +86,12 @@
 
 .user-info-text h2 {
   font-size: 1.75rem;
-  color: #1f2937;
+  color: var(--text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .user-info-text p {
-  color: #6b7280;
+  color: var(--text-secondary);
   margin: 0;
   font-size: 0.95rem;
 }
@@ -100,9 +105,10 @@
 .user-stat {
   text-align: center;
   padding: 1rem;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  background: var(--surface-elevated);
   border-radius: 12px;
   transition: transform 0.3s;
+  border: 1px solid var(--border);
 }
 
 .user-stat:hover {
@@ -123,16 +129,18 @@
 .user-stat .stat-label {
   display: block;
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 /* Streak Card */
 .streak-card {
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
 }
 
 .streak-header {
@@ -144,7 +152,7 @@
 
 .streak-header h3 {
   font-size: 1.5rem;
-  color: #1f2937;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -171,18 +179,20 @@
   gap: 0.5rem;
   padding: 1rem;
   border-radius: 12px;
-  background: #f9fafb;
+  background: var(--surface-elevated);
   min-width: 60px;
   transition: all 0.3s;
+  border: 1px solid var(--border);
 }
 
 .streak-day.active {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #10b981;
 }
 
 .streak-day .day-number {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
@@ -207,7 +217,7 @@
 
 .milestone-text {
   font-size: 1rem;
-  color: #92400e;
+  color: #b45309;
   margin: 0 0 1rem 0;
   text-align: center;
 }
@@ -219,7 +229,7 @@
   gap: 0.5rem;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #92400e;
+  color: #b45309;
   margin-bottom: 1rem;
 }
 
@@ -242,21 +252,22 @@
 .milestone-progress-text {
   text-align: center;
   font-size: 0.9rem;
-  color: #92400e;
+  color: #b45309;
   margin: 0;
   font-weight: 500;
 }
 
 .streak-motivation {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  background: rgba(59, 130, 246, 0.1);
   padding: 1.5rem;
   border-radius: 12px;
   text-align: center;
   margin-top: 1rem;
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .streak-motivation p {
-  color: #1e40af;
+  color: #3b82f6;
   margin: 0;
   font-size: 1.1rem;
   font-weight: 500;
@@ -264,10 +275,12 @@
 
 /* Achievements Section */
 .achievements-section {
-  background: white;
+  background: var(--surface);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
 }
 
 .section-header {
@@ -276,22 +289,23 @@
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid var(--border);
 }
 
 .section-header h3 {
   font-size: 1.75rem;
-  color: #1f2937;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .achievements-count {
   font-size: 0.95rem;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-weight: 500;
-  background: #f3f4f6;
+  background: var(--surface-elevated);
   padding: 0.5rem 1rem;
   border-radius: 20px;
+  border: 1px solid var(--border);
 }
 
 .achievement-category {
@@ -304,7 +318,7 @@
 
 .category-title {
   font-size: 1.25rem;
-  color: #374151;
+  color: var(--text-primary);
   margin: 0 0 1rem 0;
   padding-left: 0.5rem;
   border-left: 4px solid #10b981;
@@ -318,8 +332,8 @@
 
 .achievement-card {
   position: relative;
-  background: white;
-  border: 2px solid #e5e7eb;
+  background: var(--surface);
+  border: 2px solid var(--border);
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
@@ -346,7 +360,7 @@
 
 .achievement-card.unlocked {
   border-color: #10b981;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  background: rgba(16, 185, 129, 0.1);
 }
 
 .achievement-card.locked {
@@ -376,14 +390,14 @@
 
 .achievement-title {
   font-size: 1.1rem;
-  color: #1f2937;
+  color: var(--text-primary);
   margin: 0 0 0.5rem 0;
   font-weight: 600;
 }
 
 .achievement-description {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--text-secondary);
   margin: 0 0 1rem 0;
   line-height: 1.4;
 }
@@ -391,7 +405,7 @@
 .achievement-progress-bar {
   width: 100%;
   height: 6px;
-  background: #e5e7eb;
+  background: var(--border);
   border-radius: 3px;
   overflow: hidden;
   margin-bottom: 0.75rem;
@@ -416,7 +430,7 @@
 
 .achievement-progress-text {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
@@ -426,7 +440,7 @@
 
 .achievement-reward {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 

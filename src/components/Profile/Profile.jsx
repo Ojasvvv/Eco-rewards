@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useAchievements, ACHIEVEMENTS, STREAK_MILESTONES } from '../../context/AchievementsContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import './Profile.css';
 
@@ -9,6 +10,7 @@ const Profile = () => {
   const { user, logout } = useAuth();
   const { unlockedAchievements, stats, getAchievementProgress } = useAchievements();
   const { t } = useLanguage();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -84,7 +86,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="profile-container">
+    <div className={`profile-container ${isDark ? 'dark-theme' : ''}`}>
       {/* Header */}
       <header className="profile-header">
         <button className="back-btn" onClick={() => navigate('/dashboard')}>
