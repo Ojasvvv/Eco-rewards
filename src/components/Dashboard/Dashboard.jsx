@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAchievements } from '../../context/AchievementsContext';
 import { useNavigate } from 'react-router-dom';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
+import AchievementNotification from '../AchievementNotification/AchievementNotification';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { t } = useLanguage();
+  const { recordDeposit, recordRewardRedemption, getNextNotification, clearNotification, stats } = useAchievements();
   const navigate = useNavigate();
   const [dustbinCode, setDustbinCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,6 +36,8 @@ const Dashboard = () => {
   });
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showCongratsPopup, setShowCongratsPopup] = useState(false);
+  const [currentNotification, setCurrentNotification] = useState(null);
+  const [pendingNotification, setPendingNotification] = useState(null);
 
   // Save rewards to localStorage whenever they change
   useEffect(() => {
@@ -41,6 +46,25 @@ const Dashboard = () => {
       localStorage.setItem(`outlet_rewards_${user.uid}`, JSON.stringify(outletRewards));
     }
   }, [rewards, outletRewards, user]);
+
+  // Check for achievement notifications - but don't show if congrats popup is active
+  useEffect(() => {
+    const notification = getNextNotification();
+    if (notification && !showCongratsPopup) {
+      setCurrentNotification(notification);
+    } else if (notification && showCongratsPopup) {
+      // Store notification to show after congrats popup closes
+      setPendingNotification(notification);
+    }
+  }, [getNextNotification, showCongratsPopup]);
+
+  // Show pending notification after congrats popup closes
+  useEffect(() => {
+    if (!showCongratsPopup && pendingNotification) {
+      setCurrentNotification(pendingNotification);
+      setPendingNotification(null);
+    }
+  }, [showCongratsPopup, pendingNotification]);
 
   // Check daily usage limit
   const checkDailyLimit = () => {
@@ -154,6 +178,9 @@ const Dashboard = () => {
         ...prev,
         [dustbinInfo.outletId]: (prev[dustbinInfo.outletId] || 0) + pointsEarned
       }));
+      
+      // Record deposit for achievements
+      recordDeposit(dustbinInfo.outletId);
       
       setSuccess(`🎉 ${t('success')}! ${t('earnedPoints')} ${pointsEarned} ${t('points')}!`);
       setDustbinCode('');
@@ -274,6 +301,12 @@ const Dashboard = () => {
                 <>
                   <div className="profile-menu-overlay" onClick={(e) => { e.stopPropagation(); setShowProfileMenu(false); }} />
                   <div className="profile-menu">
+                    <button onClick={(e) => { e.stopPropagation(); navigate('/profile'); setShowProfileMenu(false); }} className="profile-menu-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      View Profile & Achievements
+                    </button>
                     <button onClick={(e) => { e.stopPropagation(); handleLogout(); }} className="profile-menu-logout">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -400,14 +433,15 @@ const Dashboard = () => {
             </div>
 
             <div className="stat-card">
-              <div className="stat-icon" style={{background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)'}}>
+              <div className="stat-icon" style={{background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'}}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
                 </svg>
               </div>
               <div className="stat-info">
-                <p className="stat-label">{t('myRewards')}</p>
-                <p className="stat-value">{Math.floor(rewards / 10)}</p>
+                <p className="stat-label">🔥 Current Streak</p>
+                <p className="stat-value">{stats.currentStreak} days</p>
               </div>
             </div>
           </div>
@@ -652,6 +686,7 @@ const Dashboard = () => {
                   onClick={() => {
                     if (rewards >= 30) {
                       setRewards(prev => prev - 30);
+                      recordRewardRedemption();
                       const code = `DOM${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
                       alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Domino's\nValid for 30 days`);
                     }
@@ -679,6 +714,7 @@ const Dashboard = () => {
                   onClick={() => {
                     if (rewards >= 20) {
                       setRewards(prev => prev - 20);
+                      recordRewardRedemption();
                       const code = `SBX${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
                       alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Starbucks\nValid for 30 days`);
                     }
@@ -706,6 +742,7 @@ const Dashboard = () => {
                   onClick={() => {
                     if (rewards >= 15) {
                       setRewards(prev => prev - 15);
+                      recordRewardRedemption();
                       const code = `MCD${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
                       alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any McDonald's\nValid for 30 days`);
                     }
@@ -733,6 +770,7 @@ const Dashboard = () => {
                   onClick={() => {
                     if (rewards >= 25) {
                       setRewards(prev => prev - 25);
+                      recordRewardRedemption();
                       const code = `KFC${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
                       alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any KFC\nValid for 30 days`);
                     }
@@ -760,6 +798,7 @@ const Dashboard = () => {
                   onClick={() => {
                     if (rewards >= 10) {
                       setRewards(prev => prev - 10);
+                      recordRewardRedemption();
                       const code = `SUB${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
                       alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Subway\nValid for 30 days`);
                     }
@@ -787,6 +826,7 @@ const Dashboard = () => {
                   onClick={() => {
                     if (rewards >= 35) {
                       setRewards(prev => prev - 35);
+                      recordRewardRedemption();
                       const code = `PHT${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
                       alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Pizza Hut\nValid for 30 days`);
                     }
@@ -813,6 +853,22 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Achievement Notification */}
+      {currentNotification && (
+        <AchievementNotification
+          notification={currentNotification}
+          onClose={() => {
+            clearNotification();
+            setCurrentNotification(null);
+          }}
+          onRewardClaimed={(rewardPoints) => {
+            setRewards(prev => prev + rewardPoints);
+            clearNotification();
+            setCurrentNotification(null);
+          }}
+        />
       )}
     </div>
   );
