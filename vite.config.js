@@ -6,6 +6,15 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true
-  }
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.html',
+      }
+    }
+  },
+  // Ensure service worker and manifest are copied to dist
+  publicDir: 'public',
 })
 

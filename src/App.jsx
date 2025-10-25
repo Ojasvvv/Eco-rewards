@@ -10,6 +10,7 @@ import Leaderboard from './components/Leaderboard/Leaderboard';
 import Profile from './components/Profile/Profile';
 import Onboarding from './components/Onboarding/Onboarding';
 import ProtectedRoute from './components/ProtectedRoute';
+import PWAInstallPrompt from './components/PWAInstallPrompt/PWAInstallPrompt';
 
 function App() {
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -50,6 +51,7 @@ function App() {
         <Router>
           <AuthProvider>
             <AchievementsProvider>
+              <PWAInstallPrompt />
               <Routes>
                 <Route path="/" element={<Login />} />
                 <Route 
