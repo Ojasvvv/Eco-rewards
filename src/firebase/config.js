@@ -1,15 +1,14 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 
-// TODO: Replace with your Firebase config
-// Get this from Firebase Console -> Project Settings -> General -> Your apps -> SDK setup and configuration
+// Firebase configuration using environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyATxxJDPufZV5lD2nw8xyhSIuSWq0w5uzU",
-  authDomain: "hackathon-f19c9.firebaseapp.com",
-  projectId: "hackathon-f19c9",
-  storageBucket: "hackathon-f19c9.firebasestorage.app",
-  messagingSenderId: "999485546225",
-  appId: "1:999485546225:web:e65c34dd9eed0b4b6ad350"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
