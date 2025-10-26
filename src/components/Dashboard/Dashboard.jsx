@@ -12,6 +12,7 @@ import {
   addRewardPoints, 
   deductRewardPoints 
 } from '../../services/rewardsService';
+import { getSafeImageURL, sanitizeDisplayName } from '../../utils/sanitize';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -315,8 +316,8 @@ const Dashboard = () => {
             </button>
             <div className="user-profile" onClick={() => setShowProfileMenu(!showProfileMenu)}>
               <img 
-                src={user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || 'User')}&background=10b981&color=fff`} 
-                alt={user?.displayName || 'User'} 
+                src={getSafeImageURL(user?.photoURL, user?.displayName || 'User')} 
+                alt={sanitizeDisplayName(user?.displayName)} 
                 className="user-avatar"
                 referrerPolicy="no-referrer"
                 crossOrigin="anonymous"
@@ -325,7 +326,7 @@ const Dashboard = () => {
                   e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || 'User')}&background=10b981&color=fff`;
                 }}
               />
-              <span className="user-name">{user?.displayName?.split(' ')[0] || 'User'}</span>
+              <span className="user-name">{sanitizeDisplayName(user?.displayName)?.split(' ')[0] || 'User'}</span>
               {showProfileMenu && (
                 <>
                   <div className="profile-menu-overlay" onClick={(e) => { e.stopPropagation(); setShowProfileMenu(false); }} />
@@ -431,7 +432,7 @@ const Dashboard = () => {
         <div className="dashboard-content">
           {/* Welcome Section */}
           <section className="welcome-section animate-slideUp">
-            <h2>{t('welcomeBack')}, {user?.displayName?.split(' ')[0] || 'Eco Warrior'}! 👋</h2>
+            <h2>{t('welcomeBack')}, {sanitizeDisplayName(user?.displayName)?.split(' ')[0] || 'Eco Warrior'}! 👋</h2>
             <p>{t('scanQRPrompt')}</p>
           </section>
 

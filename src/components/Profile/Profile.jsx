@@ -4,6 +4,7 @@ import { useAchievements, ACHIEVEMENTS, STREAK_MILESTONES } from '../../context/
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
+import { getSafeImageURL, sanitizeDisplayName, sanitizeEmail } from '../../utils/sanitize';
 import './Profile.css';
 
 const Profile = () => {
@@ -103,8 +104,8 @@ const Profile = () => {
         <section className="user-info-card">
           <div className="user-info-header">
             <img 
-              src={user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || 'User')}&background=10b981&color=fff`}
-              alt={user?.displayName}
+              src={getSafeImageURL(user?.photoURL, user?.displayName || 'User')}
+              alt={sanitizeDisplayName(user?.displayName)}
               className="user-avatar-large"
               referrerPolicy="no-referrer"
               crossOrigin="anonymous"
@@ -114,8 +115,8 @@ const Profile = () => {
               }}
             />
             <div className="user-info-text">
-              <h2>{user?.displayName || 'Eco Warrior'}</h2>
-              <p>{user?.email}</p>
+              <h2>{sanitizeDisplayName(user?.displayName) || 'Eco Warrior'}</h2>
+              <p>{sanitizeEmail(user?.email)}</p>
             </div>
           </div>
           
