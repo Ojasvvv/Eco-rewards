@@ -65,9 +65,17 @@ async function redeemRewardPointsHandler(req, res) {
 
     // Use Firestore transaction for atomicity
     const result = await db.runTransaction(async (transaction) => {
+      // ============ PHASE 1: ALL READS FIRST ============
+      // Firestore requires all reads to happen before any writes
+      
       const rewardsRef = db.collection('rewards').doc(userId);
       const rewardsDoc = await transaction.get(rewardsRef);
 
+      const statsRef = db.collection('userStats').doc(userId);
+      const statsDoc = await transaction.get(statsRef);
+
+      // ============ PHASE 2: VALIDATE & PROCESS DATA ============
+      
       if (!rewardsDoc.exists) {
         throw new Error('Rewards document not found');
       }
@@ -82,6 +90,8 @@ async function redeemRewardPointsHandler(req, res) {
       const newPoints = currentData.points - pointsToRedeem;
       const newTotalRedeemed = currentData.totalRedeemed + pointsToRedeem;
 
+      // ============ PHASE 3: ALL WRITES ============
+      
       // Update rewards
       transaction.update(rewardsRef, {
         points: newPoints,
@@ -106,9 +116,6 @@ async function redeemRewardPointsHandler(req, res) {
       });
 
       // Update user stats
-      const statsRef = db.collection('userStats').doc(userId);
-      const statsDoc = await transaction.get(statsRef);
-      
       if (statsDoc.exists) {
         const statsData = statsDoc.data();
         transaction.update(statsRef, {
