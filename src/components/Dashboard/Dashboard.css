@@ -385,6 +385,18 @@
   min-height: 120px;
 }
 
+.form-hint {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.form-hint.error {
+  color: var(--error);
+}
+
 .form-actions {
   display: flex;
   gap: 12px;

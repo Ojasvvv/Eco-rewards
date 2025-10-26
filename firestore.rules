@@ -1,0 +1,157 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ==================== HELPER FUNCTIONS ====================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidEmail() {
+      return isAuthenticated() && request.auth.token.email_verified == true;
+    }
+    
+    // ==================== USER PROFILES ====================
+    
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) 
+        && isValidEmail()
+        && request.resource.data.keys().hasAll(['email', 'displayName', 'createdAt'])
+        && request.resource.data.email is string
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 2
+        && request.resource.data.displayName.size() <= 50
+        && request.resource.data.createdAt is timestamp;
+      
+      allow update: if isOwner(userId) 
+        && isValidEmail()
+        && !('email' in request.resource.data.diff(resource.data).affectedKeys())
+        && !('createdAt' in request.resource.data.diff(resource.data).affectedKeys())
+        && (!('displayName' in request.resource.data.diff(resource.data).affectedKeys()) 
+            || (request.resource.data.displayName is string
+                && request.resource.data.displayName.size() >= 2
+                && request.resource.data.displayName.size() <= 50));
+      
+      allow delete: if false;
+    }
+    
+    // ==================== REWARDS ====================
+    // READ ONLY - ALL WRITES via Server API
+    
+    match /rewards/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if false; // Server-side only
+    }
+    
+    // ==================== USER STATS ====================
+    // READ ONLY - ALL WRITES via Server API
+    
+    match /userStats/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if false; // Server-side only
+    }
+    
+    // ==================== TRANSACTIONS ====================
+    // READ ONLY - ALL WRITES via Server API
+    
+    match /transactions/{transactionId} {
+      allow read: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+      allow write: if false; // Server-side only
+    }
+    
+    // ==================== DAILY LIMITS ====================
+    // Server-side only - tracks daily deposit limits
+    
+    match /dailyLimits/{limitId} {
+      allow read: if false; // Not needed by client
+      allow write: if false; // Server-side only
+    }
+    
+    // ==================== ACHIEVEMENTS ====================
+    // READ ONLY - ALL WRITES via Server API
+    
+    match /achievements/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if false;
+      
+      match /earned/{achievementId} {
+        allow read: if isOwner(userId);
+        allow write: if false;
+      }
+    }
+    
+    // ==================== LOCATION LOGS ====================
+    // Server-side only - tracks user deposit locations for analysis
+    
+    match /locationLogs/{logId} {
+      allow read: if false;  // Not needed by client
+      allow write: if false; // Server-side only (Admin SDK)
+    }
+    
+    // ==================== LEADERBOARD ====================
+    
+    match /leaderboard/{entryId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Server-side only
+    }
+    
+    // ==================== REPORTS ====================
+    
+    match /reports/{reportId} {
+      allow read: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+      
+      allow create: if isAuthenticated() 
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.type is string
+        && request.resource.data.type in ['broken', 'full', 'technical', 'qr_code', 'location', 'other']
+        && request.resource.data.details is string
+        && request.resource.data.details.size() >= 10
+        && request.resource.data.details.size() <= 1000
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.status == 'pending';
+      
+      allow update, delete: if false;
+    }
+    
+    // ==================== DEPOSITS ====================
+    
+    match /deposits/{depositId} {
+      allow read: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+      
+      allow create: if isAuthenticated()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.type is string
+        && request.resource.data.location is string
+        && request.resource.data.timestamp is timestamp
+        && request.resource.data.timestamp > request.time - duration.value(5, 'm')
+        && request.resource.data.timestamp <= request.time;
+      
+      allow update, delete: if false;
+    }
+    
+    // ==================== ADMIN ====================
+    
+    match /admin/{document=**} {
+      allow read, write: if request.auth != null 
+        && request.auth.token.admin == true;
+    }
+    
+    // ==================== DEFAULT DENY ====================
+    
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

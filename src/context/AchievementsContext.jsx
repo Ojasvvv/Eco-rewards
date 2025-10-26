@@ -244,94 +244,66 @@ export const AchievementsProvider = ({ children }) => {
   };
 
   // Record a new deposit
+  // SECURITY FIX: Stats are now calculated SERVER-SIDE
+  // This function just triggers a refresh of stats from Firestore
   const recordDeposit = async (outletId) => {
-    const now = new Date();
-    const hour = now.getHours();
-    const day = now.getDay(); // 0 = Sunday, 6 = Saturday
-    const today = now.toDateString();
-
-    setStats(prevStats => {
-      const lastDepositDate = prevStats.lastDepositDate ? new Date(prevStats.lastDepositDate).toDateString() : null;
-      
-      // Calculate new streak
-      let newStreak = prevStats.currentStreak;
-      if (!lastDepositDate) {
-        newStreak = 1; // First ever deposit
-      } else if (lastDepositDate === today) {
-        newStreak = prevStats.currentStreak; // Same day, no change
-      } else {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        if (lastDepositDate === yesterday.toDateString()) {
-          newStreak = prevStats.currentStreak + 1; // Streak continues
-        } else {
-          newStreak = 1; // Streak broken, start over
-        }
-      }
-
-      const newStats = {
-        ...prevStats,
-        totalDeposits: prevStats.totalDeposits + 1,
-        earlyBirdDeposits: hour < 8 ? prevStats.earlyBirdDeposits + 1 : prevStats.earlyBirdDeposits,
-        nightOwlDeposits: hour >= 20 ? prevStats.nightOwlDeposits + 1 : prevStats.nightOwlDeposits,
-        weekendDeposits: (day === 0 || day === 6) ? prevStats.weekendDeposits + 1 : prevStats.weekendDeposits,
-        outletsVisited: {
-          ...prevStats.outletsVisited,
-          [outletId]: (prevStats.outletsVisited[outletId] || 0) + 1
-        },
-        currentStreak: newStreak,
-        longestStreak: Math.max(prevStats.longestStreak, newStreak),
-        lastDepositDate: now.toISOString()
-      };
-
-      // Save to Firestore (async, don't block UI)
+    // Stats are calculated server-side in addRewardPoints API
+    // Just reload stats from Firestore after a short delay
+    setTimeout(async () => {
       if (user?.uid) {
-        updateUserStats(user.uid, newStats).catch(error => {
-          console.error('Error saving stats to Firestore:', error);
-        });
-      }
-
-      // Check for newly unlocked achievements
-      checkAchievements(newStats);
-
-      // Check for streak milestone rewards
-      if (newStreak > prevStats.currentStreak && STREAK_MILESTONES[newStreak]) {
-        const milestone = STREAK_MILESTONES[newStreak];
-        if (!prevStats.streakRewardsCollected.includes(newStreak)) {
-          setPendingNotifications(prev => [...prev, {
-            type: 'streak_milestone',
-            streak: newStreak,
-            reward: milestone.reward,
-            icon: milestone.icon,
-            message: milestone.message
-          }]);
+        try {
+          const updatedStats = await getUserStats(user.uid);
           
-          newStats.streakRewardsCollected = [...(prevStats.streakRewardsCollected || []), newStreak];
+          setStats(prevStats => {
+            // Check for newly unlocked achievements
+            checkAchievements(updatedStats);
+            
+            // Check for streak milestone rewards
+            const newStreak = updatedStats.currentStreak;
+            const prevStreak = prevStats.currentStreak;
+            
+            if (newStreak > prevStreak && STREAK_MILESTONES[newStreak]) {
+              const milestone = STREAK_MILESTONES[newStreak];
+              const collectedRewards = updatedStats.streakRewardsCollected || [];
+              
+              if (!collectedRewards.includes(newStreak)) {
+                setPendingNotifications(prev => [...prev, {
+                  type: 'streak_milestone',
+                  streak: newStreak,
+                  reward: milestone.reward,
+                  icon: milestone.icon,
+                  message: milestone.message
+                }]);
+              }
+            }
+            
+            return updatedStats;
+          });
+        } catch (error) {
+          console.error('Error refreshing stats after deposit:', error);
         }
       }
-
-      return newStats;
-    });
+    }, 1000); // 1 second delay to allow server to update
   };
 
   // Record a reward redemption
+  // SECURITY FIX: Stats are updated SERVER-SIDE in redeemRewardPoints API
   const recordRewardRedemption = async () => {
-    setStats(prevStats => {
-      const newStats = {
-        ...prevStats,
-        rewardsRedeemed: prevStats.rewardsRedeemed + 1
-      };
-      
-      // Save to Firestore (async, don't block UI)
+    // Stats are automatically updated server-side in redeemRewardPoints API
+    // Just reload stats from Firestore after a short delay
+    setTimeout(async () => {
       if (user?.uid) {
-        updateUserStats(user.uid, newStats).catch(error => {
-          console.error('Error saving stats to Firestore:', error);
-        });
+        try {
+          const updatedStats = await getUserStats(user.uid);
+          setStats(prevStats => {
+            checkAchievements(updatedStats);
+            return updatedStats;
+          });
+        } catch (error) {
+          console.error('Error refreshing stats after redemption:', error);
+        }
       }
-      
-      checkAchievements(newStats);
-      return newStats;
-    });
+    }, 1000); // 1 second delay to allow server to update
   };
 
   // Check for newly unlocked achievements

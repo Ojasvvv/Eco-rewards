@@ -1,7 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
-
+import { withRateLimitFirestore as withRateLimit } from './_middleware/rateLimiterFirestore.js';
 // Initialize Firebase Admin SDK
 if (!getApps().length) {
   initializeApp({
@@ -15,10 +15,12 @@ if (!getApps().length) {
 
 const db = getFirestore();
 
-// CORS Configuration - Only allow your production domain
-const ALLOWED_ORIGINS = ['https://eco-rewards-wheat.vercel.app'];
+// CORS Configuration - Load from environment variable only (no hardcoded URLs)
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
 
-export default async function handler(req, res) {
+async function redeemRewardPointsHandler(req, res) {
   // Handle CORS
   const origin = req.headers.origin;
   if (ALLOWED_ORIGINS.includes(origin)) {
@@ -87,8 +89,10 @@ export default async function handler(req, res) {
         lastUpdated: new Date(),
       });
 
-      // Log redemption transaction
-      const transactionId = `${userId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      // Log redemption transaction with cryptographically secure ID
+      const crypto = await import('crypto');
+      const randomBytes = crypto.randomBytes(8).toString('hex');
+      const transactionId = `${userId}_${Date.now()}_${randomBytes}`;
       const transactionRef = db.collection('transactions').doc(transactionId);
 
       transaction.set(transactionRef, {
@@ -131,4 +135,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Failed to redeem reward points' });
   }
 }
+
+// Export with rate limiting
+export default withRateLimit('redeemRewardPoints', redeemRewardPointsHandler);
 

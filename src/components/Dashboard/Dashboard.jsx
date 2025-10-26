@@ -10,9 +10,11 @@ import {
   initializeUserRewards, 
   getUserRewards, 
   addRewardPoints, 
-  deductRewardPoints 
+  deductRewardPoints,
+  checkDepositEligibility 
 } from '../../services/rewardsService';
 import { getSafeImageURL, sanitizeDisplayName } from '../../utils/sanitize';
+import { validateDustbinCode, validateReportDetails, validateReportType } from '../../utils/validation';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -81,19 +83,19 @@ const Dashboard = () => {
     }
   }, [showCongratsPopup, pendingNotification]);
 
-  // Check daily usage limit
-  const checkDailyLimit = () => {
-    const today = new Date().toDateString();
-    const usageKey = `usage_${user?.uid}_${today}`;
-    const usage = localStorage.getItem(usageKey);
-    const count = usage ? parseInt(usage, 10) : 0;
-    
-    if (count >= 5) {
-      return false;
+  // Server-side eligibility check (email verification + daily limit)
+  const checkEligibility = async () => {
+    try {
+      const eligibility = await checkDepositEligibility(user?.uid);
+      return eligibility;
+    } catch (error) {
+      console.error('Error checking eligibility:', error);
+      return {
+        eligible: false,
+        reason: 'error',
+        message: 'Unable to verify eligibility. Please try again.'
+      };
     }
-    
-    localStorage.setItem(usageKey, (count + 1).toString());
-    return true;
   };
 
   const handleLogout = async () => {
@@ -112,13 +114,26 @@ const Dashboard = () => {
   const handleSubmitReport = (e) => {
     e.preventDefault();
     
-    if (!reportType || !reportDetails.trim()) {
-      alert(t('selectIssueError'));
+    // Validate report type
+    const typeValidation = validateReportType(reportType);
+    if (!typeValidation.isValid) {
+      alert(typeValidation.error);
+      return;
+    }
+
+    // Validate report details
+    const detailsValidation = validateReportDetails(reportDetails);
+    if (!detailsValidation.isValid) {
+      alert(detailsValidation.error);
       return;
     }
 
     // TODO: Send report to backend/database
-    console.log('Report submitted:', { type: reportType, details: reportDetails, user: user?.email });
+    console.log('Report submitted:', { 
+      type: typeValidation.value, 
+      details: detailsValidation.value, 
+      user: user?.email 
+    });
     
     alert(t('thankYouReport'));
     
@@ -131,20 +146,43 @@ const Dashboard = () => {
   const handleSubmitCode = async (e) => {
     e.preventDefault();
     
-    if (!dustbinCode.trim()) {
-      setError(t('enterDustbinCode'));
+    // Validate dustbin code format
+    const codeValidation = validateDustbinCode(dustbinCode);
+    if (!codeValidation.isValid) {
+      setError(codeValidation.error);
       return;
     }
 
-    // Check daily limit
-    if (!checkDailyLimit()) {
-      setError(t('dailyLimitReached'));
-      return;
-    }
+    // Use the validated (uppercase, trimmed) code
+    const validatedCode = codeValidation.value;
 
     setError('');
     setSuccess('');
     setLoading(true);
+    setCurrentStep('checking');
+
+    // Check eligibility (email verification + daily limit) - SERVER-SIDE
+    setSuccess('🔐 Verifying eligibility...');
+    const eligibility = await checkEligibility();
+    
+    if (!eligibility.eligible) {
+      setError(`❌ ${eligibility.message}`);
+      setLoading(false);
+      setCurrentStep('');
+      
+      // If email not verified, show special message
+      if (eligibility.reason === 'email_not_verified') {
+        alert('📧 Email Verification Required\n\nPlease verify your email address to earn rewards.\n\nCheck your inbox for a verification link from Firebase.');
+      }
+      return;
+    }
+
+    // Show remaining deposits
+    if (eligibility.remainingDeposits !== undefined) {
+      setSuccess(`✅ Verified! You have ${eligibility.remainingDeposits} deposits remaining today.`);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+
     setCurrentStep('location');
 
     try {
@@ -156,7 +194,7 @@ const Dashboard = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Simulate dustbin location and get outlet info (in real app, fetch from API)
-      const dustbinInfo = getDustbinInfo(dustbinCode);
+      const dustbinInfo = getDustbinInfo(validatedCode);
       const dustbinLocation = { lat: location.lat + 0.0001, lng: location.lng + 0.0001 };
       const distance = calculateDistance(location, dustbinLocation);
       
@@ -184,16 +222,24 @@ const Dashboard = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Step 4: Credit rewards FOR THIS SPECIFIC OUTLET (via Firestore)
+      // SERVER-SIDE VALIDATION: Location and dustbin code are verified by the API
       setCurrentStep('rewarded');
       const pointsEarned = 10;
       
       try {
-        // Add points to Firestore (server-controlled)
-        await addRewardPoints(user.uid, pointsEarned, 'deposit', {
-          outlet: dustbinInfo.outlet,
-          outletId: dustbinInfo.outletId,
-          timestamp: new Date().toISOString()
-        });
+        // Add points to Firestore (server-controlled with location validation)
+        await addRewardPoints(
+          user.uid, 
+          pointsEarned, 
+          'deposit', 
+          {
+            outlet: dustbinInfo.outlet,
+            outletId: dustbinInfo.outletId,
+            timestamp: new Date().toISOString()
+          },
+          validatedCode,  // Server validates dustbin code exists in database
+          location        // Server validates user is within 100m of dustbin
+        );
         
         // Update local state to reflect the change
         setRewards(prev => prev + pointsEarned);
@@ -239,17 +285,27 @@ const Dashboard = () => {
 
   // Simulate getting dustbin info (in real app, fetch from backend)
   const getDustbinInfo = (code) => {
+    // Map first 2-3 characters to outlets for demo purposes
     const outlets = {
       'DOM': { outlet: "Domino's Pizza", outletId: 'dominos' },
       'SBX': { outlet: "Starbucks", outletId: 'starbucks' },
+      'SB': { outlet: "Starbucks", outletId: 'starbucks' },
       'MCD': { outlet: "McDonald's", outletId: 'mcdonalds' },
+      'MC': { outlet: "McDonald's", outletId: 'mcdonalds' },
       'KFC': { outlet: "KFC", outletId: 'kfc' },
+      'KF': { outlet: "KFC", outletId: 'kfc' },
       'SUB': { outlet: "Subway", outletId: 'subway' },
-      'PHT': { outlet: "Pizza Hut", outletId: 'pizzahut' }
+      'SU': { outlet: "Subway", outletId: 'subway' },
+      'PHT': { outlet: "Pizza Hut", outletId: 'pizzahut' },
+      'PH': { outlet: "Pizza Hut", outletId: 'pizzahut' },
+      'PZ': { outlet: "Pizza Hut", outletId: 'pizzahut' }
     };
     
-    const prefix = code.substring(0, 3).toUpperCase();
-    return outlets[prefix] || { outlet: "Partner Store", outletId: 'general' };
+    // Try 3-char prefix first, then 2-char
+    const prefix3 = code.substring(0, 3).toUpperCase();
+    const prefix2 = code.substring(0, 2).toUpperCase();
+    
+    return outlets[prefix3] || outlets[prefix2] || { outlet: "Partner Store", outletId: 'general' };
   };
 
   const getUserLocation = () => {
@@ -410,8 +466,13 @@ const Dashboard = () => {
                   className="form-textarea"
                   placeholder={t('describeProblem')}
                   rows="6"
+                  minLength="10"
+                  maxLength="1000"
                   required
                 />
+                <small className="form-hint">
+                  {reportDetails.length}/1000 characters (minimum 10)
+                </small>
               </div>
 
               <div className="form-actions">
@@ -497,8 +558,10 @@ const Dashboard = () => {
                     onChange={(e) => setDustbinCode(e.target.value.toUpperCase())}
                     placeholder={t('enterCodePlaceholder')}
                     className="code-input"
-                    maxLength="20"
+                    maxLength="5"
                     disabled={loading}
+                    pattern="[A-Z0-9]{1,5}"
+                    title="Format: Alphanumeric only, max 5 characters (e.g., AB123, XY45Z)"
                   />
                 </div>
 

@@ -31,11 +31,9 @@ export const AuthProvider = ({ children }) => {
       try {
         // Set persistence to LOCAL (cached in browser)
         await setPersistence(auth, browserLocalPersistence);
-        console.log('Auth persistence set to LOCAL');
         
         // Now listen for auth state changes
         unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-          console.log('Auth state changed:', currentUser ? 'User logged in' : 'No user');
           setUser(currentUser);
           setLoading(false);
         });

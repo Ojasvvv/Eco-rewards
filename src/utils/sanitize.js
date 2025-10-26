@@ -1,7 +1,33 @@
 /**
  * Security utilities for sanitizing user input
  * Protects against XSS and other injection attacks
+ * 
+ * Note: To install DOMPurify for additional protection, run:
+ * npm install dompurify isomorphic-dompurify
+ * 
+ * If PowerShell execution is disabled on Windows:
+ * 1. Open PowerShell as Administrator
+ * 2. Run: Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+ * 3. Then run: npm install dompurify isomorphic-dompurify
  */
+
+// Uncomment these lines after installing DOMPurify:
+import DOMPurify from 'isomorphic-dompurify';
+
+/**
+ * Sanitize HTML content using DOMPurify (when available)
+ * Falls back to basic sanitization if DOMPurify is not installed
+ */
+export const sanitizeHTML = (dirty) => {
+  if (!dirty) return '';
+  
+  // If DOMPurify is available, use it (uncomment after installation)
+return DOMPurify.sanitize(dirty, {
+ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'span'],
+ALLOWED_ATTR: []
+ });
+  
+};
 
 /**
  * Sanitize text content (React already does this, but explicit is better)
@@ -11,6 +37,8 @@ export const sanitizeText = (text) => {
   if (!text) return '';
   return String(text)
     .replace(/[<>]/g, '') // Remove angle brackets
+    .replace(/javascript:/gi, '') // Remove javascript: protocol
+    .replace(/on\w+\s*=/gi, '') // Remove event handlers like onclick=
     .trim()
     .slice(0, 1000); // Limit length
 };

@@ -1,6 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
+import { withRateLimitFirestore as withRateLimit } from './_middleware/rateLimiterFirestore.js';
 
 // Initialize Firebase Admin SDK
 if (!getApps().length) {
@@ -15,10 +16,12 @@ if (!getApps().length) {
 
 const db = getFirestore();
 
-// CORS Configuration - Only allow your production domain
-const ALLOWED_ORIGINS = ['https://eco-rewards-wheat.vercel.app'];
+// CORS Configuration - Load from environment variable only (no hardcoded URLs)
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
 
-export default async function handler(req, res) {
+async function addRewardPointsHandler(req, res) {
   // Handle CORS
   const origin = req.headers.origin;
   if (ALLOWED_ORIGINS.includes(origin)) {
@@ -50,11 +53,43 @@ export default async function handler(req, res) {
     const userId = decodedToken.uid;
 
     // Get request data
-    const { pointsToAdd, reason, depositData } = req.body;
+    const { pointsToAdd, reason, depositData, dustbinCode, userLocation } = req.body;
 
     // Validate input
     if (!pointsToAdd || typeof pointsToAdd !== 'number' || pointsToAdd <= 0) {
       return res.status(400).json({ error: 'Invalid points amount' });
+    }
+
+    // SECURITY FIX: Validate depositData structure
+    if (depositData !== null && depositData !== undefined) {
+      if (typeof depositData !== 'object' || Array.isArray(depositData)) {
+        return res.status(400).json({ error: 'depositData must be an object' });
+      }
+      
+      // Only allow specific whitelisted fields
+      const allowedDepositFields = ['outlet', 'outletId', 'timestamp', 'type'];
+      const depositKeys = Object.keys(depositData);
+      const invalidKeys = depositKeys.filter(key => !allowedDepositFields.includes(key));
+      
+      if (invalidKeys.length > 0) {
+        return res.status(400).json({ 
+          error: `Invalid depositData fields: ${invalidKeys.join(', ')}` 
+        });
+      }
+      
+      // Validate field types
+      if (depositData.outlet && typeof depositData.outlet !== 'string') {
+        return res.status(400).json({ error: 'depositData.outlet must be a string' });
+      }
+      if (depositData.outletId && typeof depositData.outletId !== 'string') {
+        return res.status(400).json({ error: 'depositData.outletId must be a string' });
+      }
+      if (depositData.timestamp && typeof depositData.timestamp !== 'string') {
+        return res.status(400).json({ error: 'depositData.timestamp must be a string' });
+      }
+      if (depositData.type && typeof depositData.type !== 'string') {
+        return res.status(400).json({ error: 'depositData.type must be a string' });
+      }
     }
 
     // Maximum points per deposit (anti-cheat)
@@ -66,6 +101,69 @@ export default async function handler(req, res) {
     const validReasons = ['deposit', 'bonus', 'streak', 'achievement', 'referral'];
     if (!validReasons.includes(reason)) {
       return res.status(400).json({ error: 'Invalid reason' });
+    }
+
+    // SERVER-SIDE LOCATION VALIDATION AND LOGGING
+    // For now, just validate location format and log it to Firebase (no dustbin database check)
+    if (reason === 'deposit') {
+      // REQUIRED: Dustbin code must be provided and valid (max 5 chars, alphanumeric)
+      if (!dustbinCode || typeof dustbinCode !== 'string' || dustbinCode.trim().length === 0) {
+        return res.status(400).json({ error: 'Dustbin code is required for deposit' });
+      }
+
+      const trimmedCode = dustbinCode.trim().toUpperCase();
+      
+      // Validate length (max 5 characters)
+      if (trimmedCode.length > 5) {
+        return res.status(400).json({ error: 'Dustbin code is too long (maximum 5 characters)' });
+      }
+
+      // Validate format (alphanumeric only)
+      const codeRegex = /^[A-Z0-9]{1,5}$/;
+      if (!codeRegex.test(trimmedCode)) {
+        return res.status(400).json({ error: 'Invalid dustbin code format (alphanumeric only, max 5 characters)' });
+      }
+
+      // REQUIRED: Validate user location is provided
+      if (!userLocation || typeof userLocation !== 'object' || 
+          typeof userLocation.lat !== 'number' || typeof userLocation.lng !== 'number') {
+        return res.status(400).json({ error: 'Valid user location is required for deposit' });
+      }
+
+      // Validate location coordinates are within valid ranges
+      if (userLocation.lat < -90 || userLocation.lat > 90 || 
+          userLocation.lng < -180 || userLocation.lng > 180) {
+        return res.status(400).json({ error: 'Invalid GPS coordinates' });
+      }
+
+      // Store validated dustbin code for logging
+      depositData.dustbinCode = trimmedCode;
+
+      // Log the validated location data to Firebase
+      depositData.validatedLocation = {
+        latitude: userLocation.lat,
+        longitude: userLocation.lng,
+        timestamp: new Date().toISOString(),
+        accuracy: userLocation.accuracy || null
+      };
+
+      // Log to separate collection for location tracking/analysis
+      try {
+        await db.collection('locationLogs').add({
+          userId,
+          location: {
+            latitude: userLocation.lat,
+            longitude: userLocation.lng
+          },
+          dustbinCode: dustbinCode || null,
+          timestamp: new Date(),
+          points: pointsToAdd,
+          reason
+        });
+      } catch (logError) {
+        // Don't fail the transaction if logging fails
+        console.error('Location logging failed:', logError);
+      }
     }
 
     // Use Firestore transaction for atomicity
@@ -88,8 +186,68 @@ export default async function handler(req, res) {
         lastUpdated: new Date(),
       });
 
-      // Log transaction
-      const transactionId = `${userId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      // SERVER-SIDE STATS CALCULATION (Security Fix)
+      // Only calculate stats for actual deposits, not for bonuses/achievements
+      if (reason === 'deposit') {
+        const statsRef = db.collection('userStats').doc(userId);
+        const statsDoc = await transaction.get(statsRef);
+        
+        if (statsDoc.exists) {
+          const currentStats = statsDoc.data();
+          const now = new Date();
+          const hour = now.getHours();
+          const day = now.getDay(); // 0 = Sunday, 6 = Saturday
+          const today = now.toISOString().split('T')[0]; // YYYY-MM-DD
+          
+          // Calculate streak server-side
+          let newStreak = currentStats.currentStreak || 0;
+          const lastDepositDate = currentStats.lastDepositDate 
+            ? new Date(currentStats.lastDepositDate.toDate ? currentStats.lastDepositDate.toDate() : currentStats.lastDepositDate).toISOString().split('T')[0]
+            : null;
+          
+          if (!lastDepositDate) {
+            newStreak = 1; // First deposit
+          } else if (lastDepositDate === today) {
+            newStreak = currentStats.currentStreak; // Same day, no change
+          } else {
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            
+            if (lastDepositDate === yesterdayStr) {
+              newStreak = (currentStats.currentStreak || 0) + 1; // Streak continues
+            } else {
+              newStreak = 1; // Streak broken
+            }
+          }
+          
+          // Get outlet info
+          const outletId = depositData?.outletId || 'unknown';
+          const currentOutlets = currentStats.outletsVisited || {};
+          const updatedOutlets = {
+            ...currentOutlets,
+            [outletId]: (currentOutlets[outletId] || 0) + 1
+          };
+          
+          // Update all stats server-side
+          transaction.update(statsRef, {
+            totalDeposits: (currentStats.totalDeposits || 0) + 1,
+            earlyBirdDeposits: hour < 8 ? (currentStats.earlyBirdDeposits || 0) + 1 : (currentStats.earlyBirdDeposits || 0),
+            nightOwlDeposits: hour >= 20 ? (currentStats.nightOwlDeposits || 0) + 1 : (currentStats.nightOwlDeposits || 0),
+            weekendDeposits: (day === 0 || day === 6) ? (currentStats.weekendDeposits || 0) + 1 : (currentStats.weekendDeposits || 0),
+            outletsVisited: updatedOutlets,
+            currentStreak: newStreak,
+            longestStreak: Math.max(currentStats.longestStreak || 0, newStreak),
+            lastDepositDate: now,
+            lastUpdated: now
+          });
+        }
+      }
+
+      // Log transaction with cryptographically secure ID
+      const crypto = await import('crypto');
+      const randomBytes = crypto.randomBytes(8).toString('hex');
+      const transactionId = `${userId}_${Date.now()}_${randomBytes}`;
       const transactionRef = db.collection('transactions').doc(transactionId);
 
       transaction.set(transactionRef, {
@@ -115,4 +273,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Failed to add reward points' });
   }
 }
+
+// Export with rate limiting
+export default withRateLimit('addRewardPoints', addRewardPointsHandler);
 

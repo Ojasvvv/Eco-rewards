@@ -1,6 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
+import { withRateLimitFirestore as withRateLimit } from './_middleware/rateLimiterFirestore.js';
 
 // Initialize Firebase Admin SDK
 if (!getApps().length) {
@@ -15,10 +16,17 @@ if (!getApps().length) {
 
 const db = getFirestore();
 
-// CORS Configuration - Only allow your production domain
-const ALLOWED_ORIGINS = ['https://eco-rewards-wheat.vercel.app'];
+// CORS Configuration - Load from environment variable only (no hardcoded URLs)
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
 
-export default async function handler(req, res) {
+/**
+ * SECURITY: This endpoint is now DEPRECATED and restricted
+ * Stats are calculated server-side in addRewardPoints.js
+ * This endpoint only allows updating streakRewardsCollected (for claiming streak rewards)
+ */
+async function updateUserStatsHandler(req, res) {
   // Handle CORS
   const origin = req.headers.origin;
   if (ALLOWED_ORIGINS.includes(origin)) {
@@ -59,24 +67,52 @@ export default async function handler(req, res) {
 
     const statsRef = db.collection('userStats').doc(userId);
 
-    // Only allow specific fields to be updated
+    // SECURITY: Only allow updating streakRewardsCollected (for claiming rewards)
+    // All other stats are calculated server-side in addRewardPoints.js
     const allowedFields = [
-      'totalDeposits',
-      'earlyBirdDeposits',
-      'nightOwlDeposits',
-      'weekendDeposits',
-      'outletsVisited',
-      'currentStreak',
-      'longestStreak',
-      'lastDepositDate',
       'streakRewardsCollected',
     ];
 
     const updateData = {};
     for (const [key, value] of Object.entries(statsUpdate)) {
       if (allowedFields.includes(key)) {
-        updateData[key] = value;
+        // Only validate streakRewardsCollected (the only field we allow)
+        if (key === 'streakRewardsCollected') {
+          // Must be an array of numbers
+          if (!Array.isArray(value)) {
+            return res.status(400).json({ 
+              error: 'streakRewardsCollected must be an array' 
+            });
+          }
+          if (value.some(v => typeof v !== 'number' || !Number.isInteger(v) || v < 0 || v > 1000)) {
+            return res.status(400).json({ 
+              error: 'streakRewardsCollected must contain valid milestone numbers' 
+            });
+          }
+          
+          // SECURITY: Only allow ADDING to the array, not removing
+          // Get current array and ensure new values are only additions
+          const statsDoc = await statsRef.get();
+          if (statsDoc.exists) {
+            const currentRewards = statsDoc.data().streakRewardsCollected || [];
+            const newRewards = value.filter(v => !currentRewards.includes(v));
+            if (newRewards.length === 0) {
+              return res.status(400).json({ 
+                error: 'No new streak rewards to add' 
+              });
+            }
+            // Only add new rewards, don't replace entire array
+            updateData[key] = [...currentRewards, ...newRewards];
+          } else {
+            updateData[key] = value;
+          }
+        }
       }
+    }
+
+    // Ensure at least one field is being updated
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ error: 'No valid fields to update' });
     }
 
     updateData.lastUpdated = new Date();
@@ -89,4 +125,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Failed to update user stats' });
   }
 }
+
+// Export with rate limiting
+export default withRateLimit('updateUserStats', updateUserStatsHandler);
 
