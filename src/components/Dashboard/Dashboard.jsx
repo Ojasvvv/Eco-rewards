@@ -131,6 +131,8 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
+      // Clear dashboard visit flag so next login shows "Welcome" instead of "Welcome Back"
+      sessionStorage.removeItem('hasVisitedDashboard');
       await logout();
       navigate('/');
     } catch (error) {

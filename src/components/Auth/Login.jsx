@@ -25,6 +25,8 @@ const Login = () => {
       await signInWithGoogle();
       // Set flag to show onboarding after login
       sessionStorage.setItem('shouldShowOnboarding', 'true');
+      // Clear dashboard visit flag so "Welcome" shows instead of "Welcome Back"
+      sessionStorage.removeItem('hasVisitedDashboard');
       // Reload to show onboarding
       window.location.href = '/dashboard';
     } catch (error) {
