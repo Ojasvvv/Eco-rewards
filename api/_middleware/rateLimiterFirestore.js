@@ -168,8 +168,19 @@ export function withRateLimitFirestore(endpoint, handler) {
         const decodedToken = await getAuth().verifyIdToken(token);
         userId = decodedToken.uid;
       } catch (error) {
-        console.error('Token verification failed in rate limiter:', error);
-        return res.status(401).json({ error: 'Invalid authentication token' });
+        console.error('❌ Token verification failed in rate limiter:', error);
+        console.error('Token error code:', error.code);
+        console.error('Token error message:', error.message);
+        console.error('Environment check in rate limiter:', {
+          hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
+          hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
+          hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY
+        });
+        return res.status(401).json({ 
+          error: 'Invalid authentication token',
+          code: error.code,
+          details: error.message
+        });
       }
 
       // Check rate limit using Firestore with verified user ID

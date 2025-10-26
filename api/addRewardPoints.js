@@ -336,7 +336,19 @@ async function addRewardPointsHandler(req, res) {
       totalEarned: result.newTotalEarned,
     });
   } catch (error) {
-    console.error('Error adding reward points:', error);
+    console.error('❌ Error adding reward points:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
+    
+    // Log environment variable status (without exposing values)
+    console.error('Environment check:', {
+      hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
+      hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
+      hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
+      hasAllowedOrigins: !!process.env.ALLOWED_ORIGINS,
+      origin: req.headers.origin
+    });
     
     // Provide more helpful error messages
     let errorMessage = 'Failed to add reward points';
@@ -359,7 +371,8 @@ async function addRewardPointsHandler(req, res) {
     return res.status(500).json({ 
       error: errorMessage,
       details: errorDetails,
-      code: error.code
+      code: error.code,
+      timestamp: new Date().toISOString()
     });
   }
 }
