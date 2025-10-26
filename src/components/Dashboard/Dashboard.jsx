@@ -79,12 +79,17 @@ const Dashboard = () => {
     loadRewards();
   }, [user]);
 
-  // Check for achievement notifications - but don't show if congrats popup is active
+  // Check for achievement notifications - ONLY show immediately after earning them, not on page load
   // Re-check whenever a notification is cleared (when currentNotification becomes null)
   useEffect(() => {
     const notification = getNextNotification();
+    // Only show if we're actually on the page (component is mounted and visible)
     if (notification && !showCongratsPopup && !currentNotification) {
-      setCurrentNotification(notification);
+      // Small delay to ensure we're on the correct page
+      const timer = setTimeout(() => {
+        setCurrentNotification(notification);
+      }, 100);
+      return () => clearTimeout(timer);
     } else if (notification && showCongratsPopup) {
       // Store notification to show after congrats popup closes
       setPendingNotification(notification);
@@ -98,6 +103,15 @@ const Dashboard = () => {
       setPendingNotification(null);
     }
   }, [showCongratsPopup, pendingNotification]);
+
+  // Clear any pending notifications when component unmounts (user navigates away)
+  useEffect(() => {
+    return () => {
+      // Clear current notification when leaving the page
+      setCurrentNotification(null);
+      setPendingNotification(null);
+    };
+  }, []);
 
   // Server-side eligibility check (email verification + daily limit)
   const checkEligibility = async () => {
@@ -132,6 +146,47 @@ const Dashboard = () => {
       navigate('/');
     } catch (error) {
       console.error('Error logging out:', error);
+    }
+  };
+
+  // Helper function to handle coupon redemption with proper auth checks
+  const handleRedeemCoupon = async (points, couponName, couponPrefix) => {
+    // Critical: Check if user is authenticated
+    if (!user || !user.uid) {
+      alert('❌ Please log in to redeem coupons');
+      return;
+    }
+
+    // Check if user has enough points
+    if (rewards < points) {
+      alert(`❌ Insufficient points. You need ${points - rewards} more points.`);
+      return;
+    }
+
+    try {
+      // Deduct points on server (server validates user is authenticated)
+      await deductRewardPoints(user.uid, points, couponName);
+      
+      // Only generate code AFTER successful server response
+      const code = `${couponPrefix}${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+      
+      // Update local state
+      setRewards(prev => prev - points);
+      recordRewardRedemption();
+      
+      // Show success message
+      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this code at the store\nValid for 30 days`);
+    } catch (error) {
+      console.error('Redemption error:', error);
+      
+      // Check for specific error messages
+      if (error.message && error.message.includes('Unauthorized')) {
+        alert('❌ Authentication required. Please log in again.');
+      } else if (error.message && error.message.includes('Insufficient points')) {
+        alert('❌ Insufficient points. Please try again.');
+      } else {
+        alert('❌ Failed to redeem coupon. Please try again.');
+      }
     }
   };
 
@@ -811,21 +866,8 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="redeem-btn"
-                  disabled={rewards < 30}
-                  onClick={async () => {
-                    if (rewards >= 30) {
-                      try {
-                        await deductRewardPoints(user.uid, 30, "Domino's 20% OFF");
-                        setRewards(prev => prev - 30);
-                        recordRewardRedemption();
-                        const code = `DOM${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                        alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Domino's\nValid for 30 days`);
-                      } catch (error) {
-                        alert('Failed to redeem coupon. Please try again.');
-                        console.error('Redemption error:', error);
-                      }
-                    }
-                  }}
+                  disabled={!user || rewards < 30}
+                  onClick={() => handleRedeemCoupon(30, "Domino's 20% OFF", 'DOM')}
                 >
                   {rewards >= 30 ? 'Redeem Now' : `Need ${30 - rewards} more points`}
                 </button>
@@ -845,21 +887,8 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="redeem-btn"
-                  disabled={rewards < 20}
-                  onClick={async () => {
-                    if (rewards >= 20) {
-                      try {
-                        await deductRewardPoints(user.uid, 20, 'Starbucks Free Tall Drink');
-                        setRewards(prev => prev - 20);
-                        recordRewardRedemption();
-                        const code = `SBX${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                        alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Starbucks\nValid for 30 days`);
-                      } catch (error) {
-                        alert('Failed to redeem coupon. Please try again.');
-                        console.error('Redemption error:', error);
-                      }
-                    }
-                  }}
+                  disabled={!user || rewards < 20}
+                  onClick={() => handleRedeemCoupon(20, 'Starbucks Free Tall Drink', 'SBX')}
                 >
                   {rewards >= 20 ? 'Redeem Now' : `Need ${20 - rewards} more points`}
                 </button>
@@ -879,21 +908,8 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="redeem-btn"
-                  disabled={rewards < 15}
-                  onClick={async () => {
-                    if (rewards >= 15) {
-                      try {
-                        await deductRewardPoints(user.uid, 15, "McDonald's Free Medium Fries");
-                        setRewards(prev => prev - 15);
-                        recordRewardRedemption();
-                        const code = `MCD${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                        alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any McDonald's\nValid for 30 days`);
-                      } catch (error) {
-                        alert('Failed to redeem coupon. Please try again.');
-                        console.error('Redemption error:', error);
-                      }
-                    }
-                  }}
+                  disabled={!user || rewards < 15}
+                  onClick={() => handleRedeemCoupon(15, "McDonald's Free Medium Fries", 'MCD')}
                 >
                   {rewards >= 15 ? 'Redeem Now' : `Need ${15 - rewards} more points`}
                 </button>
@@ -913,21 +929,8 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="redeem-btn"
-                  disabled={rewards < 25}
-                  onClick={async () => {
-                    if (rewards >= 25) {
-                      try {
-                        await deductRewardPoints(user.uid, 25, 'KFC $5 OFF');
-                        setRewards(prev => prev - 25);
-                        recordRewardRedemption();
-                        const code = `KFC${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                        alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any KFC\nValid for 30 days`);
-                      } catch (error) {
-                        alert('Failed to redeem coupon. Please try again.');
-                        console.error('Redemption error:', error);
-                      }
-                    }
-                  }}
+                  disabled={!user || rewards < 25}
+                  onClick={() => handleRedeemCoupon(25, 'KFC $5 OFF', 'KFC')}
                 >
                   {rewards >= 25 ? 'Redeem Now' : `Need ${25 - rewards} more points`}
                 </button>
@@ -947,21 +950,8 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="redeem-btn"
-                  disabled={rewards < 10}
-                  onClick={async () => {
-                    if (rewards >= 10) {
-                      try {
-                        await deductRewardPoints(user.uid, 10, 'Subway Buy 1 Get 1');
-                        setRewards(prev => prev - 10);
-                        recordRewardRedemption();
-                        const code = `SUB${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                        alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Subway\nValid for 30 days`);
-                      } catch (error) {
-                        alert('Failed to redeem coupon. Please try again.');
-                        console.error('Redemption error:', error);
-                      }
-                    }
-                  }}
+                  disabled={!user || rewards < 10}
+                  onClick={() => handleRedeemCoupon(10, 'Subway Buy 1 Get 1', 'SUB')}
                 >
                   {rewards >= 10 ? 'Redeem Now' : `Need ${10 - rewards} more points`}
                 </button>
@@ -981,21 +971,8 @@ const Dashboard = () => {
                 </div>
                 <button 
                   className="redeem-btn"
-                  disabled={rewards < 35}
-                  onClick={async () => {
-                    if (rewards >= 35) {
-                      try {
-                        await deductRewardPoints(user.uid, 35, 'Pizza Hut 25% OFF');
-                        setRewards(prev => prev - 35);
-                        recordRewardRedemption();
-                        const code = `PHT${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                        alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Pizza Hut\nValid for 30 days`);
-                      } catch (error) {
-                        alert('Failed to redeem coupon. Please try again.');
-                        console.error('Redemption error:', error);
-                      }
-                    }
-                  }}
+                  disabled={!user || rewards < 35}
+                  onClick={() => handleRedeemCoupon(35, 'Pizza Hut 25% OFF', 'PHT')}
                 >
                   {rewards >= 35 ? 'Redeem Now' : `Need ${35 - rewards} more points`}
                 </button>

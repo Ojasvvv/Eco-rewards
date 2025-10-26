@@ -24,6 +24,7 @@ const Leaderboard = () => {
   const [showReport, setShowReport] = React.useState(false);
   const [reportType, setReportType] = React.useState('');
   const [reportDetails, setReportDetails] = React.useState('');
+  const [showProfileMenu, setShowProfileMenu] = React.useState(false);
 
   const handleReport = () => {
     setShowReport(true);
@@ -212,7 +213,7 @@ const Leaderboard = () => {
               </svg>
               <span>{t('back')}</span>
             </button>
-            <div className="user-profile" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }} title="View Profile">
+            <div className="user-profile" onClick={() => setShowProfileMenu(!showProfileMenu)}>
               <img 
                 src={user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || 'User')}&background=10b981&color=fff`} 
                 alt={user?.displayName || 'User'} 
@@ -225,6 +226,25 @@ const Leaderboard = () => {
                 }}
               />
               <span className="user-name">{user?.displayName?.split(' ')[0] || 'User'}</span>
+              {showProfileMenu && (
+                <>
+                  <div className="profile-menu-overlay" onClick={(e) => { e.stopPropagation(); setShowProfileMenu(false); }} />
+                  <div className="profile-menu">
+                    <button onClick={(e) => { e.stopPropagation(); navigate('/profile'); setShowProfileMenu(false); }} className="profile-menu-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      View Profile & Achievements
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); handleLogout(); }} className="profile-menu-logout">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      Logout
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
             <button onClick={toggleTheme} className="theme-toggle-btn" title={isDark ? "Light mode" : "Dark mode"}>
               {isDark ? (
