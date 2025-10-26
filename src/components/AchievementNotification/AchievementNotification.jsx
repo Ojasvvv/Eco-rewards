@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import './AchievementNotification.css';
 
 const AchievementNotification = ({ notification, onClose, onRewardClaimed }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [confetti, setConfetti] = useState([]);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     // Generate subtle confetti - fewer pieces for cleaner look
@@ -15,11 +16,6 @@ const AchievementNotification = ({ notification, onClose, onRewardClaimed }) => 
       rotation: Math.random() * 360
     }));
     setConfetti(confettiArray);
-
-    // Trigger entrance animation immediately on next frame
-    requestAnimationFrame(() => {
-      setIsVisible(true);
-    });
   }, []);
 
   const handleClose = () => {

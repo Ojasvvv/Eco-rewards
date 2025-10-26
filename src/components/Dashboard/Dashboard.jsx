@@ -5,7 +5,6 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useAchievements } from '../../context/AchievementsContext';
 import { useNavigate } from 'react-router-dom';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
-import AchievementNotification from '../AchievementNotification/AchievementNotification';
 import Footer from '../Footer/Footer';
 import { 
   initializeUserRewards, 
@@ -22,7 +21,7 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { t } = useLanguage();
-  const { recordDeposit, recordRewardRedemption, getNextNotification, clearNotification, stats, pendingNotificationsCount } = useAchievements();
+  const { recordDeposit, recordRewardRedemption, stats } = useAchievements();
   const navigate = useNavigate();
   const [dustbinCode, setDustbinCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,8 +38,6 @@ const Dashboard = () => {
   const [outletRewards, setOutletRewards] = useState({});
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showCongratsPopup, setShowCongratsPopup] = useState(false);
-  const [currentNotification, setCurrentNotification] = useState(null);
-  const [pendingNotification, setPendingNotification] = useState(null);
 
   // Prevent background scrolling when modal is open
   useEffect(() => {
@@ -79,39 +76,6 @@ const Dashboard = () => {
     loadRewards();
   }, [user]);
 
-  // Check for achievement notifications - show them when available
-  // Re-check whenever a notification is cleared (when currentNotification becomes null)
-  useEffect(() => {
-    // Only check if we don't have a current notification
-    if (!currentNotification) {
-      const notification = getNextNotification();
-      
-      if (notification && !showCongratsPopup) {
-        // Show notification immediately
-        setCurrentNotification(notification);
-      } else if (notification && showCongratsPopup && !pendingNotification) {
-        // Store notification to show after congrats popup closes (if not already pending)
-        setPendingNotification(notification);
-      }
-    }
-  }, [getNextNotification, showCongratsPopup, currentNotification, pendingNotification, pendingNotificationsCount]);
-
-  // Show pending notification after congrats popup closes
-  useEffect(() => {
-    if (!showCongratsPopup && pendingNotification && !currentNotification) {
-      setCurrentNotification(pendingNotification);
-      setPendingNotification(null);
-    }
-  }, [showCongratsPopup, pendingNotification, currentNotification]);
-
-  // Clear any pending notifications when component unmounts (user navigates away)
-  useEffect(() => {
-    return () => {
-      // Clear notifications when leaving the page
-      setCurrentNotification(null);
-      setPendingNotification(null);
-    };
-  }, []);
 
   // Server-side eligibility check (email verification + daily limit)
   const checkEligibility = async () => {
@@ -995,40 +959,6 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Achievement Notification */}
-      {currentNotification && (
-        <AchievementNotification
-          key={currentNotification.type === 'achievement' ? currentNotification.achievement?.id : currentNotification.streak}
-          notification={currentNotification}
-          onClose={() => {
-            clearNotification();
-            setCurrentNotification(null);
-          }}
-          onRewardClaimed={async (rewardPoints) => {
-            try {
-              // Add points to Firestore securely
-              await addRewardPoints(user.uid, rewardPoints, 'achievement', {
-                type: 'achievement_claimed',
-                timestamp: new Date().toISOString()
-              });
-              // Update local state
-              setRewards(prev => prev + rewardPoints);
-              
-              // Clear current display first (with animation time)
-              setCurrentNotification(null);
-              
-              // Then clear from queue after a delay to ensure proper sequencing
-              setTimeout(() => {
-                clearNotification();
-              }, 400);
-            } catch (error) {
-              console.error('Error claiming achievement reward:', error);
-              alert('Failed to claim reward. Please try again.');
-            }
-          }}
-        />
       )}
 
       {/* Footer */}
