@@ -44,7 +44,7 @@ const AchievementNotification = ({ notification, onClose, onRewardClaimed }) => 
   const isStreakMilestone = notification.type === 'streak_milestone';
 
   return (
-    <div className={`achievement-notification-overlay ${isVisible ? 'visible' : ''}`} onClick={(e) => e.stopPropagation()}>
+    <div className={`achievement-notification-overlay ${isVisible ? 'visible' : ''}`}>
       {/* Confetti */}
       <div className="confetti-container">
         {confetti.map(piece => (

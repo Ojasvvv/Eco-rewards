@@ -82,14 +82,17 @@ const Dashboard = () => {
   // Check for achievement notifications - show them when available
   // Re-check whenever a notification is cleared (when currentNotification becomes null)
   useEffect(() => {
-    const notification = getNextNotification();
-    
-    if (notification && !showCongratsPopup && !currentNotification) {
-      // Show notification immediately
-      setCurrentNotification(notification);
-    } else if (notification && showCongratsPopup && !pendingNotification) {
-      // Store notification to show after congrats popup closes (if not already pending)
-      setPendingNotification(notification);
+    // Only check if we don't have a current notification
+    if (!currentNotification) {
+      const notification = getNextNotification();
+      
+      if (notification && !showCongratsPopup) {
+        // Show notification immediately
+        setCurrentNotification(notification);
+      } else if (notification && showCongratsPopup && !pendingNotification) {
+        // Store notification to show after congrats popup closes (if not already pending)
+        setPendingNotification(notification);
+      }
     }
   }, [getNextNotification, showCongratsPopup, currentNotification, pendingNotification]);
 
@@ -997,6 +1000,7 @@ const Dashboard = () => {
       {/* Achievement Notification */}
       {currentNotification && (
         <AchievementNotification
+          key={currentNotification.type === 'achievement' ? currentNotification.achievement?.id : currentNotification.streak}
           notification={currentNotification}
           onClose={() => {
             clearNotification();
@@ -1011,8 +1015,14 @@ const Dashboard = () => {
               });
               // Update local state
               setRewards(prev => prev + rewardPoints);
-              clearNotification();
+              
+              // Clear current display first (with animation time)
               setCurrentNotification(null);
+              
+              // Then clear from queue after a delay to ensure proper sequencing
+              setTimeout(() => {
+                clearNotification();
+              }, 400);
             } catch (error) {
               console.error('Error claiming achievement reward:', error);
               alert('Failed to claim reward. Please try again.');
