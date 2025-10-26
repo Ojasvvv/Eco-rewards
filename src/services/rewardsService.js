@@ -334,3 +334,19 @@ export const checkDepositEligibility = async (userId) => {
   }
 };
 
+/**
+ * Clear rate limits for the current user
+ * USE THIS IF YOU'RE STUCK: This will immediately clear all rate limits
+ */
+export const clearRateLimit = async () => {
+  try {
+    console.log('🧹 Clearing rate limits...');
+    const result = await callAPI('clearRateLimit', {}, null, 0);
+    console.log('✅ Rate limits cleared successfully');
+    return result;
+  } catch (error) {
+    console.error('❌ Error clearing rate limits:', error);
+    throw error;
+  }
+};
+

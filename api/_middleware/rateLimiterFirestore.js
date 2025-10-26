@@ -124,8 +124,34 @@ export async function checkRateLimitFirestore(userId, endpoint) {
       
       // Check if under limit
       if (requests.length >= config.maxRequests) {
-        // Rate limit exceeded
+        // Double-check that the oldest request is still within the window
         const oldestRequest = requests[0].timestamp;
+        const oldestAge = now - oldestRequest;
+        
+        // If the oldest request is actually outside the window, it should have been filtered
+        // This is a safety check to prevent permanent rate limiting due to edge cases
+        if (oldestAge >= config.windowMs) {
+          // The oldest request expired - remove it and allow this request
+          requests.shift(); // Remove the oldest request
+          requests.push({
+            timestamp: now,
+            ip: null
+          });
+          
+          transaction.update(rateLimitRef, {
+            requests,
+            windowStart: requests.length > 0 ? requests[0].timestamp : now,
+            lastRequest: now,
+            updatedAt: new Date()
+          });
+          
+          return {
+            allowed: true,
+            remaining: config.maxRequests - requests.length
+          };
+        }
+        
+        // Rate limit exceeded and oldest request is still valid
         const retryAfter = Math.ceil((oldestRequest + config.windowMs - now) / 1000);
         
         // CRITICAL FIX: Update the document with filtered requests even when rate-limited
@@ -140,9 +166,9 @@ export async function checkRateLimitFirestore(userId, endpoint) {
         
         return {
           allowed: false,
-          retryAfter,
+          retryAfter: Math.max(1, retryAfter), // Ensure at least 1 second retry
           remaining: 0,
-          message: `Rate limit exceeded. Try again in ${retryAfter} seconds.`
+          message: `Rate limit exceeded. Try again in ${Math.max(1, retryAfter)} seconds.`
         };
       }
       
