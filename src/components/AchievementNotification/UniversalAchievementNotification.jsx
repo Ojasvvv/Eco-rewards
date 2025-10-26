@@ -6,15 +6,18 @@ import AchievementNotification from './AchievementNotification';
 
 const UniversalAchievementNotification = () => {
   const { user } = useAuth();
-  const { getNextNotification, clearNotification, pendingNotificationsCount } = useAchievements();
+  const { getNextNotification, clearNotification, pendingNotificationsCount, notificationsBlocked } = useAchievements();
   const [currentNotification, setCurrentNotification] = useState(null);
   const [notificationKey, setNotificationKey] = useState(0);
   const [isClosing, setIsClosing] = useState(false);
 
   // Check for new notifications
   useEffect(() => {
-    // Only show new notification if not currently showing one and not in the middle of closing
-    if (!currentNotification && !isClosing) {
+    // Only show new notification if:
+    // 1. Not currently showing one
+    // 2. Not in the middle of closing
+    // 3. Notifications are not blocked (e.g., by congrats popup)
+    if (!currentNotification && !isClosing && !notificationsBlocked) {
       const notification = getNextNotification();
       if (notification) {
         // Small delay to ensure previous notification fully cleared
@@ -25,7 +28,7 @@ const UniversalAchievementNotification = () => {
         return () => clearTimeout(timer);
       }
     }
-  }, [currentNotification, getNextNotification, pendingNotificationsCount, isClosing]);
+  }, [currentNotification, getNextNotification, pendingNotificationsCount, isClosing, notificationsBlocked]);
 
   const handleClose = () => {
     setIsClosing(true);

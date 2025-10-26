@@ -167,6 +167,7 @@ export const AchievementsProvider = ({ children }) => {
   });
   const [pendingNotifications, setPendingNotifications] = useState([]);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [notificationsBlocked, setNotificationsBlocked] = useState(false);
 
   // Load achievements and stats from Firestore (secure, server-side storage)
   useEffect(() => {
@@ -372,6 +373,16 @@ export const AchievementsProvider = ({ children }) => {
     }
   };
 
+  // Block notifications (e.g., when congrats popup is showing)
+  const blockNotifications = () => {
+    setNotificationsBlocked(true);
+  };
+
+  // Unblock notifications
+  const unblockNotifications = () => {
+    setNotificationsBlocked(false);
+  };
+
   const value = {
     unlockedAchievements,
     stats,
@@ -382,7 +393,10 @@ export const AchievementsProvider = ({ children }) => {
     getAchievementProgress,
     achievements: ACHIEVEMENTS,
     streakMilestones: STREAK_MILESTONES,
-    pendingNotificationsCount: pendingNotifications.length // Add this so Dashboard can react to changes
+    pendingNotificationsCount: pendingNotifications.length,
+    notificationsBlocked,
+    blockNotifications,
+    unblockNotifications
   };
 
   return (

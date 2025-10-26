@@ -21,7 +21,7 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { t } = useLanguage();
-  const { recordDeposit, recordRewardRedemption, stats } = useAchievements();
+  const { recordDeposit, recordRewardRedemption, stats, blockNotifications, unblockNotifications } = useAchievements();
   const navigate = useNavigate();
   const [dustbinCode, setDustbinCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -52,6 +52,15 @@ const Dashboard = () => {
       document.body.style.overflow = 'unset';
     };
   }, [showRewards, showReport]);
+
+  // Block achievement notifications when congrats popup is showing
+  useEffect(() => {
+    if (showCongratsPopup) {
+      blockNotifications();
+    } else {
+      unblockNotifications();
+    }
+  }, [showCongratsPopup, blockNotifications, unblockNotifications]);
 
   // Load rewards from Firestore (secure, server-side storage)
   useEffect(() => {
