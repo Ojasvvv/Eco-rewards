@@ -96,18 +96,14 @@ export default async function handler(req, res) {
       });
     }
 
-    // Increment the counter
-    await dailyLimitRef.set({
-      userId,
-      count: depositCount + 1,
-      lastDeposit: new Date().toISOString(),
-      date: today
-    }, { merge: true });
-
+    // DO NOT increment counter here - it will be incremented in addRewardPoints
+    // when the deposit actually succeeds (atomically in the same transaction)
+    
     // User is eligible!
     return res.status(200).json({
       eligible: true,
-      remainingDeposits: DAILY_DEPOSIT_LIMIT - (depositCount + 1),
+      remainingDeposits: DAILY_DEPOSIT_LIMIT - depositCount,
+      currentCount: depositCount,
       limit: DAILY_DEPOSIT_LIMIT,
       emailVerified: userRecord.emailVerified,
       message: 'Eligible to earn rewards'

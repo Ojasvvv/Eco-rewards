@@ -5,6 +5,19 @@ import { withRateLimitFirestore as withRateLimit } from './_middleware/rateLimit
 
 // Initialize Firebase Admin SDK
 if (!getApps().length) {
+  // Validate required environment variables
+  const requiredEnvVars = {
+    FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,
+    FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL,
+    FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY
+  };
+  
+  const missing = Object.keys(requiredEnvVars).filter(key => !requiredEnvVars[key]);
+  if (missing.length > 0) {
+    console.error('❌ Missing Firebase Admin environment variables:', missing.join(', '));
+    console.error('Please set these in Vercel Dashboard → Settings → Environment Variables');
+  }
+  
   initializeApp({
     credential: cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
@@ -281,6 +294,21 @@ async function addRewardPointsHandler(req, res) {
             lastUpdated: now
           });
         }
+        
+        // INCREMENT DAILY LIMIT COUNTER (atomically with deposit)
+        // This ensures the counter only increments if the deposit succeeds
+        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        const dailyLimitRef = db.collection('dailyLimits').doc(`${userId}_${today}`);
+        const dailyLimitDoc = await transaction.get(dailyLimitRef);
+        
+        const currentCount = dailyLimitDoc.exists ? (dailyLimitDoc.data().count || 0) : 0;
+        
+        transaction.set(dailyLimitRef, {
+          userId,
+          count: currentCount + 1,
+          lastDeposit: new Date().toISOString(),
+          date: today
+        }, { merge: true });
       }
 
       // Log transaction with cryptographically secure ID
@@ -309,7 +337,30 @@ async function addRewardPointsHandler(req, res) {
     });
   } catch (error) {
     console.error('Error adding reward points:', error);
-    return res.status(500).json({ error: 'Failed to add reward points' });
+    
+    // Provide more helpful error messages
+    let errorMessage = 'Failed to add reward points';
+    let errorDetails = error.message;
+    
+    if (error.code === 'app/invalid-credential') {
+      errorMessage = 'Firebase Admin credentials are invalid';
+      errorDetails = 'Please check FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY in Vercel environment variables';
+    } else if (error.message?.includes('private key')) {
+      errorMessage = 'Firebase private key is invalid';
+      errorDetails = 'Make sure FIREBASE_PRIVATE_KEY includes \\n line breaks and is wrapped in quotes';
+    } else if (error.code === 'auth/id-token-expired') {
+      errorMessage = 'Authentication token expired';
+      errorDetails = 'Please sign in again';
+    } else if (error.code === 'auth/argument-error') {
+      errorMessage = 'Authentication error';
+      errorDetails = 'Invalid authentication token';
+    }
+    
+    return res.status(500).json({ 
+      error: errorMessage,
+      details: errorDetails,
+      code: error.code
+    });
   }
 }
 
