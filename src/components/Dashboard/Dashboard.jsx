@@ -42,6 +42,20 @@ const Dashboard = () => {
   const [currentNotification, setCurrentNotification] = useState(null);
   const [pendingNotification, setPendingNotification] = useState(null);
 
+  // Prevent background scrolling when modal is open
+  useEffect(() => {
+    if (showRewards || showReport) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showRewards, showReport]);
+
   // Load rewards from Firestore (secure, server-side storage)
   useEffect(() => {
     const loadRewards = async () => {

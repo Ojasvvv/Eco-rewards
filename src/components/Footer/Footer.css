@@ -3,7 +3,7 @@
 .eco-footer {
   position: relative;
   margin-top: auto;
-  padding: 40px 20px;
+  padding: 24px 20px 20px;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   transition: background 0.3s ease;
 }
@@ -21,7 +21,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
 }
 
 /* Team section */
@@ -33,21 +33,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  font-size: 15px;
+  gap: 5px;
+  font-size: 13px;
   color: rgba(255, 255, 255, 0.85);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .footer-heart {
-  font-size: 18px;
+  font-size: 14px;
 }
 
 .footer-team-name {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 24px;
+  gap: 6px;
+  font-size: 20px;
   font-weight: 700;
 }
 
@@ -64,7 +64,7 @@
 .footer-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   justify-content: center;
   align-items: center;
 }
@@ -73,10 +73,10 @@
 .footer-github-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -139,8 +139,8 @@
 
 /* Tagline */
 .footer-tagline {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
   text-align: center;
   font-style: italic;
 }
@@ -151,10 +151,10 @@
   align-items: center;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
-  margin-top: 10px;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 4px;
 }
 
 .copyright-separator {
@@ -174,44 +174,44 @@
 /* Responsive design */
 @media (max-width: 768px) {
   .eco-footer {
-    padding: 30px 15px;
+    padding: 20px 15px 16px;
   }
 
   .footer-team-name {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .footer-made-with {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .footer-actions {
     flex-direction: column;
     width: 100%;
-    gap: 10px;
+    gap: 8px;
   }
 
   .footer-contact-btn,
   .footer-github-btn {
     width: 100%;
-    max-width: 280px;
+    max-width: 260px;
     justify-content: center;
   }
 
   .footer-tagline {
-    font-size: 13px;
+    font-size: 11px;
   }
 }
 
 @media (max-width: 480px) {
   .footer-team-name {
-    font-size: 18px;
+    font-size: 16px;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
   }
 
   .footer-copyright {
-    font-size: 12px;
+    font-size: 10px;
   }
 
   .copyright-winner {
