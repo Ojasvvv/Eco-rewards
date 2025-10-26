@@ -6,6 +6,7 @@ import { useAchievements } from '../../context/AchievementsContext';
 import { useNavigate } from 'react-router-dom';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import AchievementNotification from '../AchievementNotification/AchievementNotification';
+import Footer from '../Footer/Footer';
 import { 
   initializeUserRewards, 
   getUserRewards, 
@@ -1010,6 +1011,9 @@ const Dashboard = () => {
           }}
         />
       )}
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

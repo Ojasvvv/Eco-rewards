@@ -5,6 +5,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { getSafeImageURL, sanitizeDisplayName, sanitizeEmail } from '../../utils/sanitize';
+import Footer from '../Footer/Footer';
 import './Profile.css';
 
 const Profile = () => {
@@ -246,6 +247,9 @@ const Profile = () => {
           </button>
         </section>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

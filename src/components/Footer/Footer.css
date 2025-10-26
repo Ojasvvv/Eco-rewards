@@ -1,0 +1,504 @@
+/* ==================== Eco Footer Styles ==================== */
+
+.eco-footer {
+  position: relative;
+  margin-top: auto;
+  padding: 60px 20px 30px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  transition: all 0.3s ease;
+}
+
+.eco-footer.dark {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+/* Animated gradient background */
+.footer-gradient-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.2) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
+              radial-gradient(circle at 20% 80%, rgba(236, 72, 153, 0.2) 0%, transparent 50%);
+  animation: gradientShift 10s ease infinite;
+  pointer-events: none;
+}
+
+@keyframes gradientShift {
+  0%, 100% { opacity: 0.5; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.8; transform: scale(1.1) rotate(5deg); }
+}
+
+/* Floating eco icons */
+.floating-icons-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.floating-icon {
+  position: absolute;
+  bottom: -50px;
+  font-size: 24px;
+  animation: floatUp 12s linear infinite;
+  opacity: 0.6;
+  filter: blur(0.5px);
+}
+
+@keyframes floatUp {
+  0% {
+    bottom: -50px;
+    opacity: 0;
+    transform: translateX(0) rotate(0deg);
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    bottom: 100%;
+    opacity: 0;
+    transform: translateX(50px) rotate(360deg);
+  }
+}
+
+/* Main content */
+.footer-content {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+/* Heart section with team name */
+.footer-heart-section {
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.footer-heart-section:hover {
+  transform: scale(1.05);
+}
+
+.footer-made-with {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 10px;
+}
+
+.footer-heart {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heart-beat {
+  display: inline-block;
+  font-size: 28px;
+  animation: heartBeat 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5));
+}
+
+@keyframes heartBeat {
+  0%, 100% { transform: scale(1); }
+  10%, 30% { transform: scale(0.9); }
+  20%, 40%, 60%, 80% { transform: scale(1.1); }
+  50%, 70% { transform: scale(1.05); }
+}
+
+.heart-particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.particle {
+  position: absolute;
+  font-size: 12px;
+  animation: particleFloat 2s ease-in-out infinite;
+  opacity: 0;
+}
+
+.particle:nth-child(1) {
+  animation-delay: 0s;
+  left: -30px;
+}
+
+.particle:nth-child(2) {
+  animation-delay: 0.7s;
+  left: 30px;
+}
+
+.particle:nth-child(3) {
+  animation-delay: 1.4s;
+  top: -30px;
+}
+
+@keyframes particleFloat {
+  0%, 100% { opacity: 0; transform: translateY(0) scale(0); }
+  50% { opacity: 1; transform: translateY(-20px) scale(1); }
+}
+
+.footer-team-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.team-text {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.apatheia-text {
+  background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #ec4899 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientMove 3s ease infinite;
+  text-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+}
+
+@keyframes gradientMove {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Action buttons */
+.footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-contact-btn,
+.footer-github-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.footer-contact-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.footer-contact-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.5);
+}
+
+.footer-github-btn {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.footer-github-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.btn-icon {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.footer-contact-btn:hover .btn-icon {
+  animation: bounce 0.6s ease;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.btn-hover-effect {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.footer-contact-btn:hover .btn-hover-effect,
+.footer-github-btn:hover .btn-hover-effect {
+  left: 100%;
+}
+
+.btn-sparkles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 16px;
+  opacity: 0;
+  color: white;
+}
+
+.footer-contact-btn:hover .sparkle {
+  animation: sparkleOut 0.8s ease-out;
+}
+
+.sparkle:nth-child(1) {
+  animation-delay: 0s;
+  left: -40px;
+  top: -20px;
+}
+
+.sparkle:nth-child(2) {
+  animation-delay: 0.2s;
+  right: -40px;
+  top: -20px;
+}
+
+.sparkle:nth-child(3) {
+  animation-delay: 0.4s;
+  bottom: -20px;
+}
+
+@keyframes sparkleOut {
+  0% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+  100% { opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+.github-stars {
+  font-size: 14px;
+  animation: starTwinkle 2s ease-in-out infinite;
+}
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
+
+/* Email ripple effect */
+.email-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  animation: rippleEffect 0.6s ease-out;
+}
+
+@keyframes rippleEffect {
+  to {
+    width: 300px;
+    height: 300px;
+    opacity: 0;
+  }
+}
+
+/* Toast notification */
+.footer-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 50px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+  z-index: 10000;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.footer-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Tagline */
+.footer-tagline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-style: italic;
+  margin-top: 10px;
+}
+
+.tagline-icon {
+  font-size: 20px;
+  animation: rotate 4s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Copyright */
+.footer-copyright {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 20px;
+}
+
+.copyright-winner {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  background: rgba(255, 215, 0, 0.2);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+}
+
+/* Wave effect */
+.footer-waves {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  pointer-events: none;
+}
+
+.waves {
+  width: 100%;
+  height: 100%;
+}
+
+.wave-parallax use {
+  animation: waveMove 25s cubic-bezier(.55,.5,.45,.5) infinite;
+}
+
+.wave-parallax use:nth-child(1) {
+  animation-delay: -2s;
+  animation-duration: 7s;
+}
+
+.wave-parallax use:nth-child(2) {
+  animation-delay: -3s;
+  animation-duration: 10s;
+}
+
+.wave-parallax use:nth-child(3) {
+  animation-delay: -4s;
+  animation-duration: 13s;
+}
+
+.wave-parallax use:nth-child(4) {
+  animation-delay: -5s;
+  animation-duration: 20s;
+}
+
+@keyframes waveMove {
+  0% { transform: translate3d(-90px, 0, 0); }
+  100% { transform: translate3d(85px, 0, 0); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .eco-footer {
+    padding: 40px 15px 20px;
+  }
+
+  .footer-team-name {
+    font-size: 24px;
+  }
+
+  .footer-made-with {
+    font-size: 16px;
+  }
+
+  .footer-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .footer-contact-btn,
+  .footer-github-btn {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+
+  .footer-tagline {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .floating-icon {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-team-name {
+    font-size: 20px;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .footer-copyright {
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .copyright-winner {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
