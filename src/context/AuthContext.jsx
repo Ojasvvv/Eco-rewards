@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     let unsubscribe;
+    let validationInterval;
     
     // Set persistence FIRST, then listen for auth changes
     const initAuth = async () => {
@@ -36,6 +37,36 @@ export const AuthProvider = ({ children }) => {
         unsubscribe = onAuthStateChanged(auth, (currentUser) => {
           setUser(currentUser);
           setLoading(false);
+          
+          // SECURITY: Set up periodic validation if user is logged in
+          if (currentUser) {
+            // Clear any existing interval
+            if (validationInterval) {
+              clearInterval(validationInterval);
+            }
+            
+            // Validate user account every 5 minutes
+            validationInterval = setInterval(async () => {
+              try {
+                // Force token refresh - this will fail if account is deleted
+                await currentUser.getIdToken(true);
+              } catch (tokenError) {
+                console.error('Token refresh failed:', tokenError);
+                // If token refresh fails, sign out user
+                if (tokenError.code === 'auth/user-token-expired' || 
+                    tokenError.code === 'auth/user-disabled' ||
+                    tokenError.message?.includes('user') && tokenError.message?.includes('not found')) {
+                  alert('Your account is no longer valid. You have been logged out.');
+                  await signOut(auth);
+                }
+              }
+            }, 5 * 60 * 1000); // 5 minutes
+          } else {
+            // Clear validation interval if user logs out
+            if (validationInterval) {
+              clearInterval(validationInterval);
+            }
+          }
         });
       } catch (error) {
         console.error('Error setting persistence:', error);
@@ -52,6 +83,9 @@ export const AuthProvider = ({ children }) => {
     return () => {
       if (unsubscribe) {
         unsubscribe();
+      }
+      if (validationInterval) {
+        clearInterval(validationInterval);
       }
     };
   }, []);

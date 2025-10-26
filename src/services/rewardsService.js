@@ -41,6 +41,20 @@ async function callAPI(endpoint, data, throttleKey = null, throttleMs = 2000) {
   if (!response.ok) {
     const error = await response.json();
     
+    // SECURITY: Handle deleted account error - force logout
+    if (response.status === 403 && error.code === 'auth/user-not-found' && error.forceLogout) {
+      // Force logout the user as their account no longer exists
+      try {
+        await auth.signOut();
+        window.location.href = '/';
+        // Show alert before redirect
+        alert('Your account no longer exists. You have been logged out.');
+      } catch (logoutError) {
+        console.error('Error during forced logout:', logoutError);
+      }
+      throw new Error('Account no longer exists');
+    }
+    
     // Handle 429 errors - distinguish between rate limit and daily limit
     if (response.status === 429) {
       // Check if it's a daily limit error (has specific code)

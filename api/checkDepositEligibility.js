@@ -56,8 +56,22 @@ async function checkDepositEligibilityHandler(req, res) {
     const decodedToken = await auth.verifyIdToken(token);
     const userId = decodedToken.uid;
 
-    // Get user details to check email verification
-    const userRecord = await auth.getUser(userId);
+    // SECURITY: Get user details to check email verification AND verify user exists
+    let userRecord;
+    try {
+      userRecord = await auth.getUser(userId);
+    } catch (authError) {
+      if (authError.code === 'auth/user-not-found') {
+        return res.status(403).json({ 
+          error: 'Account no longer exists', 
+          code: 'auth/user-not-found',
+          forceLogout: true,
+          eligible: false,
+          reason: 'account_deleted'
+        });
+      }
+      throw authError;
+    }
 
     // Check 1: Email verification
     // Google OAuth users are auto-verified by Google

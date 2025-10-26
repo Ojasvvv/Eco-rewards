@@ -170,6 +170,7 @@ export const AchievementsProvider = ({ children }) => {
   const [notificationsBlocked, setNotificationsBlocked] = useState(false);
   const [congratsPopup, setCongratsPopup] = useState(null);
   const [notificationTrigger, setNotificationTrigger] = useState(0);
+  const [rewardsRefreshTrigger, setRewardsRefreshTrigger] = useState(0);
 
   // Load achievements and stats from Firestore (secure, server-side storage)
   useEffect(() => {
@@ -400,6 +401,11 @@ export const AchievementsProvider = ({ children }) => {
     setCongratsPopup(null);
   }, []);
 
+  // Trigger rewards refresh (for use after claiming achievement rewards)
+  const triggerRewardsRefresh = useCallback(() => {
+    setRewardsRefreshTrigger(prev => prev + 1);
+  }, []);
+
   const value = {
     unlockedAchievements,
     stats,
@@ -417,7 +423,9 @@ export const AchievementsProvider = ({ children }) => {
     congratsPopup,
     showCongratsPopup,
     closeCongratsPopup,
-    notificationTrigger
+    notificationTrigger,
+    triggerRewardsRefresh,
+    rewardsRefreshTrigger
   };
 
   return (

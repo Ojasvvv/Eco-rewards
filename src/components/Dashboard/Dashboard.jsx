@@ -21,7 +21,7 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { t } = useLanguage();
-  const { recordDeposit, recordRewardRedemption, stats, showCongratsPopup } = useAchievements();
+  const { recordDeposit, recordRewardRedemption, stats, showCongratsPopup, rewardsRefreshTrigger } = useAchievements();
   const navigate = useNavigate();
   const [dustbinCode, setDustbinCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,6 +37,16 @@ const Dashboard = () => {
   const [reportDetails, setReportDetails] = useState('');
   const [outletRewards, setOutletRewards] = useState({});
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isFirstVisit, setIsFirstVisit] = useState(false);
+
+  // Check if this is first visit to dashboard in this session
+  useEffect(() => {
+    const hasVisitedDashboard = sessionStorage.getItem('hasVisitedDashboard');
+    if (!hasVisitedDashboard) {
+      setIsFirstVisit(true);
+      sessionStorage.setItem('hasVisitedDashboard', 'true');
+    }
+  }, []);
 
   // Prevent background scrolling when modal is open
   useEffect(() => {
@@ -74,6 +84,22 @@ const Dashboard = () => {
     
     loadRewards();
   }, [user]);
+
+  // Refresh rewards when achievement rewards are claimed
+  useEffect(() => {
+    const refreshRewards = async () => {
+      if (user?.uid && rewardsRefreshTrigger > 0) {
+        try {
+          const rewardsData = await getUserRewards(user.uid);
+          setRewards(rewardsData.points || 0);
+        } catch (error) {
+          console.error('Error refreshing rewards:', error);
+        }
+      }
+    };
+    
+    refreshRewards();
+  }, [rewardsRefreshTrigger, user]);
 
 
   // Server-side eligibility check (email verification + daily limit)
@@ -546,7 +572,7 @@ const Dashboard = () => {
         <div className="dashboard-content">
           {/* Welcome Section */}
           <section className="welcome-section animate-slideUp">
-            <h2>{t('welcomeBack')}, {sanitizeDisplayName(user?.displayName)?.split(' ')[0] || 'Eco Warrior'}! 👋</h2>
+            <h2>{t(isFirstVisit ? 'welcome' : 'welcomeBack')}, {sanitizeDisplayName(user?.displayName)?.split(' ')[0] || 'Eco Warrior'}! 👋</h2>
             <p>{t('scanQRPrompt')}</p>
           </section>
 

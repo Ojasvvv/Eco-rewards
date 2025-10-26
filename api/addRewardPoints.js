@@ -65,6 +65,20 @@ async function addRewardPointsHandler(req, res) {
     const decodedToken = await getAuth().verifyIdToken(token);
     const userId = decodedToken.uid;
 
+    // SECURITY: Verify user still exists in Firebase Auth (prevents deleted accounts from operating)
+    try {
+      await getAuth().getUser(userId);
+    } catch (authError) {
+      if (authError.code === 'auth/user-not-found') {
+        return res.status(403).json({ 
+          error: 'Account no longer exists', 
+          code: 'auth/user-not-found',
+          forceLogout: true 
+        });
+      }
+      throw authError;
+    }
+
     // Get request data
     const { pointsToAdd, reason, depositData, dustbinCode, userLocation } = req.body;
 

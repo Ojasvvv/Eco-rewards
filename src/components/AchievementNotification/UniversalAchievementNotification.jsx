@@ -6,7 +6,7 @@ import AchievementNotification from './AchievementNotification';
 
 const UniversalAchievementNotification = () => {
   const { user } = useAuth();
-  const { getNextNotification, clearNotification, pendingNotificationsCount, notificationsBlocked, notificationTrigger } = useAchievements();
+  const { getNextNotification, clearNotification, pendingNotificationsCount, notificationsBlocked, notificationTrigger, triggerRewardsRefresh } = useAchievements();
   const [currentNotification, setCurrentNotification] = useState(null);
   const [notificationKey, setNotificationKey] = useState(0);
   const [isClosing, setIsClosing] = useState(false);
@@ -48,6 +48,9 @@ const UniversalAchievementNotification = () => {
         type: 'achievement_claimed',
         timestamp: new Date().toISOString()
       });
+      
+      // Trigger rewards refresh in Dashboard
+      triggerRewardsRefresh();
       
       // Wait for exit animation before clearing
       setTimeout(() => {

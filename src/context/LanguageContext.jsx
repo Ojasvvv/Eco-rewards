@@ -13,7 +13,7 @@ export const useLanguage = () => {
 const translations = {
   en: {
     // Onboarding
-    welcome: "Welcome to EcoRewards",
+    welcome: "Welcome",
     tagline: "Recycle Smart, Earn Rewards",
     selectLanguage: "Select Your Language",
     continue: "Continue",
@@ -123,7 +123,7 @@ const translations = {
   },
   hi: {
     // Onboarding
-    welcome: "EcoRewards में आपका स्वागत है",
+    welcome: "स्वागत है",
     tagline: "समझदारी से रीसायकल करें, इनाम पाएं",
     selectLanguage: "अपनी भाषा चुनें",
     continue: "आगे बढ़ें",
@@ -233,7 +233,7 @@ const translations = {
   },
   te: {
     // Onboarding
-    welcome: "EcoRewards కి స్వాగతం",
+    welcome: "స్వాగతం",
     tagline: "తెలివిగా రీసైకిల్ చేసి, బహుమతులు పొందండి",
     selectLanguage: "మీ భాషను ఎంచుకోండి",
     continue: "కొనసాగించండి",
@@ -343,7 +343,7 @@ const translations = {
   },
   ta: {
     // Onboarding
-    welcome: "EcoRewards க்கு வரவேற்கிறோம்",
+    welcome: "வரவேற்கிறோம்",
     tagline: "புத்திசாலித்தனமாக மறுசுழற்சி செய்யுங்கள், வெகுமதிகளைப் பெறுங்கள்",
     selectLanguage: "உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்",
     continue: "தொடரவும்",
