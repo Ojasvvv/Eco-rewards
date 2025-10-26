@@ -383,8 +383,10 @@ export const AchievementsProvider = ({ children }) => {
   // Unblock notifications
   const unblockNotifications = () => {
     setNotificationsBlocked(false);
-    // Trigger a re-check for pending notifications
-    setNotificationTrigger(prev => prev + 1);
+    // Trigger a re-check for pending notifications after state updates
+    setTimeout(() => {
+      setNotificationTrigger(prev => prev + 1);
+    }, 50);
   };
 
   // Show congrats popup
