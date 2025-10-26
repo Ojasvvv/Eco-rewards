@@ -321,11 +321,16 @@ export const AchievementsProvider = ({ children }) => {
 
   // Unlock an achievement
   const unlockAchievement = (achievement) => {
+    console.log('🏆 Achievement unlocked:', achievement.title);
     setUnlockedAchievements(prev => [...prev, achievement.id]);
-    setPendingNotifications(prev => [...prev, {
-      type: 'achievement',
-      achievement: achievement
-    }]);
+    setPendingNotifications(prev => {
+      const newQueue = [...prev, {
+        type: 'achievement',
+        achievement: achievement
+      }];
+      console.log('📝 Pending notifications queue:', newQueue.length);
+      return newQueue;
+    });
   };
 
   // Get notification to display
@@ -383,13 +388,15 @@ export const AchievementsProvider = ({ children }) => {
 
   // Unblock notifications
   const unblockNotifications = useCallback(() => {
+    console.log('🔓 Unblocking notifications, pending count:', pendingNotifications.length);
     setNotificationsBlocked(false);
     // Trigger a re-check for pending notifications after state updates
     // Increased delay to ensure state has settled
     setTimeout(() => {
+      console.log('🔔 Triggering notification check');
       setNotificationTrigger(prev => prev + 1);
     }, 150);
-  }, []);
+  }, [pendingNotifications.length]);
 
   // Show congrats popup
   const showCongratsPopup = useCallback((points) => {

@@ -7,6 +7,7 @@ const UniversalCongratsPopup = () => {
   const { congratsPopup, closeCongratsPopup, blockNotifications, unblockNotifications } = useAchievements();
   const prevCongratsPopup = useRef(congratsPopup);
   const location = useLocation();
+  const prevLocation = useRef(location.pathname);
 
   useEffect(() => {
     if (congratsPopup) {
@@ -20,11 +21,18 @@ const UniversalCongratsPopup = () => {
 
   // Close popup and unblock notifications when navigating to a different page
   useEffect(() => {
-    if (congratsPopup) {
-      closeCongratsPopup();
-      unblockNotifications();
+    // Only trigger if location actually changed
+    if (location.pathname !== prevLocation.current) {
+      if (congratsPopup) {
+        closeCongratsPopup();
+        // Use a small delay to ensure state settles before unblocking
+        setTimeout(() => {
+          unblockNotifications();
+        }, 100);
+      }
+      prevLocation.current = location.pathname;
     }
-  }, [location.pathname]);
+  }, [location.pathname, congratsPopup, closeCongratsPopup, unblockNotifications]);
 
   // Also ensure unblock on unmount
   useEffect(() => {
