@@ -1,12 +1,43 @@
 import { doc, getDoc } from 'firebase/firestore';
-import { db, functions } from '../firebase/config';
-import { httpsCallable } from 'firebase/functions';
+import { db, auth } from '../firebase/config';
 
 /**
- * Rewards Service - Production Version
- * All write operations go through secure Cloud Functions
+ * Rewards Service - Production Version (Vercel Serverless)
+ * All write operations go through secure Vercel API endpoints
  * This prevents ANY client-side manipulation of rewards
  */
+
+const API_BASE_URL = import.meta.env.PROD 
+  ? 'https://eco-rewards-wheat.vercel.app/api'
+  : 'http://localhost:5173/api';
+
+/**
+ * Helper function to make authenticated API calls
+ */
+async function callAPI(endpoint, data) {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const token = await user.getIdToken();
+  
+  const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'API request failed');
+  }
+
+  return response.json();
+}
 
 /**
  * Initialize user rewards document
@@ -60,21 +91,18 @@ export const getUserRewards = async (userId) => {
 };
 
 /**
- * Add points to user's account via Cloud Function (SERVER-SIDE ONLY)
+ * Add points to user's account via Vercel API (SERVER-SIDE ONLY)
  * This is the ONLY way to add points - fully tamper-proof
  */
 export const addRewardPoints = async (userId, pointsToAdd, reason = 'deposit', depositData = null) => {
   try {
-    // Call the Cloud Function
-    const addRewardPointsFunc = httpsCallable(functions, 'addRewardPoints');
-    
-    const result = await addRewardPointsFunc({
+    const result = await callAPI('addRewardPoints', {
       pointsToAdd,
       reason,
       depositData
     });
     
-    if (result.data.success) {
+    if (result.success) {
       return true;
     } else {
       throw new Error('Failed to add reward points');
@@ -86,21 +114,18 @@ export const addRewardPoints = async (userId, pointsToAdd, reason = 'deposit', d
 };
 
 /**
- * Deduct points from user's account via Cloud Function (SERVER-SIDE ONLY)
+ * Deduct points from user's account via Vercel API (SERVER-SIDE ONLY)
  * Server validates the user has enough points before deducting
  */
 export const deductRewardPoints = async (userId, pointsToDeduct, couponName) => {
   try {
-    // Call the Cloud Function
-    const redeemRewardPointsFunc = httpsCallable(functions, 'redeemRewardPoints');
-    
-    const result = await redeemRewardPointsFunc({
+    const result = await callAPI('redeemRewardPoints', {
       pointsToRedeem: pointsToDeduct,
       couponName,
       couponId: `${couponName}_${Date.now()}`
     });
     
-    if (result.data.success) {
+    if (result.success) {
       return true;
     } else {
       throw new Error('Failed to redeem reward points');
@@ -108,9 +133,9 @@ export const deductRewardPoints = async (userId, pointsToDeduct, couponName) => 
   } catch (error) {
     console.error('Error deducting reward points:', error);
     // Provide more specific error messages
-    if (error.code === 'functions/failed-precondition') {
+    if (error.message.includes('Insufficient points')) {
       throw new Error('Insufficient points');
-    } else if (error.code === 'functions/unauthenticated') {
+    } else if (error.message.includes('Unauthorized')) {
       throw new Error('Authentication required');
     }
     throw error;
@@ -212,18 +237,15 @@ export const getUserStats = async (userId) => {
 };
 
 /**
- * Update user stats via Cloud Function (SERVER-SIDE ONLY)
+ * Update user stats via Vercel API (SERVER-SIDE ONLY)
  */
 export const updateUserStats = async (userId, statsUpdate) => {
   try {
-    // Call the Cloud Function
-    const updateUserStatsFunc = httpsCallable(functions, 'updateUserStats');
-    
-    const result = await updateUserStatsFunc({
+    const result = await callAPI('updateUserStats', {
       statsUpdate
     });
     
-    if (result.data.success) {
+    if (result.success) {
       return true;
     } else {
       throw new Error('Failed to update user stats');
