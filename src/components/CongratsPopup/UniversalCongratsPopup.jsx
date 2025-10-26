@@ -12,7 +12,7 @@ const UniversalCongratsPopup = () => {
       // Small delay to ensure state settles before unblocking
       const timer = setTimeout(() => {
         unblockNotifications();
-      }, 100);
+      }, 50);
       return () => clearTimeout(timer);
     }
   }, [congratsPopup, blockNotifications, unblockNotifications]);

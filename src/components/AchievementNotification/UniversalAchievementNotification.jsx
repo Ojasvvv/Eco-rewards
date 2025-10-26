@@ -6,7 +6,7 @@ import AchievementNotification from './AchievementNotification';
 
 const UniversalAchievementNotification = () => {
   const { user } = useAuth();
-  const { getNextNotification, clearNotification, pendingNotificationsCount, notificationsBlocked } = useAchievements();
+  const { getNextNotification, clearNotification, pendingNotificationsCount, notificationsBlocked, notificationTrigger } = useAchievements();
   const [currentNotification, setCurrentNotification] = useState(null);
   const [notificationKey, setNotificationKey] = useState(0);
   const [isClosing, setIsClosing] = useState(false);
@@ -20,15 +20,15 @@ const UniversalAchievementNotification = () => {
     if (!currentNotification && !isClosing && !notificationsBlocked) {
       const notification = getNextNotification();
       if (notification) {
-        // Small delay to ensure previous notification fully cleared
+        // Small delay to ensure previous notification fully cleared (reduced from 100ms to 50ms)
         const timer = setTimeout(() => {
           setCurrentNotification(notification);
           setNotificationKey(prev => prev + 1);
-        }, 100);
+        }, 50);
         return () => clearTimeout(timer);
       }
     }
-  }, [currentNotification, getNextNotification, pendingNotificationsCount, isClosing, notificationsBlocked]);
+  }, [currentNotification, getNextNotification, pendingNotificationsCount, isClosing, notificationsBlocked, notificationTrigger]);
 
   const handleClose = () => {
     setIsClosing(true);
