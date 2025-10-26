@@ -321,11 +321,16 @@ export const AchievementsProvider = ({ children }) => {
 
   // Unlock an achievement
   const unlockAchievement = (achievement) => {
+    console.log('🏆 Unlocking achievement:', achievement.id);
     setUnlockedAchievements(prev => [...prev, achievement.id]);
-    setPendingNotifications(prev => [...prev, {
-      type: 'achievement',
-      achievement: achievement
-    }]);
+    setPendingNotifications(prev => {
+      const newQueue = [...prev, {
+        type: 'achievement',
+        achievement: achievement
+      }];
+      console.log('📋 Pending notifications queue:', newQueue.length);
+      return newQueue;
+    });
   };
 
   // Get notification to display
@@ -378,15 +383,18 @@ export const AchievementsProvider = ({ children }) => {
 
   // Block notifications (e.g., when congrats popup is showing)
   const blockNotifications = useCallback(() => {
+    console.log('🚫 Blocking notifications');
     setNotificationsBlocked(true);
   }, []);
 
   // Unblock notifications
   const unblockNotifications = useCallback(() => {
+    console.log('✅ Unblocking notifications');
     setNotificationsBlocked(false);
     // Trigger a re-check for pending notifications after state updates
     // Increased delay to ensure state has settled
     setTimeout(() => {
+      console.log('🔄 Triggering notification check');
       setNotificationTrigger(prev => prev + 1);
     }, 150);
   }, []);

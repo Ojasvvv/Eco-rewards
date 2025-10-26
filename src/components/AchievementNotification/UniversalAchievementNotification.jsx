@@ -13,14 +13,24 @@ const UniversalAchievementNotification = () => {
 
   // Check for new notifications
   useEffect(() => {
+    console.log('🔔 Notification check:', {
+      currentNotification: !!currentNotification,
+      isClosing,
+      notificationsBlocked,
+      pendingCount: pendingNotificationsCount,
+      notificationTrigger
+    });
+    
     // Only show new notification if:
     // 1. Not currently showing one
     // 2. Not in the middle of closing
     // 3. Notifications are not blocked (e.g., by congrats popup)
     if (!currentNotification && !isClosing && !notificationsBlocked) {
       const notification = getNextNotification();
+      console.log('📬 Got notification:', notification);
       if (notification) {
         // Show notification immediately - delays are handled elsewhere
+        console.log('✅ Showing notification');
         setCurrentNotification(notification);
         setNotificationKey(prev => prev + 1);
       }
