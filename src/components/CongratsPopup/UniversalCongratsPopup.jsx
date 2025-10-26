@@ -16,7 +16,7 @@ const UniversalCongratsPopup = () => {
     }
   }, [congratsPopup, blockNotifications, unblockNotifications]);
 
-  if (!isShowing) return null;
+  if (!isShowing || !congratsPopup) return null;
 
   return (
     <CongratsPopup
