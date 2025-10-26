@@ -1,0 +1,53 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isValidImageType() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    function isValidImageSize() {
+      return request.resource.size < 5 * 1024 * 1024; // 5MB max
+    }
+    
+    // User profile pictures
+    match /users/{userId}/profile/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) 
+        && isValidImageType() 
+        && isValidImageSize();
+      allow delete: if isOwner(userId);
+    }
+    
+    // Report images (for dustbin issues)
+    match /reports/{userId}/{reportId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId) 
+        && isValidImageType() 
+        && isValidImageSize();
+      allow update, delete: if isOwner(userId);
+    }
+    
+    // Public assets (company logos, etc.) - read only
+    match /public/{allPaths=**} {
+      allow read: if true;
+      allow write: if false; // Only admins via backend
+    }
+    
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
