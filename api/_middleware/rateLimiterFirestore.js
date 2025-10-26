@@ -93,12 +93,33 @@ export async function checkRateLimitFirestore(userId, endpoint) {
       const data = doc.data();
       let requests = data.requests || [];
       
-      // Clean up old requests outside the window
-      requests = requests.filter(req => req.timestamp > windowStart);
+      // AGGRESSIVE cleanup: Remove old requests outside the window
+      requests = requests.filter(req => {
+        const age = now - req.timestamp;
+        return age < config.windowMs;
+      });
       
-      // If all requests are old (cleaned up), reset the array
+      // Safety: If array somehow has too many items, keep only recent ones
+      if (requests.length > config.maxRequests * 2) {
+        requests = requests.slice(-config.maxRequests);
+      }
+      
+      // If all requests are old, completely reset
       if (requests.length === 0) {
-        requests = [];
+        // Reset the document completely
+        transaction.set(rateLimitRef, {
+          userId,
+          endpoint,
+          requests: [{
+            timestamp: now,
+            ip: null
+          }],
+          windowStart: now,
+          lastRequest: now,
+          updatedAt: new Date()
+        });
+        
+        return { allowed: true, remaining: config.maxRequests - 1 };
       }
       
       // Check if under limit

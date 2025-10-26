@@ -105,6 +105,18 @@ const Dashboard = () => {
       return eligibility;
     } catch (error) {
       console.error('Error checking eligibility:', error);
+      
+      // Check if it's a rate limit error
+      if (error.message && error.message.includes('Rate limit exceeded')) {
+        const match = error.message.match(/(\d+) seconds/);
+        const waitTime = match ? match[1] : '60';
+        return {
+          eligible: false,
+          reason: 'rate_limit',
+          message: `⏱️ Too many requests. Please wait ${waitTime} seconds before trying again.`
+        };
+      }
+      
       return {
         eligible: false,
         reason: 'error',
@@ -281,7 +293,15 @@ const Dashboard = () => {
         }, 4000);
       } catch (rewardError) {
         console.error('Error crediting rewards:', rewardError);
-        setError('Deposit recorded, but there was an issue crediting points. Please contact support.');
+        
+        // Check if it's a rate limit error
+        if (rewardError.message && rewardError.message.includes('Rate limit exceeded')) {
+          const match = rewardError.message.match(/(\d+) seconds/);
+          const waitTime = match ? match[1] : '60';
+          setError(`⏱️ Rate limit reached. Please wait ${waitTime} seconds before trying again.`);
+        } else {
+          setError('Deposit recorded, but there was an issue crediting points. Please contact support.');
+        }
         setCurrentStep('');
       }
       
