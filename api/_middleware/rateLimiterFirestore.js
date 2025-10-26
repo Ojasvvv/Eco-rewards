@@ -48,10 +48,10 @@ import { getFirestore } from 'firebase-admin/firestore';
  * More forgiving limits to prevent blocking legitimate users
  */
 const RATE_LIMITS = {
-  addRewardPoints: { maxRequests: 20, windowMs: 60000 }, // 20 per minute (was 10)
-  redeemRewardPoints: { maxRequests: 10, windowMs: 60000 }, // 10 per minute (was 5)
-  updateUserStats: { maxRequests: 30, windowMs: 60000 }, // 30 per minute (was 20)
-  checkDepositEligibility: { maxRequests: 60, windowMs: 60000 }, // 60 per minute (was 30)
+  addRewardPoints: { maxRequests: 30, windowMs: 60000 }, // 30 per minute (was 20)
+  redeemRewardPoints: { maxRequests: 20, windowMs: 60000 }, // 20 per minute (was 10)
+  updateUserStats: { maxRequests: 50, windowMs: 60000 }, // 50 per minute (was 30)
+  checkDepositEligibility: { maxRequests: 100, windowMs: 60000 }, // 100 per minute (was 60)
 };
 
 /**
@@ -127,6 +127,16 @@ export async function checkRateLimitFirestore(userId, endpoint) {
         // Rate limit exceeded
         const oldestRequest = requests[0].timestamp;
         const retryAfter = Math.ceil((oldestRequest + config.windowMs - now) / 1000);
+        
+        // CRITICAL FIX: Update the document with filtered requests even when rate-limited
+        // This ensures old expired requests are cleaned up from the database
+        // Without this, users get stuck in rate-limited state indefinitely
+        transaction.update(rateLimitRef, {
+          requests,
+          windowStart: requests.length > 0 ? requests[0].timestamp : now,
+          lastRequest: now,
+          updatedAt: new Date()
+        });
         
         return {
           allowed: false,

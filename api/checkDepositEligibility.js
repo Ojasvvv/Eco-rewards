@@ -1,6 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
+import { withRateLimitFirestore as withRateLimit } from './_middleware/rateLimiterFirestore.js';
 
 // Initialize Firebase Admin SDK
 if (!getApps().length) {
@@ -24,7 +25,7 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
 // Daily deposit limit per user
 const DAILY_DEPOSIT_LIMIT = 5;
 
-export default async function handler(req, res) {
+async function checkDepositEligibilityHandler(req, res) {
   // Handle CORS
   const origin = req.headers.origin;
   if (ALLOWED_ORIGINS.includes(origin)) {
@@ -119,4 +120,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Failed to check eligibility' });
   }
 }
+
+// Export with rate limiting
+export default withRateLimit('checkDepositEligibility', checkDepositEligibilityHandler);
 
