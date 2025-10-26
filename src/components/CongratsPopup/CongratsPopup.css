@@ -1,0 +1,127 @@
+.congrats-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.congrats-popup {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 320px;
+  width: 90%;
+  text-align: center;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.congrats-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.congrats-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.congrats-message {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.reward-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.reward-badge:hover {
+  transform: scale(1.05);
+}
+
+.reward-emoji {
+  font-size: 24px;
+}
+
+.reward-points {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fef3c7;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .congrats-popup {
+    padding: 24px;
+    max-width: 280px;
+  }
+
+  .congrats-icon {
+    font-size: 56px;
+  }
+
+  .congrats-title {
+    font-size: 20px;
+  }
+
+  .congrats-message {
+    font-size: 14px;
+  }
+
+  .reward-emoji {
+    font-size: 20px;
+  }
+
+  .reward-points {
+    font-size: 18px;
+  }
+}
+

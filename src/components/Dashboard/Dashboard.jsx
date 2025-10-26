@@ -21,7 +21,7 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { t } = useLanguage();
-  const { recordDeposit, recordRewardRedemption, stats, blockNotifications, unblockNotifications } = useAchievements();
+  const { recordDeposit, recordRewardRedemption, stats, showCongratsPopup } = useAchievements();
   const navigate = useNavigate();
   const [dustbinCode, setDustbinCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,7 +37,6 @@ const Dashboard = () => {
   const [reportDetails, setReportDetails] = useState('');
   const [outletRewards, setOutletRewards] = useState({});
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showCongratsPopup, setShowCongratsPopup] = useState(false);
 
   // Prevent background scrolling when modal is open
   useEffect(() => {
@@ -52,15 +51,6 @@ const Dashboard = () => {
       document.body.style.overflow = 'unset';
     };
   }, [showRewards, showReport]);
-
-  // Block achievement notifications when congrats popup is showing
-  useEffect(() => {
-    if (showCongratsPopup) {
-      blockNotifications();
-    } else {
-      unblockNotifications();
-    }
-  }, [showCongratsPopup, blockNotifications, unblockNotifications]);
 
   // Load rewards from Firestore (secure, server-side storage)
   useEffect(() => {
@@ -312,14 +302,13 @@ const Dashboard = () => {
         setSuccess(`🎉 ${t('success')}! ${t('earnedPoints')} ${pointsEarned} ${t('points')}!`);
         setDustbinCode('');
         
-        // Show congratulations popup
-        setShowCongratsPopup(true);
+        // Show congratulations popup (universal)
+        showCongratsPopup(pointsEarned);
         
         setTimeout(() => {
           setSuccess('');
           setCurrentStep('');
-          setShowCongratsPopup(false);
-        }, 4000);
+        }, 1000);
       } catch (rewardError) {
         console.error('Error crediting rewards:', rewardError);
         
@@ -950,21 +939,6 @@ const Dashboard = () => {
                   {rewards >= 35 ? 'Redeem Now' : `Need ${35 - rewards} more points`}
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Congratulations Popup */}
-      {showCongratsPopup && (
-        <div className="congrats-popup-overlay" onClick={() => setShowCongratsPopup(false)}>
-          <div className="congrats-popup" onClick={(e) => e.stopPropagation()}>
-            <div className="congrats-icon">🎉</div>
-            <h2 className="congrats-title">{t('congratulations')}</h2>
-            <p className="congrats-message">{t('welcomeReward')}</p>
-            <div className="reward-badge" onClick={() => setShowCongratsPopup(false)}>
-              <span className="reward-emoji">💰</span>
-              <span className="reward-points">+10</span>
             </div>
           </div>
         </div>

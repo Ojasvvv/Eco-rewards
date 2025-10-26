@@ -12,6 +12,7 @@ import Onboarding from './components/Onboarding/Onboarding';
 import ProtectedRoute from './components/ProtectedRoute';
 import PWAInstallPrompt from './components/PWAInstallPrompt/PWAInstallPrompt';
 import UniversalAchievementNotification from './components/AchievementNotification/UniversalAchievementNotification';
+import UniversalCongratsPopup from './components/CongratsPopup/UniversalCongratsPopup';
 
 function App() {
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -53,6 +54,7 @@ function App() {
           <AuthProvider>
             <AchievementsProvider>
               <PWAInstallPrompt />
+              <UniversalCongratsPopup />
               <UniversalAchievementNotification />
               <Routes>
                 <Route path="/" element={<Login />} />

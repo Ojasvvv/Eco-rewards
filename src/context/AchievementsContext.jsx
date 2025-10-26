@@ -168,6 +168,7 @@ export const AchievementsProvider = ({ children }) => {
   const [pendingNotifications, setPendingNotifications] = useState([]);
   const [statsLoading, setStatsLoading] = useState(true);
   const [notificationsBlocked, setNotificationsBlocked] = useState(false);
+  const [congratsPopup, setCongratsPopup] = useState(null);
 
   // Load achievements and stats from Firestore (secure, server-side storage)
   useEffect(() => {
@@ -383,6 +384,16 @@ export const AchievementsProvider = ({ children }) => {
     setNotificationsBlocked(false);
   };
 
+  // Show congrats popup
+  const showCongratsPopup = (points) => {
+    setCongratsPopup({ points });
+  };
+
+  // Close congrats popup
+  const closeCongratsPopup = () => {
+    setCongratsPopup(null);
+  };
+
   const value = {
     unlockedAchievements,
     stats,
@@ -396,7 +407,10 @@ export const AchievementsProvider = ({ children }) => {
     pendingNotificationsCount: pendingNotifications.length,
     notificationsBlocked,
     blockNotifications,
-    unblockNotifications
+    unblockNotifications,
+    congratsPopup,
+    showCongratsPopup,
+    closeCongratsPopup
   };
 
   return (
