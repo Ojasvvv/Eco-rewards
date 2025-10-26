@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './AchievementNotification.css';
 
-const AchievementNotification = ({ notification, onClose, onRewardClaimed }) => {
-  const [isVisible, setIsVisible] = useState(true);
+const AchievementNotification = ({ notification, onClose, onRewardClaimed, isClosing }) => {
   const [confetti, setConfetti] = useState([]);
-  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     // Generate subtle confetti - fewer pieces for cleaner look
@@ -18,13 +16,6 @@ const AchievementNotification = ({ notification, onClose, onRewardClaimed }) => 
     setConfetti(confettiArray);
   }, []);
 
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      onClose();
-    }, 300);
-  };
-
   const handleClaimReward = () => {
     const reward = notification.type === 'achievement' 
       ? notification.achievement.reward 
@@ -32,8 +23,9 @@ const AchievementNotification = ({ notification, onClose, onRewardClaimed }) => 
     
     if (reward > 0) {
       onRewardClaimed(reward);
+    } else {
+      onClose();
     }
-    handleClose();
   };
 
   if (!notification) return null;
@@ -42,7 +34,7 @@ const AchievementNotification = ({ notification, onClose, onRewardClaimed }) => 
   const isStreakMilestone = notification.type === 'streak_milestone';
 
   return (
-    <div className={`achievement-notification-overlay ${isVisible ? 'visible' : ''}`}>
+    <div className={`achievement-notification-overlay ${isClosing ? 'closing' : 'visible'}`}>
       {/* Confetti */}
       <div className="confetti-container">
         {confetti.map(piece => (
@@ -59,7 +51,7 @@ const AchievementNotification = ({ notification, onClose, onRewardClaimed }) => 
         ))}
       </div>
 
-      <div className={`achievement-notification ${isVisible ? 'show' : ''}`} onClick={(e) => e.stopPropagation()}>
+      <div className={`achievement-notification ${isClosing ? 'closing' : 'show'}`} onClick={(e) => e.stopPropagation()}>
 
         {/* Icon */}
         <div className="notification-icon-large">

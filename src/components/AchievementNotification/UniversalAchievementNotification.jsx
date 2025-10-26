@@ -9,26 +9,38 @@ const UniversalAchievementNotification = () => {
   const { getNextNotification, clearNotification, pendingNotificationsCount } = useAchievements();
   const [currentNotification, setCurrentNotification] = useState(null);
   const [notificationKey, setNotificationKey] = useState(0);
+  const [isClosing, setIsClosing] = useState(false);
 
   // Check for new notifications
   useEffect(() => {
-    if (!currentNotification) {
+    // Only show new notification if not currently showing one and not in the middle of closing
+    if (!currentNotification && !isClosing) {
       const notification = getNextNotification();
       if (notification) {
-        setCurrentNotification(notification);
-        // Increment key to force smooth re-render without flash
-        setNotificationKey(prev => prev + 1);
+        // Small delay to ensure previous notification fully cleared
+        const timer = setTimeout(() => {
+          setCurrentNotification(notification);
+          setNotificationKey(prev => prev + 1);
+        }, 100);
+        return () => clearTimeout(timer);
       }
     }
-  }, [currentNotification, getNextNotification, pendingNotificationsCount]);
+  }, [currentNotification, getNextNotification, pendingNotificationsCount, isClosing]);
 
   const handleClose = () => {
-    clearNotification();
-    setCurrentNotification(null);
+    setIsClosing(true);
+    // Wait for exit animation before clearing
+    setTimeout(() => {
+      clearNotification();
+      setCurrentNotification(null);
+      setIsClosing(false);
+    }, 400); // Match exit animation duration
   };
 
   const handleRewardClaimed = async (rewardPoints) => {
     if (!user?.uid) return;
+    
+    setIsClosing(true);
     
     try {
       // Add points to Firestore securely
@@ -37,12 +49,16 @@ const UniversalAchievementNotification = () => {
         timestamp: new Date().toISOString()
       });
       
-      // Clear current notification
-      clearNotification();
-      setCurrentNotification(null);
+      // Wait for exit animation before clearing
+      setTimeout(() => {
+        clearNotification();
+        setCurrentNotification(null);
+        setIsClosing(false);
+      }, 400); // Match exit animation duration
     } catch (error) {
       console.error('Error claiming achievement reward:', error);
       alert('Failed to claim reward. Please try again.');
+      setIsClosing(false);
     }
   };
 
@@ -54,6 +70,7 @@ const UniversalAchievementNotification = () => {
       notification={currentNotification}
       onClose={handleClose}
       onRewardClaimed={handleRewardClaimed}
+      isClosing={isClosing}
     />
   );
 };
