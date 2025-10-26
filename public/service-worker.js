@@ -57,11 +57,25 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip caching during development (Vite HMR, node_modules, etc.)
+  if (event.request.url.includes('/@vite/') || 
+      event.request.url.includes('/node_modules/') ||
+      event.request.url.includes('/@fs/') ||
+      event.request.url.includes('/@id/') ||
+      event.request.url.includes('.js?v=') ||
+      event.request.url.includes('.ts?v=') ||
+      event.request.url.includes('.jsx?v=') ||
+      event.request.url.includes('.tsx?v=')) {
+    // Just fetch, don't cache
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
         // Only cache successful GET requests
-        if (response && response.status === 200) {
+        if (response && response.status === 200 && response.type === 'basic') {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME)
             .then((cache) => {

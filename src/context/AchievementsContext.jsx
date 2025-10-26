@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { 
+  initializeUserStats, 
+  getUserStats, 
+  updateUserStats 
+} from '../services/rewardsService';
 
 const AchievementsContext = createContext({});
 
@@ -161,33 +166,54 @@ export const AchievementsProvider = ({ children }) => {
     streakRewardsCollected: []
   });
   const [pendingNotifications, setPendingNotifications] = useState([]);
+  const [statsLoading, setStatsLoading] = useState(true);
 
-  // Load achievements and stats from localStorage
+  // Load achievements and stats from Firestore (secure, server-side storage)
   useEffect(() => {
-    if (user?.uid) {
-      const savedAchievements = localStorage.getItem(`achievements_${user.uid}`);
-      const savedStats = localStorage.getItem(`stats_${user.uid}`);
-      
-      if (savedAchievements) {
-        setUnlockedAchievements(JSON.parse(savedAchievements));
+    const loadStats = async () => {
+      if (user?.uid) {
+        try {
+          setStatsLoading(true);
+          
+          // Load achievements from localStorage (can migrate to Firestore later)
+          const savedAchievements = localStorage.getItem(`achievements_${user.uid}`);
+          if (savedAchievements) {
+            setUnlockedAchievements(JSON.parse(savedAchievements));
+          }
+          
+          // Initialize user stats in Firestore if first time
+          await initializeUserStats(user.uid);
+          
+          // Load stats from Firestore
+          const firestoreStats = await getUserStats(user.uid);
+          setStats(firestoreStats);
+          
+          // Check streak on load
+          checkStreak(firestoreStats);
+        } catch (error) {
+          console.error('Error loading stats:', error);
+          // Fallback to localStorage if Firestore fails
+          const savedStats = localStorage.getItem(`stats_${user.uid}`);
+          if (savedStats) {
+            const parsedStats = JSON.parse(savedStats);
+            setStats(parsedStats);
+            checkStreak(parsedStats);
+          }
+        } finally {
+          setStatsLoading(false);
+        }
       }
-      
-      if (savedStats) {
-        const parsedStats = JSON.parse(savedStats);
-        setStats(parsedStats);
-        // Check streak on load
-        checkStreak(parsedStats);
-      }
-    }
+    };
+    
+    loadStats();
   }, [user]);
 
-  // Save achievements and stats to localStorage
+  // Save achievements to localStorage (keep for now, can migrate later)
   useEffect(() => {
-    if (user?.uid) {
+    if (user?.uid && unlockedAchievements.length > 0) {
       localStorage.setItem(`achievements_${user.uid}`, JSON.stringify(unlockedAchievements));
-      localStorage.setItem(`stats_${user.uid}`, JSON.stringify(stats));
     }
-  }, [unlockedAchievements, stats, user]);
+  }, [unlockedAchievements, user]);
 
   // Check and update streak
   const checkStreak = (currentStats) => {
@@ -218,7 +244,7 @@ export const AchievementsProvider = ({ children }) => {
   };
 
   // Record a new deposit
-  const recordDeposit = (outletId) => {
+  const recordDeposit = async (outletId) => {
     const now = new Date();
     const hour = now.getHours();
     const day = now.getDay(); // 0 = Sunday, 6 = Saturday
@@ -258,6 +284,13 @@ export const AchievementsProvider = ({ children }) => {
         lastDepositDate: now.toISOString()
       };
 
+      // Save to Firestore (async, don't block UI)
+      if (user?.uid) {
+        updateUserStats(user.uid, newStats).catch(error => {
+          console.error('Error saving stats to Firestore:', error);
+        });
+      }
+
       // Check for newly unlocked achievements
       checkAchievements(newStats);
 
@@ -282,12 +315,20 @@ export const AchievementsProvider = ({ children }) => {
   };
 
   // Record a reward redemption
-  const recordRewardRedemption = () => {
+  const recordRewardRedemption = async () => {
     setStats(prevStats => {
       const newStats = {
         ...prevStats,
         rewardsRedeemed: prevStats.rewardsRedeemed + 1
       };
+      
+      // Save to Firestore (async, don't block UI)
+      if (user?.uid) {
+        updateUserStats(user.uid, newStats).catch(error => {
+          console.error('Error saving stats to Firestore:', error);
+        });
+      }
+      
       checkAchievements(newStats);
       return newStats;
     });

@@ -6,6 +6,12 @@ import { useAchievements } from '../../context/AchievementsContext';
 import { useNavigate } from 'react-router-dom';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import AchievementNotification from '../AchievementNotification/AchievementNotification';
+import { 
+  initializeUserRewards, 
+  getUserRewards, 
+  addRewardPoints, 
+  deductRewardPoints 
+} from '../../services/rewardsService';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -18,34 +24,42 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
-  const [rewards, setRewards] = useState(() => {
-    // Load rewards from localStorage
-    const saved = localStorage.getItem(`rewards_${user?.uid}`);
-    return saved ? parseInt(saved, 10) : 0;
-  });
+  const [rewards, setRewards] = useState(0);
+  const [rewardsLoading, setRewardsLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState('');
   const [userLocation, setUserLocation] = useState(null);
   const [showRewards, setShowRewards] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [reportType, setReportType] = useState('');
   const [reportDetails, setReportDetails] = useState('');
-  const [outletRewards, setOutletRewards] = useState(() => {
-    // Load outlet-specific rewards from localStorage
-    const saved = localStorage.getItem(`outlet_rewards_${user?.uid}`);
-    return saved ? JSON.parse(saved) : {};
-  });
+  const [outletRewards, setOutletRewards] = useState({});
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showCongratsPopup, setShowCongratsPopup] = useState(false);
   const [currentNotification, setCurrentNotification] = useState(null);
   const [pendingNotification, setPendingNotification] = useState(null);
 
-  // Save rewards to localStorage whenever they change
+  // Load rewards from Firestore (secure, server-side storage)
   useEffect(() => {
-    if (user?.uid) {
-      localStorage.setItem(`rewards_${user.uid}`, rewards.toString());
-      localStorage.setItem(`outlet_rewards_${user.uid}`, JSON.stringify(outletRewards));
-    }
-  }, [rewards, outletRewards, user]);
+    const loadRewards = async () => {
+      if (user?.uid) {
+        try {
+          setRewardsLoading(true);
+          // Initialize user rewards if first time
+          await initializeUserRewards(user.uid);
+          // Get current rewards from Firestore
+          const rewardsData = await getUserRewards(user.uid);
+          setRewards(rewardsData.points || 0);
+        } catch (error) {
+          console.error('Error loading rewards:', error);
+          setError('Failed to load rewards. Please refresh the page.');
+        } finally {
+          setRewardsLoading(false);
+        }
+      }
+    };
+    
+    loadRewards();
+  }, [user]);
 
   // Check for achievement notifications - but don't show if congrats popup is active
   useEffect(() => {
@@ -168,31 +182,42 @@ const Dashboard = () => {
       setSuccess('✅ Trash validated successfully!');
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Step 4: Credit rewards FOR THIS SPECIFIC OUTLET
+      // Step 4: Credit rewards FOR THIS SPECIFIC OUTLET (via Firestore)
       setCurrentStep('rewarded');
       const pointsEarned = 10;
-      setRewards(prev => prev + pointsEarned);
       
-      // Track outlet-specific rewards
-      setOutletRewards(prev => ({
-        ...prev,
-        [dustbinInfo.outletId]: (prev[dustbinInfo.outletId] || 0) + pointsEarned
-      }));
-      
-      // Record deposit for achievements
-      recordDeposit(dustbinInfo.outletId);
-      
-      setSuccess(`🎉 ${t('success')}! ${t('earnedPoints')} ${pointsEarned} ${t('points')}!`);
-      setDustbinCode('');
-      
-      // Show congratulations popup
-      setShowCongratsPopup(true);
-      
-      setTimeout(() => {
-        setSuccess('');
+      try {
+        // Add points to Firestore (server-controlled)
+        await addRewardPoints(user.uid, pointsEarned, `Deposit at ${dustbinInfo.outlet}`);
+        
+        // Update local state to reflect the change
+        setRewards(prev => prev + pointsEarned);
+        
+        // Track outlet-specific rewards
+        setOutletRewards(prev => ({
+          ...prev,
+          [dustbinInfo.outletId]: (prev[dustbinInfo.outletId] || 0) + pointsEarned
+        }));
+        
+        // Record deposit for achievements
+        recordDeposit(dustbinInfo.outletId);
+        
+        setSuccess(`🎉 ${t('success')}! ${t('earnedPoints')} ${pointsEarned} ${t('points')}!`);
+        setDustbinCode('');
+        
+        // Show congratulations popup
+        setShowCongratsPopup(true);
+        
+        setTimeout(() => {
+          setSuccess('');
+          setCurrentStep('');
+          setShowCongratsPopup(false);
+        }, 4000);
+      } catch (rewardError) {
+        console.error('Error crediting rewards:', rewardError);
+        setError('Deposit recorded, but there was an issue crediting points. Please contact support.');
         setCurrentStep('');
-        setShowCongratsPopup(false);
-      }, 4000);
+      }
       
     } catch (err) {
       if (err.message === 'location_denied') {
@@ -683,12 +708,18 @@ const Dashboard = () => {
                 <button 
                   className="redeem-btn"
                   disabled={rewards < 30}
-                  onClick={() => {
+                  onClick={async () => {
                     if (rewards >= 30) {
-                      setRewards(prev => prev - 30);
-                      recordRewardRedemption();
-                      const code = `DOM${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Domino's\nValid for 30 days`);
+                      try {
+                        await deductRewardPoints(user.uid, 30, "Domino's 20% OFF");
+                        setRewards(prev => prev - 30);
+                        recordRewardRedemption();
+                        const code = `DOM${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+                        alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Domino's\nValid for 30 days`);
+                      } catch (error) {
+                        alert('Failed to redeem coupon. Please try again.');
+                        console.error('Redemption error:', error);
+                      }
                     }
                   }}
                 >
@@ -711,12 +742,18 @@ const Dashboard = () => {
                 <button 
                   className="redeem-btn"
                   disabled={rewards < 20}
-                  onClick={() => {
+                  onClick={async () => {
                     if (rewards >= 20) {
-                      setRewards(prev => prev - 20);
-                      recordRewardRedemption();
-                      const code = `SBX${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Starbucks\nValid for 30 days`);
+                      try {
+                        await deductRewardPoints(user.uid, 20, 'Starbucks Free Tall Drink');
+                        setRewards(prev => prev - 20);
+                        recordRewardRedemption();
+                        const code = `SBX${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+                        alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Starbucks\nValid for 30 days`);
+                      } catch (error) {
+                        alert('Failed to redeem coupon. Please try again.');
+                        console.error('Redemption error:', error);
+                      }
                     }
                   }}
                 >
@@ -739,12 +776,18 @@ const Dashboard = () => {
                 <button 
                   className="redeem-btn"
                   disabled={rewards < 15}
-                  onClick={() => {
+                  onClick={async () => {
                     if (rewards >= 15) {
-                      setRewards(prev => prev - 15);
-                      recordRewardRedemption();
-                      const code = `MCD${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any McDonald's\nValid for 30 days`);
+                      try {
+                        await deductRewardPoints(user.uid, 15, "McDonald's Free Medium Fries");
+                        setRewards(prev => prev - 15);
+                        recordRewardRedemption();
+                        const code = `MCD${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+                        alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any McDonald's\nValid for 30 days`);
+                      } catch (error) {
+                        alert('Failed to redeem coupon. Please try again.');
+                        console.error('Redemption error:', error);
+                      }
                     }
                   }}
                 >
@@ -767,12 +810,18 @@ const Dashboard = () => {
                 <button 
                   className="redeem-btn"
                   disabled={rewards < 25}
-                  onClick={() => {
+                  onClick={async () => {
                     if (rewards >= 25) {
-                      setRewards(prev => prev - 25);
-                      recordRewardRedemption();
-                      const code = `KFC${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any KFC\nValid for 30 days`);
+                      try {
+                        await deductRewardPoints(user.uid, 25, 'KFC $5 OFF');
+                        setRewards(prev => prev - 25);
+                        recordRewardRedemption();
+                        const code = `KFC${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+                        alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any KFC\nValid for 30 days`);
+                      } catch (error) {
+                        alert('Failed to redeem coupon. Please try again.');
+                        console.error('Redemption error:', error);
+                      }
                     }
                   }}
                 >
@@ -795,12 +844,18 @@ const Dashboard = () => {
                 <button 
                   className="redeem-btn"
                   disabled={rewards < 10}
-                  onClick={() => {
+                  onClick={async () => {
                     if (rewards >= 10) {
-                      setRewards(prev => prev - 10);
-                      recordRewardRedemption();
-                      const code = `SUB${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Subway\nValid for 30 days`);
+                      try {
+                        await deductRewardPoints(user.uid, 10, 'Subway Buy 1 Get 1');
+                        setRewards(prev => prev - 10);
+                        recordRewardRedemption();
+                        const code = `SUB${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+                        alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Subway\nValid for 30 days`);
+                      } catch (error) {
+                        alert('Failed to redeem coupon. Please try again.');
+                        console.error('Redemption error:', error);
+                      }
                     }
                   }}
                 >
@@ -823,12 +878,18 @@ const Dashboard = () => {
                 <button 
                   className="redeem-btn"
                   disabled={rewards < 35}
-                  onClick={() => {
+                  onClick={async () => {
                     if (rewards >= 35) {
-                      setRewards(prev => prev - 35);
-                      recordRewardRedemption();
-                      const code = `PHT${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                      alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Pizza Hut\nValid for 30 days`);
+                      try {
+                        await deductRewardPoints(user.uid, 35, 'Pizza Hut 25% OFF');
+                        setRewards(prev => prev - 35);
+                        recordRewardRedemption();
+                        const code = `PHT${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+                        alert(`✅ Coupon Redeemed!\n\nCode: ${code}\n\nShow this at any Pizza Hut\nValid for 30 days`);
+                      } catch (error) {
+                        alert('Failed to redeem coupon. Please try again.');
+                        console.error('Redemption error:', error);
+                      }
                     }
                   }}
                 >
@@ -863,10 +924,18 @@ const Dashboard = () => {
             clearNotification();
             setCurrentNotification(null);
           }}
-          onRewardClaimed={(rewardPoints) => {
-            setRewards(prev => prev + rewardPoints);
-            clearNotification();
-            setCurrentNotification(null);
+          onRewardClaimed={async (rewardPoints) => {
+            try {
+              // Add points to Firestore securely
+              await addRewardPoints(user.uid, rewardPoints, 'Achievement reward');
+              // Update local state
+              setRewards(prev => prev + rewardPoints);
+              clearNotification();
+              setCurrentNotification(null);
+            } catch (error) {
+              console.error('Error claiming achievement reward:', error);
+              alert('Failed to claim reward. Please try again.');
+            }
           }}
         />
       )}
