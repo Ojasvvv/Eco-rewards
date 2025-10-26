@@ -4,7 +4,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
-import Footer from '../Footer/Footer';
 import './Leaderboard.css';
 
 const Leaderboard = () => {
@@ -332,9 +331,6 @@ const Leaderboard = () => {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

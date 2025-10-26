@@ -45,12 +45,13 @@ import { getFirestore } from 'firebase-admin/firestore';
 
 /**
  * Rate limit configuration
+ * More forgiving limits to prevent blocking legitimate users
  */
 const RATE_LIMITS = {
-  addRewardPoints: { maxRequests: 10, windowMs: 60000 }, // 10 per minute
-  redeemRewardPoints: { maxRequests: 5, windowMs: 60000 }, // 5 per minute
-  updateUserStats: { maxRequests: 20, windowMs: 60000 }, // 20 per minute
-  checkDepositEligibility: { maxRequests: 30, windowMs: 60000 }, // 30 per minute
+  addRewardPoints: { maxRequests: 20, windowMs: 60000 }, // 20 per minute (was 10)
+  redeemRewardPoints: { maxRequests: 10, windowMs: 60000 }, // 10 per minute (was 5)
+  updateUserStats: { maxRequests: 30, windowMs: 60000 }, // 30 per minute (was 20)
+  checkDepositEligibility: { maxRequests: 60, windowMs: 60000 }, // 60 per minute (was 30)
 };
 
 /**
@@ -94,6 +95,11 @@ export async function checkRateLimitFirestore(userId, endpoint) {
       
       // Clean up old requests outside the window
       requests = requests.filter(req => req.timestamp > windowStart);
+      
+      // If all requests are old (cleaned up), reset the array
+      if (requests.length === 0) {
+        requests = [];
+      }
       
       // Check if under limit
       if (requests.length >= config.maxRequests) {
