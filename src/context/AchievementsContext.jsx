@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { 
   initializeUserStats, 
@@ -328,17 +328,17 @@ export const AchievementsProvider = ({ children }) => {
   };
 
   // Get notification to display
-  const getNextNotification = () => {
+  const getNextNotification = useCallback(() => {
     if (pendingNotifications.length > 0) {
       return pendingNotifications[0];
     }
     return null;
-  };
+  }, [pendingNotifications]);
 
   // Clear current notification
-  const clearNotification = () => {
+  const clearNotification = useCallback(() => {
     setPendingNotifications(prev => prev.slice(1));
-  };
+  }, []);
 
   // Get achievement progress
   const getAchievementProgress = (achievementId) => {
@@ -376,28 +376,29 @@ export const AchievementsProvider = ({ children }) => {
   };
 
   // Block notifications (e.g., when congrats popup is showing)
-  const blockNotifications = () => {
+  const blockNotifications = useCallback(() => {
     setNotificationsBlocked(true);
-  };
+  }, []);
 
   // Unblock notifications
-  const unblockNotifications = () => {
+  const unblockNotifications = useCallback(() => {
     setNotificationsBlocked(false);
     // Trigger a re-check for pending notifications after state updates
+    // Increased delay to ensure state has settled
     setTimeout(() => {
       setNotificationTrigger(prev => prev + 1);
-    }, 50);
-  };
+    }, 150);
+  }, []);
 
   // Show congrats popup
-  const showCongratsPopup = (points) => {
+  const showCongratsPopup = useCallback((points) => {
     setCongratsPopup({ points });
-  };
+  }, []);
 
   // Close congrats popup
-  const closeCongratsPopup = () => {
+  const closeCongratsPopup = useCallback(() => {
     setCongratsPopup(null);
-  };
+  }, []);
 
   const value = {
     unlockedAchievements,

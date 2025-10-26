@@ -20,12 +20,9 @@ const UniversalAchievementNotification = () => {
     if (!currentNotification && !isClosing && !notificationsBlocked) {
       const notification = getNextNotification();
       if (notification) {
-        // Small delay to ensure previous notification fully cleared
-        const timer = setTimeout(() => {
-          setCurrentNotification(notification);
-          setNotificationKey(prev => prev + 1);
-        }, 100);
-        return () => clearTimeout(timer);
+        // Show notification immediately - delays are handled elsewhere
+        setCurrentNotification(notification);
+        setNotificationKey(prev => prev + 1);
       }
     }
   }, [currentNotification, getNextNotification, pendingNotificationsCount, isClosing, notificationsBlocked, notificationTrigger]);
