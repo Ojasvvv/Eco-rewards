@@ -22,7 +22,7 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { t } = useLanguage();
-  const { recordDeposit, recordRewardRedemption, getNextNotification, clearNotification, stats } = useAchievements();
+  const { recordDeposit, recordRewardRedemption, getNextNotification, clearNotification, stats, pendingNotificationsCount } = useAchievements();
   const navigate = useNavigate();
   const [dustbinCode, setDustbinCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -94,7 +94,7 @@ const Dashboard = () => {
         setPendingNotification(notification);
       }
     }
-  }, [getNextNotification, showCongratsPopup, currentNotification, pendingNotification]);
+  }, [getNextNotification, showCongratsPopup, currentNotification, pendingNotification, pendingNotificationsCount]);
 
   // Show pending notification after congrats popup closes
   useEffect(() => {

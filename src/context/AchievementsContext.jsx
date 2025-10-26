@@ -381,7 +381,8 @@ export const AchievementsProvider = ({ children }) => {
     clearNotification,
     getAchievementProgress,
     achievements: ACHIEVEMENTS,
-    streakMilestones: STREAK_MILESTONES
+    streakMilestones: STREAK_MILESTONES,
+    pendingNotificationsCount: pendingNotifications.length // Add this so Dashboard can react to changes
   };
 
   return (
