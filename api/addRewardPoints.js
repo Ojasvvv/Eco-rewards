@@ -171,20 +171,40 @@ async function addRewardPointsHandler(req, res) {
       const rewardsRef = db.collection('rewards').doc(userId);
       const rewardsDoc = await transaction.get(rewardsRef);
 
+      let currentData;
+      let newPoints;
+      let newTotalEarned;
+
       if (!rewardsDoc.exists) {
-        throw new Error('Rewards document not found');
+        // Auto-create rewards document if it doesn't exist
+        currentData = {
+          points: 0,
+          totalEarned: 0,
+          totalRedeemed: 0,
+          createdAt: new Date()
+        };
+        newPoints = pointsToAdd;
+        newTotalEarned = pointsToAdd;
+        
+        transaction.set(rewardsRef, {
+          points: newPoints,
+          totalEarned: newTotalEarned,
+          totalRedeemed: 0,
+          createdAt: new Date(),
+          lastUpdated: new Date(),
+        });
+      } else {
+        currentData = rewardsDoc.data();
+        newPoints = currentData.points + pointsToAdd;
+        newTotalEarned = currentData.totalEarned + pointsToAdd;
+
+        // Update rewards
+        transaction.update(rewardsRef, {
+          points: newPoints,
+          totalEarned: newTotalEarned,
+          lastUpdated: new Date(),
+        });
       }
-
-      const currentData = rewardsDoc.data();
-      const newPoints = currentData.points + pointsToAdd;
-      const newTotalEarned = currentData.totalEarned + pointsToAdd;
-
-      // Update rewards
-      transaction.update(rewardsRef, {
-        points: newPoints,
-        totalEarned: newTotalEarned,
-        lastUpdated: new Date(),
-      });
 
       // SERVER-SIDE STATS CALCULATION (Security Fix)
       // Only calculate stats for actual deposits, not for bonuses/achievements
@@ -192,7 +212,26 @@ async function addRewardPointsHandler(req, res) {
         const statsRef = db.collection('userStats').doc(userId);
         const statsDoc = await transaction.get(statsRef);
         
-        if (statsDoc.exists) {
+        if (!statsDoc.exists) {
+          // Auto-create stats document if it doesn't exist
+          const now = new Date();
+          const outletId = depositData?.outletId || 'unknown';
+          
+          transaction.set(statsRef, {
+            totalDeposits: 1,
+            earlyBirdDeposits: now.getHours() < 8 ? 1 : 0,
+            nightOwlDeposits: now.getHours() >= 20 ? 1 : 0,
+            weekendDeposits: (now.getDay() === 0 || now.getDay() === 6) ? 1 : 0,
+            outletsVisited: { [outletId]: 1 },
+            rewardsRedeemed: 0,
+            currentStreak: 1,
+            longestStreak: 1,
+            lastDepositDate: now,
+            streakRewardsCollected: [],
+            createdAt: now,
+            lastUpdated: now
+          });
+        } else if (statsDoc.exists) {
           const currentStats = statsDoc.data();
           const now = new Date();
           const hour = now.getHours();
