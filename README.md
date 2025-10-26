@@ -6,7 +6,7 @@
 ![Team](https://img.shields.io/badge/Team-Apatheia-blue?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Production_Ready-success?style=for-the-badge)
 
-**🎉 Winner - GeeksForGeeks Hackathon @ SRM AP University 🎉**
+**🎉 Winner - GeeksForGeeks Hackathon @SRM AP University 🎉**
 
 *Rewarding Responsibility, One Deposit at a Time*
 
@@ -268,7 +268,7 @@ Transform waste disposal from a chore into an **engaging, rewarding experience**
 
 ## 🔒 Security Features
 
-> **Production-grade security** implemented throughout
+> **Top grade security** implemented throughout
 
 ### 🛡️ Authentication & Authorization
 - ✅ Firebase Authentication with Google OAuth
@@ -403,9 +403,9 @@ The complete vision includes smart dustbins with IoT sensors and real-time valid
 
 <div align="center">
 
-| <img src="https://github.com/tejag2309.png" width="100" height="100" style="border-radius: 50%;"><br>**Teja Guduri**<br>[![GitHub](https://img.shields.io/badge/GitHub-tejag2309-181717?style=flat&logo=github)]https://github.com/teja3112) | <img src="https://github.com/ManasM77.png" width="100" height="100" style="border-radius: 50%;"><br>**Manas Mishra**<br>[![GitHub](https://img.shields.io/badge/GitHub-ManasM77-181717?style=flat&logo=github)](https://github.com/ManasM77) | <img src="https://github.com/KARTIKJUYAL.png" width="100" height="100" style="border-radius: 50%;"><br>**Kartik Juyal**<br>[![GitHub](https://img.shields.io/badge/GitHub-KARTIKJUYAL-181717?style=flat&logo=github)](https://github.com/kartikeywastaken) |
+| **Teja Guduri**<br>[![GitHub](https://img.shields.io/badge/GitHub-tejag2309-181717?style=flat&logo=github)](https://github.com/teja3112) | **Manas Mishra**<br>[![GitHub](https://img.shields.io/badge/GitHub-ManasM77-181717?style=flat&logo=github)](https://github.com/ManasM77) | **Kartik Juyal**<br>[![GitHub](https://img.shields.io/badge/GitHub-KARTIKJUYAL-181717?style=flat&logo=github)](https://github.com/kartikeywastaken) |
 |:---:|:---:|:---:|
-| <img src="https://github.com/Yash1300.png" width="100" height="100" style="border-radius: 50%;"><br>**Yash Chaubey**<br>[![GitHub](https://img.shields.io/badge/GitHub-Yash1300-181717?style=flat&logo=github)](https://github.com/yashyyp04) | <img src="https://github.com/Ojasvvv.png" width="100" height="100" style="border-radius: 50%;"><br>**Ojasv Kushwah**<br>[![GitHub](https://img.shields.io/badge/GitHub-Ojasvvv-181717?style=flat&logo=github)](https://github.com/Ojasvvv) | |
+| **Yash Chaubey**<br>[![GitHub](https://img.shields.io/badge/GitHub-Yash1300-181717?style=flat&logo=github)](https://github.com/yashyyp04) | **Ojasv Kushwah**<br>[![GitHub](https://img.shields.io/badge/GitHub-Ojasvvv-181717?style=flat&logo=github)](https://github.com/Ojasvvv) | |
 
 </div>
 
@@ -415,12 +415,11 @@ The complete vision includes smart dustbins with IoT sensors and real-time valid
 
 <div align="center">
 
-### 🚀Developed & Architected by Team Leader
+### 🚀 Developed & Architected by Team Leader
 
 <table>
 <tr>
 <td align="center" width="100%">
-<img src="https://github.com/Ojasvvv.png" width="150" height="150" style="border-radius: 50%;">
 <h2>Ojasv Kushwah</h2>
 <p><strong>Team Leader & Lead Developer</strong></p>
 <p>🔥 <em>This entire project was vibecoded from scratch</em> 🔥</p>
@@ -433,7 +432,6 @@ The complete vision includes smart dustbins with IoT sensors and real-time valid
 - ✅ Security implementation & validation
 - ✅ Database design & Firestore rules
 - ✅ PWA setup & service workers
-- ✅ CI/CD & production deployment
 
 <br>
 
