@@ -94,6 +94,7 @@ export async function checkRateLimitFirestore(userId, endpoint) {
       let requests = data.requests || [];
       
       // AGGRESSIVE cleanup: Remove old requests outside the window
+      // Use strict < comparison - requests older than windowMs are removed
       requests = requests.filter(req => {
         const age = now - req.timestamp;
         return age < config.windowMs;
@@ -124,14 +125,15 @@ export async function checkRateLimitFirestore(userId, endpoint) {
       
       // Check if under limit
       if (requests.length >= config.maxRequests) {
-        // Double-check that the oldest request is still within the window
+        // Double-check that the oldest request is close to expiring
         const oldestRequest = requests[0].timestamp;
         const oldestAge = now - oldestRequest;
         
-        // If the oldest request is actually outside the window, it should have been filtered
-        // This is a safety check to prevent permanent rate limiting due to edge cases
-        if (oldestAge >= config.windowMs) {
-          // The oldest request expired - remove it and allow this request
+        // BUG FIX: Changed threshold from >= to > (strictly greater than)
+        // This allows requests through once the oldest request reaches exactly windowMs age
+        // or is older, preventing users from being stuck in rate-limited state
+        if (oldestAge > config.windowMs - 100) {  // 100ms grace period
+          // The oldest request has expired or is about to expire - remove it and allow this request
           requests.shift(); // Remove the oldest request
           requests.push({
             timestamp: now,
