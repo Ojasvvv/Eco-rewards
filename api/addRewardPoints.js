@@ -181,9 +181,32 @@ async function addRewardPointsHandler(req, res) {
 
     // Use Firestore transaction for atomicity
     const result = await db.runTransaction(async (transaction) => {
+      // ============ PHASE 1: ALL READS FIRST ============
+      // Firestore requires all reads to happen before any writes
+      
+      // Read rewards document
       const rewardsRef = db.collection('rewards').doc(userId);
       const rewardsDoc = await transaction.get(rewardsRef);
 
+      // Read stats document (if needed for deposits)
+      let statsDoc = null;
+      let statsRef = null;
+      if (reason === 'deposit') {
+        statsRef = db.collection('userStats').doc(userId);
+        statsDoc = await transaction.get(statsRef);
+      }
+
+      // Read daily limit document (if needed for deposits)
+      let dailyLimitDoc = null;
+      let dailyLimitRef = null;
+      if (reason === 'deposit') {
+        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        dailyLimitRef = db.collection('dailyLimits').doc(`${userId}_${today}`);
+        dailyLimitDoc = await transaction.get(dailyLimitRef);
+      }
+
+      // ============ PHASE 2: PROCESS DATA ============
+      
       let currentData;
       let newPoints;
       let newTotalEarned;
@@ -198,7 +221,16 @@ async function addRewardPointsHandler(req, res) {
         };
         newPoints = pointsToAdd;
         newTotalEarned = pointsToAdd;
-        
+      } else {
+        currentData = rewardsDoc.data();
+        newPoints = currentData.points + pointsToAdd;
+        newTotalEarned = currentData.totalEarned + pointsToAdd;
+      }
+
+      // ============ PHASE 3: ALL WRITES ============
+      
+      // Write rewards document
+      if (!rewardsDoc.exists) {
         transaction.set(rewardsRef, {
           points: newPoints,
           totalEarned: newTotalEarned,
@@ -207,11 +239,6 @@ async function addRewardPointsHandler(req, res) {
           lastUpdated: new Date(),
         });
       } else {
-        currentData = rewardsDoc.data();
-        newPoints = currentData.points + pointsToAdd;
-        newTotalEarned = currentData.totalEarned + pointsToAdd;
-
-        // Update rewards
         transaction.update(rewardsRef, {
           points: newPoints,
           totalEarned: newTotalEarned,
@@ -219,12 +246,8 @@ async function addRewardPointsHandler(req, res) {
         });
       }
 
-      // SERVER-SIDE STATS CALCULATION (Security Fix)
-      // Only calculate stats for actual deposits, not for bonuses/achievements
-      if (reason === 'deposit') {
-        const statsRef = db.collection('userStats').doc(userId);
-        const statsDoc = await transaction.get(statsRef);
-        
+      // Write stats document (for deposits only)
+      if (reason === 'deposit' && statsDoc !== null) {
         if (!statsDoc.exists) {
           // Auto-create stats document if it doesn't exist
           const now = new Date();
@@ -244,7 +267,7 @@ async function addRewardPointsHandler(req, res) {
             createdAt: now,
             lastUpdated: now
           });
-        } else if (statsDoc.exists) {
+        } else {
           const currentStats = statsDoc.data();
           const now = new Date();
           const hour = now.getHours();
@@ -294,13 +317,11 @@ async function addRewardPointsHandler(req, res) {
             lastUpdated: now
           });
         }
+      }
         
-        // INCREMENT DAILY LIMIT COUNTER (atomically with deposit)
-        // This ensures the counter only increments if the deposit succeeds
+      // Write daily limit counter (for deposits only)
+      if (reason === 'deposit' && dailyLimitDoc !== null && dailyLimitRef !== null) {
         const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        const dailyLimitRef = db.collection('dailyLimits').doc(`${userId}_${today}`);
-        const dailyLimitDoc = await transaction.get(dailyLimitRef);
-        
         const currentCount = dailyLimitDoc.exists ? (dailyLimitDoc.data().count || 0) : 0;
         
         transaction.set(dailyLimitRef, {
