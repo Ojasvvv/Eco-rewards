@@ -212,7 +212,7 @@ const Leaderboard = () => {
               </svg>
               <span>{t('back')}</span>
             </button>
-            <div className="user-profile">
+            <div className="user-profile" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }} title="View Profile">
               <img 
                 src={user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || 'User')}&background=10b981&color=fff`} 
                 alt={user?.displayName || 'User'} 

@@ -80,15 +80,16 @@ const Dashboard = () => {
   }, [user]);
 
   // Check for achievement notifications - but don't show if congrats popup is active
+  // Re-check whenever a notification is cleared (when currentNotification becomes null)
   useEffect(() => {
     const notification = getNextNotification();
-    if (notification && !showCongratsPopup) {
+    if (notification && !showCongratsPopup && !currentNotification) {
       setCurrentNotification(notification);
     } else if (notification && showCongratsPopup) {
       // Store notification to show after congrats popup closes
       setPendingNotification(notification);
     }
-  }, [getNextNotification, showCongratsPopup]);
+  }, [getNextNotification, showCongratsPopup, currentNotification]);
 
   // Show pending notification after congrats popup closes
   useEffect(() => {

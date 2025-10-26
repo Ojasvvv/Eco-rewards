@@ -41,8 +41,14 @@ async function callAPI(endpoint, data, throttleKey = null, throttleMs = 2000) {
   if (!response.ok) {
     const error = await response.json();
     
-    // Handle rate limit errors specifically
+    // Handle 429 errors - distinguish between rate limit and daily limit
     if (response.status === 429) {
+      // Check if it's a daily limit error (has specific code)
+      if (error.code === 'DAILY_LIMIT_REACHED') {
+        throw new Error(error.message || 'Daily deposit limit reached. Try again tomorrow!');
+      }
+      
+      // Otherwise it's a rate limit error
       const retryAfter = response.headers.get('Retry-After') || error.retryAfter || 60;
       throw new Error(`Rate limit exceeded. Please wait ${retryAfter} seconds before trying again.`);
     }
