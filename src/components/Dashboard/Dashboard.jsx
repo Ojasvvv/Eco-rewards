@@ -79,35 +79,32 @@ const Dashboard = () => {
     loadRewards();
   }, [user]);
 
-  // Check for achievement notifications - ONLY show immediately after earning them, not on page load
+  // Check for achievement notifications - show them when available
   // Re-check whenever a notification is cleared (when currentNotification becomes null)
   useEffect(() => {
     const notification = getNextNotification();
-    // Only show if we're actually on the page (component is mounted and visible)
+    
     if (notification && !showCongratsPopup && !currentNotification) {
-      // Small delay to ensure we're on the correct page
-      const timer = setTimeout(() => {
-        setCurrentNotification(notification);
-      }, 100);
-      return () => clearTimeout(timer);
-    } else if (notification && showCongratsPopup) {
-      // Store notification to show after congrats popup closes
+      // Show notification immediately
+      setCurrentNotification(notification);
+    } else if (notification && showCongratsPopup && !pendingNotification) {
+      // Store notification to show after congrats popup closes (if not already pending)
       setPendingNotification(notification);
     }
-  }, [getNextNotification, showCongratsPopup, currentNotification]);
+  }, [getNextNotification, showCongratsPopup, currentNotification, pendingNotification]);
 
   // Show pending notification after congrats popup closes
   useEffect(() => {
-    if (!showCongratsPopup && pendingNotification) {
+    if (!showCongratsPopup && pendingNotification && !currentNotification) {
       setCurrentNotification(pendingNotification);
       setPendingNotification(null);
     }
-  }, [showCongratsPopup, pendingNotification]);
+  }, [showCongratsPopup, pendingNotification, currentNotification]);
 
   // Clear any pending notifications when component unmounts (user navigates away)
   useEffect(() => {
     return () => {
-      // Clear current notification when leaving the page
+      // Clear notifications when leaving the page
       setCurrentNotification(null);
       setPendingNotification(null);
     };
