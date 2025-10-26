@@ -188,7 +188,11 @@ const Dashboard = () => {
       
       try {
         // Add points to Firestore (server-controlled)
-        await addRewardPoints(user.uid, pointsEarned, `Deposit at ${dustbinInfo.outlet}`);
+        await addRewardPoints(user.uid, pointsEarned, 'deposit', {
+          outlet: dustbinInfo.outlet,
+          outletId: dustbinInfo.outletId,
+          timestamp: new Date().toISOString()
+        });
         
         // Update local state to reflect the change
         setRewards(prev => prev + pointsEarned);
@@ -927,7 +931,10 @@ const Dashboard = () => {
           onRewardClaimed={async (rewardPoints) => {
             try {
               // Add points to Firestore securely
-              await addRewardPoints(user.uid, rewardPoints, 'Achievement reward');
+              await addRewardPoints(user.uid, rewardPoints, 'achievement', {
+                type: 'achievement_claimed',
+                timestamp: new Date().toISOString()
+              });
               // Update local state
               setRewards(prev => prev + rewardPoints);
               clearNotification();
