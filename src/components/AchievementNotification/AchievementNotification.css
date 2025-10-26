@@ -4,18 +4,20 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  backdrop-filter: blur(8px);
+  z-index: 10000;
+  transition: background-color 0.3s ease;
+  backdrop-filter: blur(0px);
+  pointer-events: none;
 }
 
 .achievement-notification-overlay.visible {
-  opacity: 1;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  pointer-events: all;
 }
 
 .achievement-notification {
@@ -27,10 +29,11 @@
   width: 90%;
   text-align: center;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  transform: scale(0.9) translateY(-10px);
+  transform: scale(0.8) translateY(20px);
   opacity: 0;
-  transition: all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+  transition: all 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
   border: 1px solid rgba(0, 0, 0, 0.05);
+  pointer-events: all;
 }
 
 .achievement-notification.show {
@@ -321,5 +324,28 @@
     padding: 0.75rem 1.25rem;
     font-size: 0.9rem;
   }
+}
+
+/* Dark mode support */
+body.dark-theme .achievement-notification {
+  background: #1f2937;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .notification-subtitle {
+  color: #f3f4f6;
+}
+
+body.dark-theme .notification-description {
+  color: #9ca3af;
+}
+
+body.dark-theme .close-notification-btn {
+  background: #374151;
+  color: #f3f4f6;
+}
+
+body.dark-theme .close-notification-btn:hover {
+  background: #4b5563;
 }
 

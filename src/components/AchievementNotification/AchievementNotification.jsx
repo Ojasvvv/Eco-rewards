@@ -6,9 +6,6 @@ const AchievementNotification = ({ notification, onClose, onRewardClaimed }) => 
   const [confetti, setConfetti] = useState([]);
 
   useEffect(() => {
-    // Trigger entrance animation
-    setTimeout(() => setIsVisible(true), 10);
-
     // Generate subtle confetti - fewer pieces for cleaner look
     const confettiArray = Array.from({ length: 25 }, (_, i) => ({
       id: i,
@@ -18,6 +15,11 @@ const AchievementNotification = ({ notification, onClose, onRewardClaimed }) => 
       rotation: Math.random() * 360
     }));
     setConfetti(confettiArray);
+
+    // Trigger entrance animation immediately on next frame
+    requestAnimationFrame(() => {
+      setIsVisible(true);
+    });
   }, []);
 
   const handleClose = () => {
