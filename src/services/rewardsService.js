@@ -152,13 +152,22 @@ export const getUserRewards = async (userId) => {
  */
 export const addRewardPoints = async (userId, pointsToAdd, reason = 'deposit', depositData = null, dustbinCode = null, userLocation = null) => {
   try {
+    // Use different throttle keys and times for different operations
+    const throttleKey = reason === 'achievement' 
+      ? `achievementReward_${userId}` 
+      : `addReward_${userId}`;
+    
+    // Achievements: No throttle (instant, server limits are enough)
+    // Deposits: 500ms throttle (just prevents accidental double-clicks)
+    const throttleMs = reason === 'achievement' ? 0 : 500;
+    
     const result = await callAPI('addRewardPoints', {
       pointsToAdd,
       reason,
       depositData,
       dustbinCode,  // Server will validate this
       userLocation  // Server will validate proximity
-    }, `addReward_${userId}`, 2000); // Throttle: 2 seconds between calls
+    }, throttleKey, throttleMs);
     
     if (result.success) {
       return true;
@@ -188,7 +197,7 @@ export const deductRewardPoints = async (userId, pointsToDeduct, couponName) => 
       pointsToRedeem: pointsToDeduct,
       couponName,
       couponId: `${couponName}_${Date.now()}`
-    }, `redeemReward_${userId}`, 3000); // Throttle: 3 seconds between redemptions
+    }, `redeemReward_${userId}`, 800); // Throttle: 800ms between redemptions
     
     if (result.success) {
       return true;
@@ -394,10 +403,9 @@ export const saveAchievements = async (userId, achievements) => {
   try {
     const result = await callAPI('saveAchievements', {
       achievements
-    }, `saveAchievements_${userId}`, 1000); // Throttle: 1 second between saves
+    }, `saveAchievements_${userId}`, 0); // No throttle - server rate limits are enough
     
     if (result.success) {
-      console.log('💾 Achievements saved to Firestore:', achievements.length);
       return true;
     } else {
       throw new Error('Failed to save achievements');
@@ -418,7 +426,6 @@ export const getAchievements = async (userId) => {
     const result = await callAPI('getAchievements', {}, null, 0); // No throttling for reads
     
     if (result.success) {
-      console.log('📂 Loaded achievements from Firestore:', result.achievements.length);
       return result.achievements || [];
     } else {
       throw new Error('Failed to get achievements');

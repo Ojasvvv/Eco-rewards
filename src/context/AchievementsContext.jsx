@@ -179,7 +179,6 @@ export const AchievementsProvider = ({ children }) => {
     const loadStats = async () => {
       if (!user?.uid) {
         // User logged out - clear all state
-        console.log('👋 User logged out, clearing achievements and stats');
         setUnlockedAchievements([]);
         setStats({
           totalDeposits: 0,
@@ -199,7 +198,6 @@ export const AchievementsProvider = ({ children }) => {
       }
       
       // User logged in - clear state first, then load fresh data
-      console.log('👤 User logged in:', user.uid);
       setUnlockedAchievements([]);
       setStats({
         totalDeposits: 0,
@@ -219,11 +217,9 @@ export const AchievementsProvider = ({ children }) => {
         setStatsLoading(true);
         
         // Load achievements from Firestore (SERVER-SIDE)
-        console.log('🔄 Loading achievements from Firestore...');
         const firestoreAchievements = await getAchievements(user.uid);
         
         if (firestoreAchievements && firestoreAchievements.length > 0) {
-          console.log('📂 Loaded achievements from Firestore:', firestoreAchievements);
           setUnlockedAchievements(firestoreAchievements);
           // Also save to localStorage as backup/cache
           localStorage.setItem(`achievements_${user.uid}`, JSON.stringify(firestoreAchievements));
@@ -232,14 +228,11 @@ export const AchievementsProvider = ({ children }) => {
           const localAchievements = localStorage.getItem(`achievements_${user.uid}`);
           if (localAchievements) {
             const parsed = JSON.parse(localAchievements);
-            console.log('📂 Migrating achievements from localStorage to Firestore:', parsed);
             setUnlockedAchievements(parsed);
             // Immediately save to Firestore
             if (parsed.length > 0) {
               await saveAchievements(user.uid, parsed);
             }
-          } else {
-            console.log('📂 No saved achievements found');
           }
         }
         
@@ -248,7 +241,6 @@ export const AchievementsProvider = ({ children }) => {
         
         // Load stats from Firestore
         const firestoreStats = await getUserStats(user.uid);
-        console.log('📊 Loaded stats from Firestore:', firestoreStats);
         setStats(firestoreStats);
         
         // Check streak on load
@@ -281,7 +273,6 @@ export const AchievementsProvider = ({ children }) => {
     const saveAchievementsToFirestore = async () => {
       if (user?.uid && unlockedAchievements.length > 0 && pendingNotifications.length === 0) {
         try {
-          console.log('💾 Saving achievements to Firestore:', unlockedAchievements);
           await saveAchievements(user.uid, unlockedAchievements);
           // Also save to localStorage as backup/cache
           localStorage.setItem(`achievements_${user.uid}`, JSON.stringify(unlockedAchievements));
@@ -328,15 +319,12 @@ export const AchievementsProvider = ({ children }) => {
   // SECURITY FIX: Stats are now calculated SERVER-SIDE
   // This function just triggers a refresh of stats from Firestore
   const recordDeposit = async (outletId) => {
-    console.log('📥 Recording deposit for outlet:', outletId);
     // Stats are calculated server-side in addRewardPoints API
     // Just reload stats from Firestore after a short delay
     setTimeout(async () => {
       if (user?.uid) {
         try {
-          console.log('🔄 Refreshing stats from Firestore...');
           const updatedStats = await getUserStats(user.uid);
-          console.log('✅ Updated stats received:', updatedStats);
           
           setStats(prevStats => {
             // Check for newly unlocked achievements
@@ -351,7 +339,6 @@ export const AchievementsProvider = ({ children }) => {
               const collectedRewards = updatedStats.streakRewardsCollected || [];
               
               if (!collectedRewards.includes(newStreak)) {
-                console.log('🔥 Streak milestone reached:', newStreak);
                 setPendingNotifications(prev => [...prev, {
                   type: 'streak_milestone',
                   streak: newStreak,
@@ -393,18 +380,9 @@ export const AchievementsProvider = ({ children }) => {
 
   // Check for newly unlocked achievements
   const checkAchievements = (currentStats) => {
-    console.log('🔍 Checking achievements with stats:', currentStats);
-    console.log('🔒 Already unlocked:', unlockedAchievements);
-    
     Object.values(ACHIEVEMENTS).forEach(achievement => {
       const isAlreadyUnlocked = unlockedAchievements.includes(achievement.id);
       const meetsRequirement = achievement.checkProgress(currentStats);
-      
-      console.log(`   ${achievement.icon} ${achievement.title}:`, {
-        unlocked: isAlreadyUnlocked,
-        meetsRequirement,
-        requirement: achievement.requirement
-      });
       
       if (!isAlreadyUnlocked && meetsRequirement) {
         unlockAchievement(achievement);
@@ -414,16 +392,11 @@ export const AchievementsProvider = ({ children }) => {
 
   // Unlock an achievement
   const unlockAchievement = (achievement) => {
-    console.log('🏆 Achievement unlocked:', achievement.title);
     setUnlockedAchievements(prev => [...prev, achievement.id]);
-    setPendingNotifications(prev => {
-      const newQueue = [...prev, {
-        type: 'achievement',
-        achievement: achievement
-      }];
-      console.log('📝 Pending notifications queue:', newQueue.length);
-      return newQueue;
-    });
+    setPendingNotifications(prev => [...prev, {
+      type: 'achievement',
+      achievement: achievement
+    }]);
   };
 
   // Get notification to display
@@ -481,14 +454,11 @@ export const AchievementsProvider = ({ children }) => {
 
   // Unblock notifications
   const unblockNotifications = useCallback(() => {
-    console.log('🔓 Unblocking notifications, pending count:', pendingNotifications.length);
     setNotificationsBlocked(false);
     // Trigger a re-check for pending notifications after state updates
-    // Increased delay to ensure state has settled
     setTimeout(() => {
-      console.log('🔔 Triggering notification check');
       setNotificationTrigger(prev => prev + 1);
-    }, 150);
+    }, 50); // Faster notification display
   }, [pendingNotifications.length]);
 
   // Show congrats popup
@@ -509,15 +479,12 @@ export const AchievementsProvider = ({ children }) => {
   // Debug function to reset achievements (temporary for testing)
   const resetAchievements = useCallback(async () => {
     if (user?.uid) {
-      console.log('🔄 Resetting achievements for testing...');
-      
       // Clear localStorage
       localStorage.removeItem(`achievements_${user.uid}`);
       
       // Clear Firestore
       try {
         await saveAchievements(user.uid, []);
-        console.log('✅ Cleared achievements from Firestore');
       } catch (error) {
         console.error('Failed to clear Firestore achievements:', error);
       }
@@ -525,8 +492,6 @@ export const AchievementsProvider = ({ children }) => {
       // Clear state
       setUnlockedAchievements([]);
       setPendingNotifications([]);
-      
-      console.log('✅ Achievements reset! Refresh the page and make a deposit to see notifications.');
     }
   }, [user]);
 
@@ -534,7 +499,6 @@ export const AchievementsProvider = ({ children }) => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.resetAchievements = resetAchievements;
-      console.log('🛠️ Debug function available: window.resetAchievements()');
     }
   }, [resetAchievements]);
 

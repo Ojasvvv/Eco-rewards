@@ -20,18 +20,9 @@ const UniversalAchievementNotification = () => {
     if (!currentNotification && !isClosing && !notificationsBlocked) {
       const notification = getNextNotification();
       if (notification) {
-        console.log('🎉 Showing achievement notification:', notification);
-        // Show notification immediately - delays are handled elsewhere
         setCurrentNotification(notification);
         setNotificationKey(prev => prev + 1);
       }
-    } else {
-      console.log('⏸️ Notifications blocked or busy:', {
-        currentNotification: !!currentNotification,
-        isClosing,
-        notificationsBlocked,
-        pendingCount: pendingNotificationsCount
-      });
     }
   }, [currentNotification, getNextNotification, pendingNotificationsCount, isClosing, notificationsBlocked, notificationTrigger]);
 
