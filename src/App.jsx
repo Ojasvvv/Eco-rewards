@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -14,9 +14,11 @@ import PWAInstallPrompt from './components/PWAInstallPrompt/PWAInstallPrompt';
 import UniversalAchievementNotification from './components/AchievementNotification/UniversalAchievementNotification';
 import UniversalCongratsPopup from './components/CongratsPopup/UniversalCongratsPopup';
 
-function App() {
+// Wrapper component to handle onboarding within Router context
+function AppContent() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Clear old localStorage flag if it exists
@@ -33,6 +35,8 @@ function App() {
   const handleOnboardingComplete = () => {
     sessionStorage.removeItem('shouldShowOnboarding');
     setShowOnboarding(false);
+    // Navigate to dashboard after onboarding completes
+    navigate('/dashboard', { replace: true });
   };
 
   if (isLoading) {
@@ -40,47 +44,55 @@ function App() {
   }
 
   return (
+    <>
+      {showOnboarding ? (
+        <Onboarding onComplete={handleOnboardingComplete} />
+      ) : (
+        <AchievementsProvider>
+          <PWAInstallPrompt />
+          <UniversalCongratsPopup />
+          <UniversalAchievementNotification />
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/leaderboard" 
+              element={
+                <ProtectedRoute>
+                  <Leaderboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AchievementsProvider>
+      )}
+    </>
+  );
+}
+
+function App() {
+  return (
     <LanguageProvider>
       <ThemeProvider>
         <Router>
           <AuthProvider>
-            {showOnboarding ? (
-              <Onboarding onComplete={handleOnboardingComplete} />
-            ) : (
-              <AchievementsProvider>
-                <PWAInstallPrompt />
-                <UniversalCongratsPopup />
-                <UniversalAchievementNotification />
-                <Routes>
-                  <Route path="/" element={<Login />} />
-                  <Route 
-                    path="/dashboard" 
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/leaderboard" 
-                    element={
-                      <ProtectedRoute>
-                        <Leaderboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/profile" 
-                    element={
-                      <ProtectedRoute>
-                        <Profile />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </AchievementsProvider>
-            )}
+            <AppContent />
           </AuthProvider>
         </Router>
       </ThemeProvider>
