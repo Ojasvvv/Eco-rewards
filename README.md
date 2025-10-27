@@ -141,13 +141,6 @@ graph LR
     style E fill:#F44336,stroke:#C62828,stroke-width:3px,color:#fff
 ```
 
-**How It Works:**
-1. 🔐 Sign in with Google
-2. 🔢 Enter dustbin code (location verified automatically)
-3. 🗑️ Smart bin opens for 10 seconds
-4. ✅ Sensors check if trash was deposited
-5. 🎁 Receive instant rewards!
-
 </div>
 
 ### 🎯 Core Features
