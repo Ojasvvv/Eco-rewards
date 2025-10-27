@@ -42,6 +42,25 @@
  */
 
 import { getFirestore } from 'firebase-admin/firestore';
+import { getAuth } from 'firebase-admin/auth';
+
+// Export adminDb for use in other API endpoints
+export const adminDb = getFirestore();
+
+/**
+ * Verify Firebase ID token
+ * @param {string} token - Firebase ID token
+ * @returns {Promise<object>} Decoded token
+ */
+export async function verifyFirebaseToken(token) {
+  try {
+    const decodedToken = await getAuth().verifyIdToken(token);
+    return decodedToken;
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    throw error;
+  }
+}
 
 /**
  * Rate limit configuration
@@ -52,6 +71,8 @@ const RATE_LIMITS = {
   redeemRewardPoints: { maxRequests: 20, windowMs: 60000 }, // 20 per minute (was 10)
   updateUserStats: { maxRequests: 50, windowMs: 60000 }, // 50 per minute (was 30)
   checkDepositEligibility: { maxRequests: 100, windowMs: 60000 }, // 100 per minute (was 60)
+  saveAchievements: { maxRequests: 10, windowMs: 60000 }, // 10 per minute - achievement saves
+  getAchievements: { maxRequests: 30, windowMs: 60000 }, // 30 per minute - achievement reads
 };
 
 /**
