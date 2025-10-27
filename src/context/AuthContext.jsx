@@ -257,52 +257,57 @@ export const AuthProvider = ({ children }) => {
       // Detect if user is on mobile or in a restricted browser
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       const isInAppBrowser = /FBAN|FBAV|Instagram|LinkedIn|Twitter/i.test(navigator.userAgent);
-      const isIOSSafari = /iPhone|iPad|iPod/i.test(navigator.userAgent) && /Safari/i.test(navigator.userAgent);
       
-      console.log('🔍 Browser detection:', { isMobile, isInAppBrowser, isIOSSafari, userAgent: navigator.userAgent });
+      console.log('🔍 Browser detection:', { isMobile, isInAppBrowser, userAgent: navigator.userAgent });
       
-      // Use redirect for mobile devices and in-app browsers (more reliable)
-      if (isMobile || isInAppBrowser || isIOSSafari) {
-        console.log('📱 Using redirect-based sign-in (mobile/in-app browser detected)');
-        // Set a flag so we know we're in the middle of a sign-in redirect
+      // NEW APPROACH: Try popup FIRST (works better on modern mobile browsers)
+      // Only use redirect for in-app browsers or if popup fails
+      if (isInAppBrowser) {
+        console.log('📱 In-app browser detected, using redirect');
         sessionStorage.setItem('signingIn', 'true');
         sessionStorage.setItem('signInTimestamp', Date.now().toString());
-        console.log('📝 Set signingIn flag and timestamp');
         await signInWithRedirect(auth, googleProvider);
-        // Note: The app will redirect and reload, so this function won't return
         return null;
-      } else {
-        // Use popup for desktop (better UX)
-        console.log('💻 Using popup-based sign-in (desktop detected)');
+      }
+      
+      // Try popup for all other cases (desktop and mobile)
+      console.log('🪟 Attempting popup sign-in...');
+      try {
         const result = await signInWithPopup(auth, googleProvider);
+        console.log('✅ Popup sign-in successful');
         return result.user;
+      } catch (popupError) {
+        console.log('❌ Popup failed:', popupError.code);
+        
+        // If popup fails on mobile, fallback to redirect
+        if (isMobile && (popupError.code === 'auth/popup-blocked' || popupError.code === 'auth/popup-closed-by-user' || popupError.code === 'auth/cancelled-popup-request')) {
+          console.log('📱 Popup failed on mobile, falling back to redirect');
+          sessionStorage.setItem('signingIn', 'true');
+          sessionStorage.setItem('signInTimestamp', Date.now().toString());
+          await signInWithRedirect(auth, googleProvider);
+          return null;
+        }
+        
+        // Re-throw the error if we can't handle it
+        throw popupError;
       }
     } catch (error) {
-      console.error('Error signing in with Google:', error);
+      console.error('❌ Error signing in with Google:', error);
       console.error('Error details:', { code: error.code, message: error.message });
       
       // Clear signing in flag on error
       sessionStorage.removeItem('signingIn');
       sessionStorage.removeItem('signInTimestamp');
       
-      // If popup fails, try redirect as fallback
-      if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
-        console.log('⚠️ Popup blocked, falling back to redirect');
-        try {
-          sessionStorage.setItem('signingIn', 'true');
-          sessionStorage.setItem('signInTimestamp', Date.now().toString());
-          await signInWithRedirect(auth, googleProvider);
-          return null;
-        } catch (redirectError) {
-          console.error('Redirect also failed:', redirectError);
-          sessionStorage.removeItem('signingIn');
-          sessionStorage.removeItem('signInTimestamp');
-          setError('Failed to sign in. Please check your browser settings and allow popups.');
-          throw redirectError;
-        }
+      // User-friendly error messages
+      if (error.code === 'auth/popup-closed-by-user') {
+        setError('Sign-in cancelled. Please try again.');
+      } else if (error.code === 'auth/network-request-failed') {
+        setError('Network error. Please check your connection and try again.');
+      } else {
+        setError('Failed to sign in. Please try again.');
       }
       
-      setError(error.message);
       throw error;
     }
   };
