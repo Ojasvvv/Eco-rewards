@@ -37,13 +37,20 @@ export const AuthProvider = ({ children }) => {
         
         // Check for redirect result (for mobile sign-in)
         let redirectHandled = false;
+        let skipFirstAuthChange = false;
+        
+        console.log('🔍 Checking for redirect result...');
         try {
           const result = await getRedirectResult(auth);
+          console.log('📥 getRedirectResult returned:', result ? `User: ${result.user.uid}` : 'null (no pending redirect)');
+          
           if (result) {
             // User successfully signed in via redirect
-            console.log('✅ Sign-in completed via redirect');
+            console.log('✅ Sign-in completed via redirect, user:', result.user.uid);
             redirectHandled = true;
+            skipFirstAuthChange = true; // We'll set user directly, skip first null from onAuthStateChanged
             setUser(result.user);
+            setLoading(false);
             
             // Clear the visit flag to show "Welcome" instead of "Welcome Back"
             if (result.user && result.user.uid) {
@@ -51,11 +58,10 @@ export const AuthProvider = ({ children }) => {
             }
             
             // IMPORTANT: Set a flag to indicate redirect was successful
-            // This helps App.jsx know to show onboarding
             sessionStorage.setItem('redirectAuthComplete', 'true');
           }
         } catch (redirectError) {
-          console.error('Redirect sign-in error:', redirectError);
+          console.error('❌ Redirect sign-in error:', redirectError);
           setError(redirectError.message);
           // Clear onboarding flag on error
           sessionStorage.removeItem('shouldShowOnboarding');
@@ -65,8 +71,15 @@ export const AuthProvider = ({ children }) => {
         unsubscribe = onAuthStateChanged(auth, (currentUser) => {
           console.log('🔄 Auth state changed:', currentUser ? `User: ${currentUser.uid}` : 'No user');
           
+          // If we just handled redirect and this is the first auth change, skip it
+          // (we already set the user from getRedirectResult)
+          if (skipFirstAuthChange) {
+            console.log('⏭️ Skipping first auth state change (already handled via redirect)');
+            skipFirstAuthChange = false;
+            return;
+          }
+          
           // Always update user state to stay in sync
-          // (redundant updates are OK, they ensure consistency)
           setUser(currentUser);
           setLoading(false);
           
