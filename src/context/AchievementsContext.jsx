@@ -251,12 +251,15 @@ export const AchievementsProvider = ({ children }) => {
   // SECURITY FIX: Stats are now calculated SERVER-SIDE
   // This function just triggers a refresh of stats from Firestore
   const recordDeposit = async (outletId) => {
+    console.log('📥 Recording deposit for outlet:', outletId);
     // Stats are calculated server-side in addRewardPoints API
     // Just reload stats from Firestore after a short delay
     setTimeout(async () => {
       if (user?.uid) {
         try {
+          console.log('🔄 Refreshing stats from Firestore...');
           const updatedStats = await getUserStats(user.uid);
+          console.log('✅ Updated stats received:', updatedStats);
           
           setStats(prevStats => {
             // Check for newly unlocked achievements
@@ -271,6 +274,7 @@ export const AchievementsProvider = ({ children }) => {
               const collectedRewards = updatedStats.streakRewardsCollected || [];
               
               if (!collectedRewards.includes(newStreak)) {
+                console.log('🔥 Streak milestone reached:', newStreak);
                 setPendingNotifications(prev => [...prev, {
                   type: 'streak_milestone',
                   streak: newStreak,
@@ -312,8 +316,20 @@ export const AchievementsProvider = ({ children }) => {
 
   // Check for newly unlocked achievements
   const checkAchievements = (currentStats) => {
+    console.log('🔍 Checking achievements with stats:', currentStats);
+    console.log('🔒 Already unlocked:', unlockedAchievements);
+    
     Object.values(ACHIEVEMENTS).forEach(achievement => {
-      if (!unlockedAchievements.includes(achievement.id) && achievement.checkProgress(currentStats)) {
+      const isAlreadyUnlocked = unlockedAchievements.includes(achievement.id);
+      const meetsRequirement = achievement.checkProgress(currentStats);
+      
+      console.log(`   ${achievement.icon} ${achievement.title}:`, {
+        unlocked: isAlreadyUnlocked,
+        meetsRequirement,
+        requirement: achievement.requirement
+      });
+      
+      if (!isAlreadyUnlocked && meetsRequirement) {
         unlockAchievement(achievement);
       }
     });
