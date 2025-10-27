@@ -33,7 +33,7 @@ const UniversalAchievementNotification = () => {
       clearNotification();
       setCurrentNotification(null);
       setIsClosing(false);
-    }, 400); // Match exit animation duration
+    }, 200); // Match exit animation duration (0.2s)
   };
 
   const handleRewardClaimed = async (rewardPoints) => {
@@ -56,7 +56,7 @@ const UniversalAchievementNotification = () => {
         clearNotification();
         setCurrentNotification(null);
         setIsClosing(false);
-      }, 400); // Match exit animation duration
+      }, 200); // Match exit animation duration (0.2s)
     } catch (error) {
       console.error('Error claiming achievement reward:', error);
       alert('Failed to claim reward. Please try again.');

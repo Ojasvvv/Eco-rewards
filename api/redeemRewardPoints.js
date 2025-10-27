@@ -47,12 +47,12 @@ async function redeemRewardPointsHandler(req, res) {
     }
 
     const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await getAuth().verifyIdToken(token);
+    const decodedToken = await adminAuth.verifyIdToken(token);
     const userId = decodedToken.uid;
 
     // SECURITY: Verify user still exists in Firebase Auth (prevents deleted accounts from operating)
     try {
-      await getAuth().getUser(userId);
+      await adminAuth.getUser(userId);
     } catch (authError) {
       if (authError.code === 'auth/user-not-found') {
         return res.status(403).json({ 
