@@ -41,26 +41,10 @@
  * a fallback rate limiting mechanism (e.g., Redis).
  */
 
-import { getFirestore } from 'firebase-admin/firestore';
-import { getAuth } from 'firebase-admin/auth';
+import { adminDb, adminAuth, verifyFirebaseToken } from './firebaseAdmin.js';
 
-// Export adminDb for use in other API endpoints
-export const adminDb = getFirestore();
-
-/**
- * Verify Firebase ID token
- * @param {string} token - Firebase ID token
- * @returns {Promise<object>} Decoded token
- */
-export async function verifyFirebaseToken(token) {
-  try {
-    const decodedToken = await getAuth().verifyIdToken(token);
-    return decodedToken;
-  } catch (error) {
-    console.error('Token verification failed:', error);
-    throw error;
-  }
-}
+// Re-export for convenience
+export { adminDb, adminAuth, verifyFirebaseToken };
 
 /**
  * Rate limit configuration
@@ -82,7 +66,7 @@ const RATE_LIMITS = {
  * @returns {Promise<object>} { allowed: boolean, retryAfter?: number }
  */
 export async function checkRateLimitFirestore(userId, endpoint) {
-  const db = getFirestore();
+  const db = adminDb;
   const config = RATE_LIMITS[endpoint] || { maxRequests: 10, windowMs: 60000 };
   const now = Date.now();
   const windowStart = now - config.windowMs;
@@ -249,9 +233,8 @@ export function withRateLimitFirestore(endpoint, handler) {
       // SECURITY FIX: Extract actual user ID from verified token
       let userId;
       try {
-        const { getAuth } = await import('firebase-admin/auth');
         const token = authHeader.split('Bearer ')[1];
-        const decodedToken = await getAuth().verifyIdToken(token);
+        const decodedToken = await verifyFirebaseToken(token);
         userId = decodedToken.uid;
       } catch (error) {
         console.error('❌ Token verification failed in rate limiter:', error);
@@ -307,7 +290,7 @@ export function withRateLimitFirestore(endpoint, handler) {
  * Can be triggered by a Cloud Scheduler or called manually
  */
 export async function cleanupOldRateLimits() {
-  const db = getFirestore();
+  const db = adminDb;
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
   
   try {

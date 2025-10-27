@@ -1,4 +1,4 @@
-import { adminDb, verifyFirebaseToken } from './_middleware/rateLimiterFirestore.js';
+import { adminDb, verifyFirebaseToken } from './_middleware/firebaseAdmin.js';
 import { applyRateLimit } from './_middleware/rateLimiter.js';
 
 /**
