@@ -12,9 +12,14 @@ const Login = () => {
   const navigate = useNavigate();
 
   // Redirect to dashboard if user is already logged in
+  // BUT only if onboarding is not scheduled (to let App.jsx show onboarding first)
   useEffect(() => {
     if (!authLoading && user) {
-      navigate('/dashboard', { replace: true });
+      const shouldShowOnboarding = sessionStorage.getItem('shouldShowOnboarding');
+      // Don't redirect if onboarding needs to be shown - let App.jsx handle it
+      if (shouldShowOnboarding !== 'true') {
+        navigate('/dashboard', { replace: true });
+      }
     }
   }, [user, authLoading, navigate]);
 

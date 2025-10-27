@@ -36,27 +36,44 @@ export const AuthProvider = ({ children }) => {
         await setPersistence(auth, browserLocalPersistence);
         
         // Check for redirect result (for mobile sign-in)
+        let redirectHandled = false;
         try {
           const result = await getRedirectResult(auth);
           if (result) {
             // User successfully signed in via redirect
             console.log('✅ Sign-in completed via redirect');
+            redirectHandled = true;
             setUser(result.user);
             
             // Clear the visit flag to show "Welcome" instead of "Welcome Back"
             if (result.user && result.user.uid) {
               localStorage.removeItem(`hasVisitedDashboard_${result.user.uid}`);
             }
+            
+            // IMPORTANT: Set a flag to indicate redirect was successful
+            // This helps App.jsx know to show onboarding
+            sessionStorage.setItem('redirectAuthComplete', 'true');
           }
         } catch (redirectError) {
           console.error('Redirect sign-in error:', redirectError);
           setError(redirectError.message);
+          // Clear onboarding flag on error
+          sessionStorage.removeItem('shouldShowOnboarding');
         }
         
         // Now listen for auth state changes
         unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+          console.log('🔄 Auth state changed:', currentUser ? `User: ${currentUser.uid}` : 'No user');
+          
+          // Always update user state to stay in sync
+          // (redundant updates are OK, they ensure consistency)
           setUser(currentUser);
           setLoading(false);
+          
+          // If we just handled a redirect and have a user, log it
+          if (redirectHandled && currentUser) {
+            console.log('✅ Auth state confirmed after redirect');
+          }
           
           // SECURITY: Set up periodic validation if user is logged in
           if (currentUser) {

@@ -29,22 +29,48 @@ function AppContent() {
     if (!authLoading) {
       // Check if user should see onboarding (session-based, shows after every login)
       const shouldShowOnboarding = sessionStorage.getItem('shouldShowOnboarding');
-      if (shouldShowOnboarding === 'true' && user) {
-        // Only show onboarding if user is authenticated
+      const redirectAuthComplete = sessionStorage.getItem('redirectAuthComplete');
+      
+      // Show onboarding if:
+      // 1. User is authenticated
+      // 2. Onboarding flag is set
+      // 3. For redirect auth, wait for the redirect to complete
+      if (user && shouldShowOnboarding === 'true') {
+        console.log('🎯 Showing onboarding for user:', user.uid);
         setShowOnboarding(true);
+        // Clear the redirect flag now that we're handling it
+        sessionStorage.removeItem('redirectAuthComplete');
+      } else if (!user && shouldShowOnboarding === 'true') {
+        // User flag is set but no user - might be a timing issue
+        // Wait a bit longer before giving up
+        console.log('⏳ Waiting for user authentication...');
+        const timeout = setTimeout(() => {
+          if (!user) {
+            console.log('❌ No user found, clearing onboarding flag');
+            sessionStorage.removeItem('shouldShowOnboarding');
+            sessionStorage.removeItem('redirectAuthComplete');
+          }
+        }, 2000); // Wait 2 seconds for auth to complete
+        return () => clearTimeout(timeout);
       }
       setIsLoading(false);
     }
   }, [authLoading, user]);
 
   const handleOnboardingComplete = () => {
+    console.log('✅ Onboarding complete, navigating to dashboard...');
     sessionStorage.removeItem('shouldShowOnboarding');
+    sessionStorage.removeItem('redirectAuthComplete');
     setShowOnboarding(false);
+    
     // Navigate to dashboard after onboarding completes
-    // Use setTimeout to ensure state has updated before navigation
-    setTimeout(() => {
-      navigate('/dashboard', { replace: true });
-    }, 0);
+    // Use requestAnimationFrame to ensure React has updated the DOM
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        console.log('🚀 Navigating to dashboard');
+        navigate('/dashboard', { replace: true });
+      }, 100); // Small delay to ensure state is fully updated
+    });
   };
 
   // Wait for both app loading and auth loading to finish
