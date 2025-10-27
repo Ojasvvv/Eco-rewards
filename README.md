@@ -49,6 +49,8 @@
 
 ### 📱 What We Built
 
+<div align="center">
+
 <table>
 <tr>
 <td width="20%" align="center">
@@ -78,6 +80,8 @@
 </td>
 </tr>
 </table>
+
+</div>
 
 > **Hardware Integration:** The smart dustbin hardware (sensors, IoT modules) is currently under development and will be integrated in future phases.
 
@@ -158,6 +162,8 @@ graph LR
 
 ### 💰 Business Model - Win³ Ecosystem
 
+<div align="center">
+
 <table>
 <tr>
 <td width="25%" align="center">
@@ -194,6 +200,8 @@ graph LR
 </td>
 </tr>
 </table>
+
+</div>
 
 ---
 
@@ -315,6 +323,8 @@ graph LR
 
 ### 🔐 Authentication & Authorization
 
+<div align="center">
+
 <table>
 <tr>
 <td width="50%">
@@ -337,6 +347,8 @@ graph LR
 </tr>
 </table>
 
+</div>
+
 ### 🔒 Input Security
 
 ```javascript
@@ -358,6 +370,8 @@ graph LR
 
 ### 🛡️ Content Security Policy
 
+<div align="center">
+
 <table>
 <tr>
 <td width="25%" align="center">✅ Strict script sources</td>
@@ -366,6 +380,8 @@ graph LR
 <td width="25%" align="center">✅ Frame protection</td>
 </tr>
 </table>
+
+</div>
 
 ---
 
@@ -410,13 +426,13 @@ graph TB
     style F fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
 ```
 
+</div>
+
 **System Flow:**
 1. 🎨 **Frontend Components** (Dashboard, Leaderboard, Profile, Login)
 2. 🔧 **Context API** manages global state (Auth, Theme, Language, Achievements)
 3. 🔥 **Firebase Auth** handles authentication
 4. ⚙️ **Backend Services** process data and store information
-
-</div>
 
 ---
 
@@ -479,8 +495,6 @@ graph TB
 
 The complete vision includes smart dustbins with IoT sensors and real-time validation. This hardware component is currently being developed and will include:
 
-</div>
-
 <table>
 <tr>
 <td width="20%" align="center">
@@ -511,7 +525,11 @@ The complete vision includes smart dustbins with IoT sensors and real-time valid
 </tr>
 </table>
 
+</div>
+
 ### 💡 Software Enhancements
+
+<div align="center">
 
 <table>
 <tr>
@@ -536,6 +554,8 @@ The complete vision includes smart dustbins with IoT sensors and real-time valid
 </td>
 </tr>
 </table>
+
+</div>
 
 ---
 
@@ -590,8 +610,6 @@ The complete vision includes smart dustbins with IoT sensors and real-time valid
 <div align="center">
 
 ### 🚀 Developed & Architected by Team Leader
-
-<img src="https://img.icons8.com/fluency/96/000000/code.png" width="100"/>
 
 ## 🌟 Ojasv Kushwah 🌟
 
