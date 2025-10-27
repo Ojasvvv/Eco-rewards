@@ -73,8 +73,9 @@ export const AuthProvider = ({ children }) => {
         } catch (redirectError) {
           console.error('❌ Redirect sign-in error:', redirectError);
           setError(redirectError.message);
-          // Clear onboarding flag on error
+          // Clear onboarding and signing in flags on error
           sessionStorage.removeItem('shouldShowOnboarding');
+          sessionStorage.removeItem('signingIn');
         }
         
         // Now listen for auth state changes
@@ -87,6 +88,26 @@ export const AuthProvider = ({ children }) => {
             console.log('⏭️ Skipping first auth state change (already handled via redirect)');
             skipFirstAuthChange = false;
             return;
+          }
+          
+          // MOBILE FIX: If getRedirectResult returned null but we now have a user,
+          // and we don't have an onboarding flag yet, this might be a completed redirect
+          // Check if this is a new sign-in by looking at session storage
+          if (currentUser && !redirectHandled) {
+            const hasOnboardingFlag = sessionStorage.getItem('shouldShowOnboarding');
+            const redirectAuthComplete = sessionStorage.getItem('redirectAuthComplete');
+            const wasSigningIn = sessionStorage.getItem('signingIn');
+            
+            // If we were signing in and now have a user, this is a successful redirect
+            if (wasSigningIn === 'true' && !hasOnboardingFlag) {
+              console.log('✅ Mobile redirect sign-in detected, setting onboarding flag');
+              sessionStorage.setItem('shouldShowOnboarding', 'true');
+              sessionStorage.setItem('redirectAuthComplete', 'true');
+              sessionStorage.removeItem('signingIn');
+              
+              // Clear the visit flag to show "Welcome" instead of "Welcome Back"
+              localStorage.removeItem(`hasVisitedDashboard_${currentUser.uid}`);
+            }
           }
           
           // Always update user state to stay in sync
@@ -162,6 +183,8 @@ export const AuthProvider = ({ children }) => {
       // Use redirect for mobile devices and in-app browsers (more reliable)
       if (isMobile || isInAppBrowser || isIOSSafari) {
         console.log('📱 Using redirect-based sign-in (mobile/in-app browser detected)');
+        // Set a flag so we know we're in the middle of a sign-in redirect
+        sessionStorage.setItem('signingIn', 'true');
         await signInWithRedirect(auth, googleProvider);
         // Note: The app will redirect and reload, so this function won't return
         return null;
@@ -196,6 +219,10 @@ export const AuthProvider = ({ children }) => {
     try {
       await signOut(auth);
       setUser(null);
+      // Clear any auth-related flags
+      sessionStorage.removeItem('shouldShowOnboarding');
+      sessionStorage.removeItem('redirectAuthComplete');
+      sessionStorage.removeItem('signingIn');
     } catch (error) {
       console.error('Error signing out:', error);
       setError(error.message);
