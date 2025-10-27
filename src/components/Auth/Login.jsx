@@ -22,17 +22,23 @@ const Login = () => {
     try {
       setError('');
       setLoading(true);
-      await signInWithGoogle();
+      
       // Set flag to show onboarding after login
       sessionStorage.setItem('shouldShowOnboarding', 'true');
-      // Clear dashboard visit flag so "Welcome" shows instead of "Welcome Back"
-      sessionStorage.removeItem('hasVisitedDashboard');
-      // Reload to show onboarding
-      window.location.href = '/dashboard';
+      
+      const result = await signInWithGoogle();
+      
+      // If we got a user result (from popup), clear their visit flag to show "Welcome"
+      if (result && result.uid) {
+        localStorage.removeItem(`hasVisitedDashboard_${result.uid}`);
+        window.location.href = '/dashboard';
+      }
+      // If redirect was used (result is null), the page will reload automatically
+      // The visit flag will be cleared when user is available after redirect
     } catch (error) {
-      setError('Failed to sign in. Please try again.');
+      // Only show error if we're still on the same page (not redirected)
+      setError('Failed to sign in. Please try again or check your browser settings.');
       console.error(error);
-    } finally {
       setLoading(false);
     }
   };

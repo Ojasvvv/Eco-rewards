@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
-  signInWithPopup, 
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut, 
   onAuthStateChanged,
   setPersistence,
@@ -32,6 +34,24 @@ export const AuthProvider = ({ children }) => {
       try {
         // Set persistence to LOCAL (cached in browser)
         await setPersistence(auth, browserLocalPersistence);
+        
+        // Check for redirect result (for mobile sign-in)
+        try {
+          const result = await getRedirectResult(auth);
+          if (result) {
+            // User successfully signed in via redirect
+            console.log('✅ Sign-in completed via redirect');
+            setUser(result.user);
+            
+            // Clear the visit flag to show "Welcome" instead of "Welcome Back"
+            if (result.user && result.user.uid) {
+              localStorage.removeItem(`hasVisitedDashboard_${result.user.uid}`);
+            }
+          }
+        } catch (redirectError) {
+          console.error('Redirect sign-in error:', redirectError);
+          setError(redirectError.message);
+        }
         
         // Now listen for auth state changes
         unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -93,10 +113,40 @@ export const AuthProvider = ({ children }) => {
   const signInWithGoogle = async () => {
     try {
       setError(null);
-      const result = await signInWithPopup(auth, googleProvider);
-      return result.user;
+      
+      // Detect if user is on mobile or in a restricted browser
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isInAppBrowser = /FBAN|FBAV|Instagram|LinkedIn|Twitter/i.test(navigator.userAgent);
+      const isIOSSafari = /iPhone|iPad|iPod/i.test(navigator.userAgent) && /Safari/i.test(navigator.userAgent);
+      
+      // Use redirect for mobile devices and in-app browsers (more reliable)
+      if (isMobile || isInAppBrowser || isIOSSafari) {
+        console.log('📱 Using redirect-based sign-in (mobile/in-app browser detected)');
+        await signInWithRedirect(auth, googleProvider);
+        // Note: The app will redirect and reload, so this function won't return
+        return null;
+      } else {
+        // Use popup for desktop (better UX)
+        console.log('💻 Using popup-based sign-in (desktop detected)');
+        const result = await signInWithPopup(auth, googleProvider);
+        return result.user;
+      }
     } catch (error) {
       console.error('Error signing in with Google:', error);
+      
+      // If popup fails, try redirect as fallback
+      if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+        console.log('⚠️ Popup blocked, falling back to redirect');
+        try {
+          await signInWithRedirect(auth, googleProvider);
+          return null;
+        } catch (redirectError) {
+          console.error('Redirect also failed:', redirectError);
+          setError('Failed to sign in. Please check your browser settings and allow popups.');
+          throw redirectError;
+        }
+      }
+      
       setError(error.message);
       throw error;
     }
