@@ -39,14 +39,20 @@ const Dashboard = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isFirstVisit, setIsFirstVisit] = useState(false);
 
-  // Check if this is first visit to dashboard in this session
+  // Check if this is first visit to dashboard EVER (not just this session)
   useEffect(() => {
-    const hasVisitedDashboard = sessionStorage.getItem('hasVisitedDashboard');
-    if (!hasVisitedDashboard) {
-      setIsFirstVisit(true);
-      sessionStorage.setItem('hasVisitedDashboard', 'true');
+    if (user?.uid) {
+      const hasEverVisitedDashboard = localStorage.getItem(`hasVisitedDashboard_${user.uid}`);
+      if (!hasEverVisitedDashboard) {
+        // First time ever visiting dashboard for this user
+        setIsFirstVisit(true);
+        localStorage.setItem(`hasVisitedDashboard_${user.uid}`, 'true');
+      } else {
+        // User has visited before
+        setIsFirstVisit(false);
+      }
     }
-  }, []);
+  }, [user]);
 
   // Prevent background scrolling when modal is open
   useEffect(() => {
@@ -131,8 +137,7 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      // Clear dashboard visit flag so next login shows "Welcome" instead of "Welcome Back"
-      sessionStorage.removeItem('hasVisitedDashboard');
+      // Don't clear the visited flag - keep it so they see "Welcome Back" next time
       await logout();
       navigate('/');
     } catch (error) {

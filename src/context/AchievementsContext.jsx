@@ -3,7 +3,9 @@ import { useAuth } from './AuthContext';
 import { 
   initializeUserStats, 
   getUserStats, 
-  updateUserStats 
+  updateUserStats,
+  getAchievements,
+  saveAchievements
 } from '../services/rewardsService';
 
 const AchievementsContext = createContext({});
@@ -179,10 +181,29 @@ export const AchievementsProvider = ({ children }) => {
         try {
           setStatsLoading(true);
           
-          // Load achievements from localStorage (can migrate to Firestore later)
-          const savedAchievements = localStorage.getItem(`achievements_${user.uid}`);
-          if (savedAchievements) {
-            setUnlockedAchievements(JSON.parse(savedAchievements));
+          // Load achievements from Firestore (SERVER-SIDE)
+          console.log('🔄 Loading achievements from Firestore...');
+          const firestoreAchievements = await getAchievements(user.uid);
+          
+          if (firestoreAchievements && firestoreAchievements.length > 0) {
+            console.log('📂 Loaded achievements from Firestore:', firestoreAchievements);
+            setUnlockedAchievements(firestoreAchievements);
+            // Also save to localStorage as backup/cache
+            localStorage.setItem(`achievements_${user.uid}`, JSON.stringify(firestoreAchievements));
+          } else {
+            // Fallback to localStorage if Firestore is empty (for migration)
+            const localAchievements = localStorage.getItem(`achievements_${user.uid}`);
+            if (localAchievements) {
+              const parsed = JSON.parse(localAchievements);
+              console.log('📂 Migrating achievements from localStorage to Firestore:', parsed);
+              setUnlockedAchievements(parsed);
+              // Immediately save to Firestore
+              if (parsed.length > 0) {
+                await saveAchievements(user.uid, parsed);
+              }
+            } else {
+              console.log('📂 No saved achievements found');
+            }
           }
           
           // Initialize user stats in Firestore if first time
@@ -190,6 +211,7 @@ export const AchievementsProvider = ({ children }) => {
           
           // Load stats from Firestore
           const firestoreStats = await getUserStats(user.uid);
+          console.log('📊 Loaded stats from Firestore:', firestoreStats);
           setStats(firestoreStats);
           
           // Check streak on load
@@ -197,6 +219,11 @@ export const AchievementsProvider = ({ children }) => {
         } catch (error) {
           console.error('Error loading stats:', error);
           // Fallback to localStorage if Firestore fails
+          const localAchievements = localStorage.getItem(`achievements_${user.uid}`);
+          if (localAchievements) {
+            setUnlockedAchievements(JSON.parse(localAchievements));
+          }
+          
           const savedStats = localStorage.getItem(`stats_${user.uid}`);
           if (savedStats) {
             const parsedStats = JSON.parse(savedStats);
@@ -212,12 +239,26 @@ export const AchievementsProvider = ({ children }) => {
     loadStats();
   }, [user]);
 
-  // Save achievements to localStorage (keep for now, can migrate later)
+  // Save achievements to Firestore only when there are no pending notifications
+  // This ensures achievements are only saved AFTER the user sees the notification
   useEffect(() => {
-    if (user?.uid && unlockedAchievements.length > 0) {
-      localStorage.setItem(`achievements_${user.uid}`, JSON.stringify(unlockedAchievements));
-    }
-  }, [unlockedAchievements, user]);
+    const saveAchievementsToFirestore = async () => {
+      if (user?.uid && unlockedAchievements.length > 0 && pendingNotifications.length === 0) {
+        try {
+          console.log('💾 Saving achievements to Firestore:', unlockedAchievements);
+          await saveAchievements(user.uid, unlockedAchievements);
+          // Also save to localStorage as backup/cache
+          localStorage.setItem(`achievements_${user.uid}`, JSON.stringify(unlockedAchievements));
+        } catch (error) {
+          console.error('Failed to save achievements to Firestore:', error);
+          // Still save to localStorage as fallback
+          localStorage.setItem(`achievements_${user.uid}`, JSON.stringify(unlockedAchievements));
+        }
+      }
+    };
+    
+    saveAchievementsToFirestore();
+  }, [unlockedAchievements, user, pendingNotifications.length]);
 
   // Check and update streak
   const checkStreak = (currentStats) => {
@@ -429,6 +470,38 @@ export const AchievementsProvider = ({ children }) => {
     setRewardsRefreshTrigger(prev => prev + 1);
   }, []);
 
+  // Debug function to reset achievements (temporary for testing)
+  const resetAchievements = useCallback(async () => {
+    if (user?.uid) {
+      console.log('🔄 Resetting achievements for testing...');
+      
+      // Clear localStorage
+      localStorage.removeItem(`achievements_${user.uid}`);
+      
+      // Clear Firestore
+      try {
+        await saveAchievements(user.uid, []);
+        console.log('✅ Cleared achievements from Firestore');
+      } catch (error) {
+        console.error('Failed to clear Firestore achievements:', error);
+      }
+      
+      // Clear state
+      setUnlockedAchievements([]);
+      setPendingNotifications([]);
+      
+      console.log('✅ Achievements reset! Refresh the page and make a deposit to see notifications.');
+    }
+  }, [user]);
+
+  // Make resetAchievements available globally for testing
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.resetAchievements = resetAchievements;
+      console.log('🛠️ Debug function available: window.resetAchievements()');
+    }
+  }, [resetAchievements]);
+
   const value = {
     unlockedAchievements,
     stats,
@@ -448,7 +521,8 @@ export const AchievementsProvider = ({ children }) => {
     closeCongratsPopup,
     notificationTrigger,
     triggerRewardsRefresh,
-    rewardsRefreshTrigger
+    rewardsRefreshTrigger,
+    resetAchievements
   };
 
   return (

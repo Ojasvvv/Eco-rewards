@@ -370,3 +370,48 @@ export const clearRateLimit = async () => {
   }
 };
 
+/**
+ * Save user achievements to Firestore (SERVER-SIDE)
+ * @param {string} userId - User ID
+ * @param {Array<string>} achievements - Array of achievement IDs
+ */
+export const saveAchievements = async (userId, achievements) => {
+  try {
+    const result = await callAPI('saveAchievements', {
+      achievements
+    }, `saveAchievements_${userId}`, 1000); // Throttle: 1 second between saves
+    
+    if (result.success) {
+      console.log('💾 Achievements saved to Firestore:', achievements.length);
+      return true;
+    } else {
+      throw new Error('Failed to save achievements');
+    }
+  } catch (error) {
+    console.error('Error saving achievements:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get user achievements from Firestore (SERVER-SIDE)
+ * @param {string} userId - User ID
+ * @returns {Array<string>} Array of achievement IDs
+ */
+export const getAchievements = async (userId) => {
+  try {
+    const result = await callAPI('getAchievements', {}, null, 0); // No throttling for reads
+    
+    if (result.success) {
+      console.log('📂 Loaded achievements from Firestore:', result.achievements.length);
+      return result.achievements || [];
+    } else {
+      throw new Error('Failed to get achievements');
+    }
+  } catch (error) {
+    console.error('Error getting achievements:', error);
+    // Return empty array on error instead of throwing
+    return [];
+  }
+};
+
