@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { AchievementsProvider } from './context/AchievementsContext';
@@ -18,29 +18,55 @@ import UniversalCongratsPopup from './components/CongratsPopup/UniversalCongrats
 function AppContent() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     // Clear old localStorage flag if it exists
     localStorage.removeItem('onboardingComplete');
     
-    // Check if user should see onboarding (session-based, shows after every login)
-    const shouldShowOnboarding = sessionStorage.getItem('shouldShowOnboarding');
-    if (shouldShowOnboarding === 'true') {
-      setShowOnboarding(true);
+    // Wait for auth to finish loading before checking onboarding
+    if (!authLoading) {
+      // Check if user should see onboarding (session-based, shows after every login)
+      const shouldShowOnboarding = sessionStorage.getItem('shouldShowOnboarding');
+      if (shouldShowOnboarding === 'true' && user) {
+        // Only show onboarding if user is authenticated
+        setShowOnboarding(true);
+      }
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, []);
+  }, [authLoading, user]);
 
   const handleOnboardingComplete = () => {
     sessionStorage.removeItem('shouldShowOnboarding');
     setShowOnboarding(false);
     // Navigate to dashboard after onboarding completes
-    navigate('/dashboard', { replace: true });
+    // Use setTimeout to ensure state has updated before navigation
+    setTimeout(() => {
+      navigate('/dashboard', { replace: true });
+    }, 0);
   };
 
-  if (isLoading) {
-    return null;
+  // Wait for both app loading and auth loading to finish
+  if (isLoading || authLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      }}>
+        <div style={{
+          width: '60px',
+          height: '60px',
+          border: '4px solid rgba(255, 255, 255, 0.3)',
+          borderTopColor: 'white',
+          borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite'
+        }}></div>
+      </div>
+    );
   }
 
   return (
