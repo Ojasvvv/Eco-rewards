@@ -62,6 +62,7 @@ export const AuthProvider = ({ children }) => {
             console.log('📝 Setting onboarding flag for redirect sign-in');
             sessionStorage.setItem('shouldShowOnboarding', 'true');
             sessionStorage.setItem('redirectAuthComplete', 'true');
+            sessionStorage.removeItem('signingIn');
           } else {
             // No redirect result - but check if we're in the middle of a sign-in flow
             const wasSigningIn = sessionStorage.getItem('signingIn');
@@ -74,6 +75,50 @@ export const AuthProvider = ({ children }) => {
               sessionStorage.removeItem('redirectAuthComplete');
             } else if (wasSigningIn === 'true') {
               console.log('⏳ No redirect result yet, but sign-in in progress - waiting for auth state change');
+              
+              // Check if the sign-in attempt is too old (abandoned/failed)
+              const signInTimestamp = sessionStorage.getItem('signInTimestamp');
+              const timeSinceSignIn = signInTimestamp ? Date.now() - parseInt(signInTimestamp) : 0;
+              const TWO_MINUTES = 2 * 60 * 1000;
+              
+              console.log(`⏱️  Time since sign-in initiated: ${Math.floor(timeSinceSignIn / 1000)}s`);
+              
+              if (timeSinceSignIn > TWO_MINUTES) {
+                console.log('🧹 Sign-in attempt is stale (>2min), clearing flags');
+                sessionStorage.removeItem('signingIn');
+                sessionStorage.removeItem('signInTimestamp');
+                sessionStorage.removeItem('shouldShowOnboarding');
+                sessionStorage.removeItem('redirectAuthComplete');
+                return; // Let the auth state set loading=false
+              }
+              
+              console.log('🔄 Will attempt to reload auth token...');
+              
+              // Debug: Check what's in storage
+              console.log('🔍 Checking storage for Firebase auth data...');
+              const storageKeys = Object.keys(localStorage).filter(k => k.includes('firebase'));
+              console.log('📦 Firebase localStorage keys:', storageKeys);
+              
+              // MOBILE FIX: Try to force reload the current user after a delay
+              // Sometimes the auth state needs a moment to sync on mobile
+              setTimeout(async () => {
+                try {
+                  console.log('🔃 Attempting to reload current user...');
+                  console.log('Current auth state:', auth.currentUser ? `User: ${auth.currentUser.uid}` : 'No user');
+                  
+                  if (auth.currentUser) {
+                    await auth.currentUser.reload();
+                    console.log('✅ User found after reload:', auth.currentUser.uid);
+                  } else {
+                    console.log('❌ Still no user after reload attempt');
+                    // Check if we need to clear the signing in flag due to a failed redirect
+                    console.log('⚠️ Possible redirect failure - user may have cancelled or session was blocked');
+                    console.log('💡 Tip: Check if third-party cookies are enabled and popup blockers are disabled');
+                  }
+                } catch (reloadError) {
+                  console.error('Error reloading user:', reloadError);
+                }
+              }, 1000);
             }
           }
         } catch (redirectError) {
@@ -214,11 +259,15 @@ export const AuthProvider = ({ children }) => {
       const isInAppBrowser = /FBAN|FBAV|Instagram|LinkedIn|Twitter/i.test(navigator.userAgent);
       const isIOSSafari = /iPhone|iPad|iPod/i.test(navigator.userAgent) && /Safari/i.test(navigator.userAgent);
       
+      console.log('🔍 Browser detection:', { isMobile, isInAppBrowser, isIOSSafari, userAgent: navigator.userAgent });
+      
       // Use redirect for mobile devices and in-app browsers (more reliable)
       if (isMobile || isInAppBrowser || isIOSSafari) {
         console.log('📱 Using redirect-based sign-in (mobile/in-app browser detected)');
         // Set a flag so we know we're in the middle of a sign-in redirect
         sessionStorage.setItem('signingIn', 'true');
+        sessionStorage.setItem('signInTimestamp', Date.now().toString());
+        console.log('📝 Set signingIn flag and timestamp');
         await signInWithRedirect(auth, googleProvider);
         // Note: The app will redirect and reload, so this function won't return
         return null;
@@ -230,15 +279,24 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error signing in with Google:', error);
+      console.error('Error details:', { code: error.code, message: error.message });
+      
+      // Clear signing in flag on error
+      sessionStorage.removeItem('signingIn');
+      sessionStorage.removeItem('signInTimestamp');
       
       // If popup fails, try redirect as fallback
       if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
         console.log('⚠️ Popup blocked, falling back to redirect');
         try {
+          sessionStorage.setItem('signingIn', 'true');
+          sessionStorage.setItem('signInTimestamp', Date.now().toString());
           await signInWithRedirect(auth, googleProvider);
           return null;
         } catch (redirectError) {
           console.error('Redirect also failed:', redirectError);
+          sessionStorage.removeItem('signingIn');
+          sessionStorage.removeItem('signInTimestamp');
           setError('Failed to sign in. Please check your browser settings and allow popups.');
           throw redirectError;
         }
@@ -257,6 +315,7 @@ export const AuthProvider = ({ children }) => {
       sessionStorage.removeItem('shouldShowOnboarding');
       sessionStorage.removeItem('redirectAuthComplete');
       sessionStorage.removeItem('signingIn');
+      sessionStorage.removeItem('signInTimestamp');
     } catch (error) {
       console.error('Error signing out:', error);
       setError(error.message);
