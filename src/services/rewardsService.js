@@ -39,7 +39,22 @@ async function callAPI(endpoint, data, throttleKey = null, throttleMs = 2000) {
   });
 
   if (!response.ok) {
-    const error = await response.json();
+    let error;
+    
+    // Try to parse response as JSON, but handle plain text errors
+    try {
+      const text = await response.text();
+      try {
+        error = JSON.parse(text);
+      } catch (jsonError) {
+        // Not JSON, treat as plain text error
+        console.error('Server returned non-JSON error:', text);
+        error = { error: text || 'Server error occurred' };
+      }
+    } catch (textError) {
+      console.error('Failed to read response:', textError);
+      error = { error: 'Failed to read server response' };
+    }
     
     // SECURITY: Handle deleted account error - force logout
     if (response.status === 403 && error.code === 'auth/user-not-found' && error.forceLogout) {
@@ -67,7 +82,7 @@ async function callAPI(endpoint, data, throttleKey = null, throttleMs = 2000) {
       throw new Error(`Rate limit exceeded. Please wait ${retryAfter} seconds before trying again.`);
     }
     
-    throw new Error(error.error || 'API request failed');
+    throw new Error(error.error || error.message || 'API request failed');
   }
 
   return response.json();

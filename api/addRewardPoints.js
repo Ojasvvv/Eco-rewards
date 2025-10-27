@@ -1,4 +1,4 @@
-import { adminDb, adminAuth } from './_middleware/firebaseAdmin.js';
+import { adminDb, adminAuth, ensureInitialized } from './_middleware/firebaseAdmin.js';
 import { withRateLimitFirestore as withRateLimit } from './_middleware/rateLimiterFirestore.js';
 
 const db = adminDb;
@@ -9,6 +9,17 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   : [];
 
 async function addRewardPointsHandler(req, res) {
+  // Check Firebase Admin initialization first
+  try {
+    ensureInitialized();
+  } catch (error) {
+    console.error('Firebase Admin not initialized:', error);
+    return res.status(500).json({ 
+      error: 'Server configuration error. Please contact support.',
+      details: error.message 
+    });
+  }
+  
   // Handle CORS
   const origin = req.headers.origin;
   if (ALLOWED_ORIGINS.includes(origin)) {

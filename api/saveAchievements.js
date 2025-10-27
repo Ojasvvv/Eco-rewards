@@ -1,4 +1,4 @@
-import { adminDb, verifyFirebaseToken } from './_middleware/firebaseAdmin.js';
+import { adminDb, verifyFirebaseToken, ensureInitialized } from './_middleware/firebaseAdmin.js';
 import { applyRateLimit } from './_middleware/rateLimiter.js';
 
 /**
@@ -12,6 +12,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Check Firebase Admin initialization
+    ensureInitialized();
     // Apply rate limiting (5 requests per minute)
     const rateLimitResult = await applyRateLimit(req, res, 'saveAchievements', 5, 60000);
     if (!rateLimitResult.allowed) {

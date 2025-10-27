@@ -41,10 +41,10 @@
  * a fallback rate limiting mechanism (e.g., Redis).
  */
 
-import { adminDb, adminAuth, verifyFirebaseToken } from './firebaseAdmin.js';
+import { adminDb, adminAuth, verifyFirebaseToken, ensureInitialized } from './firebaseAdmin.js';
 
 // Re-export for convenience
-export { adminDb, adminAuth, verifyFirebaseToken };
+export { adminDb, adminAuth, verifyFirebaseToken, ensureInitialized };
 
 /**
  * Rate limit configuration
