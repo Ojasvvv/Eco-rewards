@@ -62,12 +62,17 @@ export const AuthProvider = ({ children }) => {
             sessionStorage.setItem('shouldShowOnboarding', 'true');
             sessionStorage.setItem('redirectAuthComplete', 'true');
           } else {
-            // No redirect result - clear any stale onboarding flags from incomplete flows
+            // No redirect result - but check if we're in the middle of a sign-in flow
+            const wasSigningIn = sessionStorage.getItem('signingIn');
             const hasOnboardingFlag = sessionStorage.getItem('shouldShowOnboarding');
-            if (hasOnboardingFlag === 'true') {
-              console.log('🧹 Clearing stale onboarding flag (no redirect result)');
+            
+            // Only clear stale flags if we're NOT currently signing in
+            if (hasOnboardingFlag === 'true' && wasSigningIn !== 'true') {
+              console.log('🧹 Clearing stale onboarding flag (no redirect result and not signing in)');
               sessionStorage.removeItem('shouldShowOnboarding');
               sessionStorage.removeItem('redirectAuthComplete');
+            } else if (wasSigningIn === 'true') {
+              console.log('⏳ No redirect result yet, but sign-in in progress - waiting for auth state change');
             }
           }
         } catch (redirectError) {
