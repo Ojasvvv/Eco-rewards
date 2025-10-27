@@ -81,7 +81,7 @@ const PWAInstallPrompt = () => {
         </div>
         <div className="pwa-prompt-text">
           <h3>Install EcoRewards</h3>
-          <p>Get quick access and work offline</p>
+          <p>Get quick access and native app experience</p>
         </div>
         <button className="pwa-install-btn" onClick={handleInstallClick}>
           Install App

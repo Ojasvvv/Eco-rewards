@@ -39,52 +39,48 @@ function App() {
     return null;
   }
 
-  if (showOnboarding) {
-    return (
-      <LanguageProvider>
-        <Onboarding onComplete={handleOnboardingComplete} />
-      </LanguageProvider>
-    );
-  }
-
   return (
     <LanguageProvider>
       <ThemeProvider>
         <Router>
           <AuthProvider>
-            <AchievementsProvider>
-              <PWAInstallPrompt />
-              <UniversalCongratsPopup />
-              <UniversalAchievementNotification />
-              <Routes>
-                <Route path="/" element={<Login />} />
-                <Route 
-                  path="/dashboard" 
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/leaderboard" 
-                  element={
-                    <ProtectedRoute>
-                      <Leaderboard />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/profile" 
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </AchievementsProvider>
+            {showOnboarding ? (
+              <Onboarding onComplete={handleOnboardingComplete} />
+            ) : (
+              <AchievementsProvider>
+                <PWAInstallPrompt />
+                <UniversalCongratsPopup />
+                <UniversalAchievementNotification />
+                <Routes>
+                  <Route path="/" element={<Login />} />
+                  <Route 
+                    path="/dashboard" 
+                    element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/leaderboard" 
+                    element={
+                      <ProtectedRoute>
+                        <Leaderboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/profile" 
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </AchievementsProvider>
+            )}
           </AuthProvider>
         </Router>
       </ThemeProvider>
