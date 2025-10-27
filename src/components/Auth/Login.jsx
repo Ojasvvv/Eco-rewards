@@ -28,18 +28,17 @@ const Login = () => {
       setError('');
       setLoading(true);
       
-      // Set flag to show onboarding after login
-      sessionStorage.setItem('shouldShowOnboarding', 'true');
-      
       const result = await signInWithGoogle();
       
-      // If we got a user result (from popup), clear their visit flag to show "Welcome"
+      // If we got a user result (from popup), show onboarding
       if (result && result.uid) {
+        console.log('✅ Popup sign-in successful, setting onboarding flag');
+        sessionStorage.setItem('shouldShowOnboarding', 'true');
         localStorage.removeItem(`hasVisitedDashboard_${result.uid}`);
         window.location.href = '/dashboard';
       }
-      // If redirect was used (result is null), the page will reload automatically
-      // The visit flag will be cleared when user is available after redirect
+      // If redirect was used (result is null), the page will redirect automatically
+      // The onboarding flag will be set by AuthContext after redirect completes
     } catch (error) {
       // Only show error if we're still on the same page (not redirected)
       setError('Failed to sign in. Please try again or check your browser settings.');

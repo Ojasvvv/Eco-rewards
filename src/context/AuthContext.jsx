@@ -57,8 +57,18 @@ export const AuthProvider = ({ children }) => {
               localStorage.removeItem(`hasVisitedDashboard_${result.user.uid}`);
             }
             
-            // IMPORTANT: Set a flag to indicate redirect was successful
+            // IMPORTANT: Set flags to show onboarding after successful redirect
+            console.log('📝 Setting onboarding flag for redirect sign-in');
+            sessionStorage.setItem('shouldShowOnboarding', 'true');
             sessionStorage.setItem('redirectAuthComplete', 'true');
+          } else {
+            // No redirect result - clear any stale onboarding flags from incomplete flows
+            const hasOnboardingFlag = sessionStorage.getItem('shouldShowOnboarding');
+            if (hasOnboardingFlag === 'true') {
+              console.log('🧹 Clearing stale onboarding flag (no redirect result)');
+              sessionStorage.removeItem('shouldShowOnboarding');
+              sessionStorage.removeItem('redirectAuthComplete');
+            }
           }
         } catch (redirectError) {
           console.error('❌ Redirect sign-in error:', redirectError);
