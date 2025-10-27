@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     let unsubscribe;
     let validationInterval;
+    let redirectTimeout;
     
     // Set persistence FIRST, then listen for auth changes
     const initAuth = async () => {
@@ -98,10 +99,11 @@ export const AuthProvider = ({ children }) => {
           // MOBILE FIX: If getRedirectResult returned null but we now have a user,
           // and we don't have an onboarding flag yet, this might be a completed redirect
           // Check if this is a new sign-in by looking at session storage
+          const wasSigningIn = sessionStorage.getItem('signingIn');
+          
           if (currentUser && !redirectHandled) {
             const hasOnboardingFlag = sessionStorage.getItem('shouldShowOnboarding');
             const redirectAuthComplete = sessionStorage.getItem('redirectAuthComplete');
-            const wasSigningIn = sessionStorage.getItem('signingIn');
             
             // If we were signing in and now have a user, this is a successful redirect
             if (wasSigningIn === 'true' && !hasOnboardingFlag) {
@@ -112,6 +114,30 @@ export const AuthProvider = ({ children }) => {
               
               // Clear the visit flag to show "Welcome" instead of "Welcome Back"
               localStorage.removeItem(`hasVisitedDashboard_${currentUser.uid}`);
+            }
+          } else if (!currentUser && wasSigningIn === 'true') {
+            // CRITICAL FIX: If we're waiting for sign-in but got no user yet,
+            // keep loading=true and wait for the next auth state change
+            console.log('⏳ Waiting for user after redirect (keeping loading state)...');
+            
+            // Set a timeout to prevent infinite loading (10 seconds)
+            if (!redirectTimeout) {
+              redirectTimeout = setTimeout(() => {
+                console.log('⚠️ Redirect timeout - no user received, clearing flags');
+                sessionStorage.removeItem('signingIn');
+                sessionStorage.removeItem('shouldShowOnboarding');
+                setLoading(false);
+                setError('Sign-in timed out. Please try again.');
+              }, 10000);
+            }
+            
+            // Don't update user state or set loading to false yet
+            return;
+          } else if (currentUser && wasSigningIn === 'true') {
+            // Clear timeout if we got a user
+            if (redirectTimeout) {
+              clearTimeout(redirectTimeout);
+              redirectTimeout = null;
             }
           }
           
@@ -172,6 +198,9 @@ export const AuthProvider = ({ children }) => {
       }
       if (validationInterval) {
         clearInterval(validationInterval);
+      }
+      if (redirectTimeout) {
+        clearTimeout(redirectTimeout);
       }
     };
   }, []);
