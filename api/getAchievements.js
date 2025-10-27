@@ -1,11 +1,11 @@
-import { adminDb, verifyFirebaseToken, ensureInitialized } from './_middleware/firebaseAdmin.js';
-import { applyRateLimit } from './_middleware/rateLimiter.js';
+import { adminDb, adminAuth, ensureInitialized } from './_middleware/firebaseAdmin.js';
+import { withRateLimitFirestore as withRateLimit } from './_middleware/rateLimiterFirestore.js';
 
 /**
  * Get user achievements from Firestore
  * This endpoint retrieves which achievements the user has unlocked
  */
-export default async function handler(req, res) {
+async function getAchievementsHandler(req, res) {
   // Only allow POST requests (for consistency with auth header)
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -14,14 +14,6 @@ export default async function handler(req, res) {
   try {
     // Check Firebase Admin initialization
     ensureInitialized();
-    // Apply rate limiting (20 requests per minute - more lenient for reads)
-    const rateLimitResult = await applyRateLimit(req, res, 'getAchievements', 20, 60000);
-    if (!rateLimitResult.allowed) {
-      return res.status(429).json({
-        error: 'Rate limit exceeded',
-        retryAfter: rateLimitResult.resetIn
-      });
-    }
 
     // Verify Firebase token and get user ID
     const authHeader = req.headers.authorization;
@@ -30,7 +22,7 @@ export default async function handler(req, res) {
     }
 
     const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await verifyFirebaseToken(token);
+    const decodedToken = await adminAuth.verifyIdToken(token);
     const userId = decodedToken.uid;
 
     // Get from Firestore
@@ -71,4 +63,7 @@ export default async function handler(req, res) {
     });
   }
 }
+
+// Export handler wrapped with rate limiting (30 requests per minute for reads)
+export default withRateLimit('getAchievements', getAchievementsHandler);
 
