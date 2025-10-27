@@ -7,6 +7,8 @@ import { getAuth } from 'firebase-admin/auth';
  * This ensures Firebase is initialized only once
  */
 let initializationError = null;
+let adminDb = null;
+let adminAuth = null;
 
 if (!getApps().length) {
   // Validate required environment variables
@@ -40,9 +42,19 @@ if (!getApps().length) {
   }
 }
 
+// Only get Firestore and Auth instances if initialization succeeded
+try {
+  if (!initializationError && getApps().length > 0) {
+    adminDb = getFirestore();
+    adminAuth = getAuth();
+  }
+} catch (error) {
+  console.error('❌ Failed to get Firebase Admin instances:', error);
+  initializationError = error;
+}
+
 // Export singleton instances
-export const adminDb = getFirestore();
-export const adminAuth = getAuth();
+export { adminDb, adminAuth };
 
 /**
  * Check if Firebase Admin is properly initialized

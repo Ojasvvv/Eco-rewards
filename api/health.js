@@ -14,6 +14,8 @@
  *   500 Error - Missing configuration (with details)
  */
 
+import { getApps } from 'firebase-admin/app';
+
 export default function handler(req, res) {
   // Handle CORS for health checks from monitoring services
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -82,6 +84,32 @@ export default function handler(req, res) {
     corsValid = false;
   }
 
+  // Check Firebase Admin initialization status
+  let firebaseStatus = {
+    initialized: false,
+    error: null
+  };
+  
+  try {
+    const apps = getApps();
+    firebaseStatus.initialized = apps.length > 0;
+    firebaseStatus.appCount = apps.length;
+    
+    // Try to import the middleware to check for initialization errors
+    import('./_middleware/firebaseAdmin.js')
+      .then(module => {
+        // If adminDb or adminAuth are null, there was an initialization error
+        if (!module.adminDb || !module.adminAuth) {
+          firebaseStatus.error = 'Firebase Admin instances are null';
+        }
+      })
+      .catch(err => {
+        firebaseStatus.error = err.message;
+      });
+  } catch (error) {
+    firebaseStatus.error = error.message;
+  }
+
   // All checks passed
   return res.status(200).json({
     status: 'healthy',
@@ -91,6 +119,8 @@ export default function handler(req, res) {
     environment: process.env.NODE_ENV || 'unknown',
     configuration: {
       firebaseConfigured: true,
+      firebaseInitialized: firebaseStatus.initialized,
+      firebaseError: firebaseStatus.error,
       corsConfigured: corsValid,
       corsOrigins: corsValid ? corsOrigins : 'INVALID',
       rateLimitStrategy: process.env.USE_FIRESTORE_RATE_LIMIT === 'true' 
@@ -100,7 +130,9 @@ export default function handler(req, res) {
     optional: optionalStatus,
     recommendations: [
       !process.env.USE_FIRESTORE_RATE_LIMIT && 'Consider enabling Firestore rate limiting for production',
-      !corsValid && 'CORS origins configuration appears invalid'
+      !corsValid && 'CORS origins configuration appears invalid',
+      !firebaseStatus.initialized && 'Firebase Admin SDK not initialized',
+      firebaseStatus.error && `Firebase error: ${firebaseStatus.error}`
     ].filter(Boolean)
   });
 }

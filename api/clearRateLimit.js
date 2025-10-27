@@ -1,7 +1,7 @@
 import { adminDb, adminAuth, ensureInitialized } from './_middleware/firebaseAdmin.js';
-import { getAuth } from 'firebase-admin/auth';
 
 const db = adminDb;
+const auth = adminAuth;
 
 // CORS Configuration
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS 
@@ -47,7 +47,7 @@ async function clearRateLimitHandler(req, res) {
     }
 
     const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await getAuth().verifyIdToken(token);
+    const decodedToken = await auth.verifyIdToken(token);
     const userId = decodedToken.uid;
 
     // Delete all rate limit documents for this user
