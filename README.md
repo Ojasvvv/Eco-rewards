@@ -16,52 +16,24 @@
 
 </div>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 📖 Table of Contents
-
-<table>
-<tr>
-<td>
 
 - [🎯 About](#-about)
 - [🚨 The Problem](#-the-problem-were-solving)
 - [💡 Our Solution](#-our-solution)
 - [✨ Key Features](#-key-features)
-
-</td>
-<td>
-
 - [🛠️ Tech Stack](#️-tech-stack)
 - [🔒 Security Features](#-security-features)
 - [🏗️ Architecture](#️-architecture)
 - [📸 Screenshots](#-screenshots)
-
-</td>
-<td>
-
 - [🔮 Future Roadmap](#-future-roadmap)
 - [👥 Team](#-team)
 - [💻 Development](#-development--technical-leadership)
 - [📞 Contact](#-contact--links)
 
-</td>
-</tr>
-</table>
-
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 🎯 About
 
@@ -109,55 +81,34 @@
 
 > **Hardware Integration:** The smart dustbin hardware (sensors, IoT modules) is currently under development and will be integrated in future phases.
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 🚨 The Problem We're Solving
-
-<br>
-
-<div align="center">
 
 <table>
 <tr>
 <td width="33%" align="center">
 
-### 🌍
-### Massive Waste Crisis
+### 🌍 Massive Waste Crisis
 **1.3 billion tons** of waste generated annually, overwhelming ecosystems worldwide
 
 </td>
 <td width="33%" align="center">
 
-### 😴
-### Public Apathy
+### 😴 Public Apathy
 Current systems offer **no engagement** or feedback, leading to poor disposal habits
 
 </td>
 <td width="33%" align="center">
 
-### 🚫
-### Zero Incentive
+### 🚫 Zero Incentive
 Widespread littering due to **lack of motivation** for proper waste disposal
 
 </td>
 </tr>
 </table>
 
-</div>
-
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 💡 Our Solution
 
@@ -168,11 +119,7 @@ Transform waste disposal from a chore into an **engaging, rewarding experience**
 
 </div>
 
-<br>
-
-<details open>
-<summary><b>📱 Click to view User Flow Diagram</b></summary>
-<br>
+### 📱 User Flow Diagram
 
 <div align="center">
 
@@ -183,25 +130,21 @@ graph LR
     C --> D[✅ Trash Checked<br/>Sensors]
     D --> E[🎁 Get Reward<br/>Instant]
     
-    style A fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#fff
-    style B fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#fff
-    style C fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#fff
-    style D fill:#9C27B0,stroke:#6A1B9A,stroke-width:2px,color:#fff
-    style E fill:#F44336,stroke:#C62828,stroke-width:2px,color:#fff
+    style A fill:#4CAF50,stroke:#2E7D32,stroke-width:3px,color:#000
+    style B fill:#2196F3,stroke:#1565C0,stroke-width:3px,color:#000
+    style C fill:#FF9800,stroke:#E65100,stroke-width:3px,color:#000
+    style D fill:#9C27B0,stroke:#6A1B9A,stroke-width:3px,color:#fff
+    style E fill:#F44336,stroke:#C62828,stroke-width:3px,color:#fff
 ```
 
-**For Mobile Users:** Each step flows from left to right
-- 🔐 Sign in with Google
-- 🔢 Enter dustbin code (location verified automatically)
-- 🗑️ Smart bin opens for 10 seconds
-- ✅ Sensors check if trash was deposited
-- 🎁 Receive instant rewards!
+**How It Works:**
+1. 🔐 Sign in with Google
+2. 🔢 Enter dustbin code (location verified automatically)
+3. 🗑️ Smart bin opens for 10 seconds
+4. ✅ Sensors check if trash was deposited
+5. 🎁 Receive instant rewards!
 
 </div>
-
-</details>
-
-<br>
 
 ### 🎯 Core Features
 
@@ -213,38 +156,28 @@ graph LR
 
 </div>
 
-<br>
-
 ### 💰 Business Model - Win³ Ecosystem
-
-<div align="center">
 
 <table>
 <tr>
 <td width="25%" align="center">
-<h3>📺</h3>
-<h4>Ad Display</h4>
+<h3>📺 Ad Display</h3>
 <p>Companies sponsor<br>bin displays</p>
 </td>
 <td width="25%" align="center">
-<h3>📊</h3>
-<h4>Data Insights</h4>
+<h3>📊 Data Insights</h3>
 <p>Analytics for<br>municipalities</p>
 </td>
 <td width="25%" align="center">
-<h3>🏪</h3>
-<h4>Local Partnerships</h4>
+<h3>🏪 Local Partnerships</h3>
 <p>Businesses give<br>coupons</p>
 </td>
 <td width="25%" align="center">
-<h3>♻️</h3>
-<h4>Waste Sale</h4>
+<h3>♻️ Waste Sale</h3>
 <p>Recycling<br>revenue</p>
 </td>
 </tr>
 </table>
-
-<br>
 
 **Result:**
 
@@ -262,173 +195,95 @@ graph LR
 </tr>
 </table>
 
-</div>
-
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## ✨ Key Features
-
-<br>
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-<details>
-<summary><b>🔐 Secure Authentication</b></summary>
-<br>
-
+### 🔐 Secure Authentication
 - Google OAuth integration via Firebase
 - Email verification enforcement
 - Token-based API security
 - Persistent login sessions
 
-</details>
-
-<details>
-<summary><b>📍 Location-Based Validation</b></summary>
-<br>
-
+### 📍 Location-Based Validation
 - Real-time GPS verification
 - Server-side distance calculation (Haversine formula)
 - 100m proximity enforcement
 - **Cannot be bypassed** by GPS spoofing
 
-</details>
-
-<details>
-<summary><b>🎁 Instant Rewards System</b></summary>
-<br>
-
+### 🎁 Instant Rewards System
 - Immediate point allocation
 - Dynamic discount coupons
 - Multiple reward tiers (Coffee, Meal, Shopping, Premium)
 - QR code redemption at partner outlets
 
-</details>
-
-<details>
-<summary><b>🏆 Gamification & Achievements</b></summary>
-<br>
-
+### 🏆 Gamification & Achievements
 - 20+ unique achievements
 - Progressive milestones (First Deposit → EcoHero)
 - Real-time notifications
 - Animated celebrations with confetti
 
-</details>
-
-<details>
-<summary><b>📊 City Leaderboards</b></summary>
-<br>
-
+### 📊 City Leaderboards
 - City-wide rankings
 - Real-time updates
 - Community competition
 - Impact visualization
 
-</details>
-
-<details>
-<summary><b>👤 Comprehensive Profile</b></summary>
-<br>
-
+### 👤 Comprehensive Profile
 - Detailed statistics dashboard
 - Achievement showcase
 - Deposit history
 - Environmental impact metrics
 
-</details>
-
 </td>
 <td width="50%" valign="top">
 
-<details>
-<summary><b>🚨 Bin Reporting</b></summary>
-<br>
-
+### 🚨 Bin Reporting
 - Report full bins
 - Report damaged equipment
 - Location issues
 - Automated maintenance alerts
 
-</details>
-
-<details>
-<summary><b>🌍 Multi-language Support</b></summary>
-<br>
-
+### 🌍 Multi-language Support
 - English, Hindi, Tamil, Telugu, Kannada, Malayalam
 - Seamless language switching
 - Fully localized content
 
-</details>
-
-<details>
-<summary><b>🎨 Dark Mode</b></summary>
-<br>
-
+### 🎨 Dark Mode
 - System preference detection
 - Manual toggle
 - Smooth transitions
 
-</details>
-
-<details>
-<summary><b>📱 Progressive Web App (PWA)</b></summary>
-<br>
-
+### 📱 Progressive Web App (PWA)
 - Installable on mobile/desktop
 - Offline support
 - Native app experience
 - Quick action shortcuts
 
-</details>
-
-<details>
-<summary><b>🛡️ Advanced Security</b></summary>
-<br>
-
+### 🛡️ Advanced Security
 - Rate limiting (Firestore-based)
 - XSS protection (DOMPurify)
 - CORS configuration
 - Content Security Policy
 - Server-side validation only
 
-</details>
-
-<details>
-<summary><b>🚫 Anti-Cheat Mechanisms</b></summary>
-<br>
-
+### 🚫 Anti-Cheat Mechanisms
 - Daily deposit limits (5 per day)
 - Server-side validation only
 - Location verification
 - Email verification required
 
-</details>
-
 </td>
 </tr>
 </table>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 🛠️ Tech Stack
-
-<br>
 
 <div align="center">
 
@@ -448,13 +303,7 @@ graph LR
 
 </div>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 🔒 Security Features
 
@@ -463,8 +312,6 @@ graph LR
 > **🛡️ Top grade security implemented throughout**
 
 </div>
-
-<br>
 
 ### 🔐 Authentication & Authorization
 
@@ -490,8 +337,6 @@ graph LR
 </tr>
 </table>
 
-<br>
-
 ### 🔒 Input Security
 
 ```javascript
@@ -502,8 +347,6 @@ graph LR
 ✅ Report details length validation
 ```
 
-<br>
-
 ### 🔥 Firestore Security Rules
 
 ```javascript
@@ -512,8 +355,6 @@ graph LR
 ✅ dustbins/* - Read-only for clients
 ✅ achievements/* - Server-managed
 ```
-
-<br>
 
 ### 🛡️ Content Security Policy
 
@@ -526,23 +367,13 @@ graph LR
 </tr>
 </table>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 🏗️ Architecture
 
-<br>
-
-<details open>
-<summary><b>🏛️ Click to view System Architecture</b></summary>
-<br>
-
 <div align="center">
+
+### 🏛️ System Architecture
 
 ```mermaid
 graph TB
@@ -573,10 +404,10 @@ graph TB
     F --> H
     F --> I
     
-    style Frontend fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
-    style Backend fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
-    style E fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    style F fill:#ffebee,stroke:#c62828,stroke-width:2px
+    style Frontend fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
+    style Backend fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#000
+    style E fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+    style F fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
 ```
 
 **System Flow:**
@@ -587,15 +418,7 @@ graph TB
 
 </div>
 
-</details>
-
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 📸 Screenshots
 
@@ -605,35 +428,25 @@ graph TB
 
 </div>
 
-<br>
-
 ### 📊 Dashboard
 <div align="center">
 <img src="./screenshots/dashboard.png" alt="Dashboard" width="100%">
 </div>
-
-<br>
 
 ### 🏆 Achievements
 <div align="center">
 <img src="./screenshots/achievements.png" alt="Achievements" width="100%">
 </div>
 
-<br>
-
 ### 🥇 Leaderboard
 <div align="center">
 <img src="./screenshots/leaderboard.png" alt="Leaderboard" width="100%">
 </div>
 
-<br>
-
 ### 🎁 Rewards System
 <div align="center">
 <img src="./screenshots/rewards.png" alt="Rewards" width="100%">
 </div>
-
-<br>
 
 ### 📱 Mobile Experience
 
@@ -656,17 +469,9 @@ graph TB
 </table>
 </div>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 🔮 Future Roadmap
-
-<br>
 
 ### 🛠️ Hardware Integration (In Development)
 
@@ -675,8 +480,6 @@ graph TB
 The complete vision includes smart dustbins with IoT sensors and real-time validation. This hardware component is currently being developed and will include:
 
 </div>
-
-<br>
 
 <table>
 <tr>
@@ -708,8 +511,6 @@ The complete vision includes smart dustbins with IoT sensors and real-time valid
 </tr>
 </table>
 
-<br>
-
 ### 💡 Software Enhancements
 
 <table>
@@ -736,13 +537,7 @@ The complete vision includes smart dustbins with IoT sensors and real-time valid
 </tr>
 </table>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 👥 Team
 
@@ -750,87 +545,59 @@ The complete vision includes smart dustbins with IoT sensors and real-time valid
 
 ### 🏆 Team Apatheia 🏆
 
-<br>
-
 <table>
 <tr>
-<td align="center" width="200">
-<img src="https://img.icons8.com/color/96/000000/user-male-circle--v1.png" width="80"/><br>
+<td align="center" width="20%">
 <b>Teja Guduri</b><br>
 <a href="https://github.com/teja3112">
 <img src="https://img.shields.io/badge/GitHub-tejag2309-181717?style=flat&logo=github"/>
 </a>
 </td>
-<td align="center" width="200">
-<img src="https://img.icons8.com/color/96/000000/user-male-circle--v1.png" width="80"/><br>
+<td align="center" width="20%">
 <b>Manas Mishra</b><br>
 <a href="https://github.com/ManasM77">
 <img src="https://img.shields.io/badge/GitHub-ManasM77-181717?style=flat&logo=github"/>
 </a>
 </td>
-<td align="center" width="200">
-<img src="https://img.icons8.com/color/96/000000/user-male-circle--v1.png" width="80"/><br>
+<td align="center" width="20%">
 <b>Kartik Juyal</b><br>
 <a href="https://github.com/kartikeywastaken">
 <img src="https://img.shields.io/badge/GitHub-KARTIKJUYAL-181717?style=flat&logo=github"/>
 </a>
 </td>
-</tr>
-<tr>
-<td align="center" width="200">
-<img src="https://img.icons8.com/color/96/000000/user-male-circle--v1.png" width="80"/><br>
+<td align="center" width="20%">
 <b>Yash Chaubey</b><br>
 <a href="https://github.com/yashyyp04">
 <img src="https://img.shields.io/badge/GitHub-Yash1300-181717?style=flat&logo=github"/>
 </a>
 </td>
-<td align="center" width="200">
-<img src="https://img.icons8.com/color/96/000000/administrator-male--v1.png" width="80"/><br>
+<td align="center" width="20%">
 <b>Ojasv Kushwah</b><br>
 <sub>⭐ Team Leader ⭐</sub><br>
 <a href="https://github.com/Ojasvvv">
 <img src="https://img.shields.io/badge/GitHub-Ojasvvv-181717?style=flat&logo=github"/>
 </a>
 </td>
-<td></td>
 </tr>
 </table>
 
 </div>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 💻 Development & Technical Leadership
-
-<br>
 
 <div align="center">
 
 ### 🚀 Developed & Architected by Team Leader
 
-<br>
-
-<table>
-<tr>
-<td align="center" width="100%">
-
 <img src="https://img.icons8.com/fluency/96/000000/code.png" width="100"/>
 
-<h2>🌟 Ojasv Kushwah 🌟</h2>
+## 🌟 Ojasv Kushwah 🌟
 
 **Team Leader & Lead Developer**
 
-<br>
-
 ### 🔥 *This entire project was vibecoded from scratch* 🔥
-
-<br>
 
 **We used AI to do everything!!:**
 
@@ -853,31 +620,17 @@ The complete vision includes smart dustbins with IoT sensors and real-time valid
 </tr>
 </table>
 
-<br>
-
 ### 📧 Get in Touch
 
 [![Email](https://img.shields.io/badge/Email-Ojasvkushwah1%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:Ojasvkushwah1@gmail.com)
 [![GitHub](https://img.shields.io/badge/GitHub-Ojasvvv-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ojasvvv)
 
-<br>
-
 > 💡 **For technical discussions, collaboration opportunities, or project inquiries,**  
 > **reach out at [Ojasvkushwah1@gmail.com](mailto:Ojasvkushwah1@gmail.com)**
 
-</td>
-</tr>
-</table>
-
 </div>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 🎉 Acknowledgments
 
@@ -903,21 +656,13 @@ The complete vision includes smart dustbins with IoT sensors and real-time valid
 </tr>
 </table>
 
-<br>
-
 ### 💚 Inspiration
 
 This project addresses the urgent need for sustainable waste management solutions. We believe technology can make environmental responsibility engaging, rewarding, and scalable.
 
 </div>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 📄 License
 
@@ -929,13 +674,7 @@ For collaboration or partnership inquiries, please contact us.
 
 </div>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 🤝 Contributing
 
@@ -960,25 +699,15 @@ We welcome:
 </tr>
 </table>
 
-<br>
-
 Please open an issue to discuss proposed changes before submitting PRs.
 
 </div>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## 📞 Contact & Links
 
 <div align="center">
-
-<br>
 
 [![Email](https://img.shields.io/badge/Email-teamapatheia%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:teamapatheia@gmail.com)
 [![Live Demo](https://img.shields.io/badge/Live_Demo-eco--rewards--wheat.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://eco-rewards-wheat.vercel.app)
@@ -986,13 +715,7 @@ Please open an issue to discuss proposed changes before submitting PRs.
 
 </div>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 ## ⭐ Star This Repository
 
@@ -1000,19 +723,11 @@ Please open an issue to discuss proposed changes before submitting PRs.
 
 If you find this project innovative or useful, please give it a star! It helps us gauge interest in sustainable tech solutions.
 
-<br>
-
 [![Star History](https://img.shields.io/github/stars/Ojasvvv/Eco-rewards?style=social)](https://github.com/Ojasvvv/Eco-rewards/stargazers)
 
 </div>
 
-<br>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-</p>
-
-<br>
+---
 
 <div align="center">
 
@@ -1020,30 +735,16 @@ If you find this project innovative or useful, please give it a star! It helps u
 
 *Making the world a cleaner place, one reward at a time* 🌍♻️
 
-<br>
-
 ![Made with React](https://img.shields.io/badge/Made_with-React-61DAFB?style=flat&logo=react&logoColor=white)
 ![Powered by Firebase](https://img.shields.io/badge/Powered_by-Firebase-FFCA28?style=flat&logo=firebase&logoColor=black)
 ![Deployed on Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000000?style=flat&logo=vercel&logoColor=white)
 
-<br>
-
 **[🏆 GeeksForGeeks Hackathon Winner @ SRM AP](https://www.geeksforgeeks.org/)**
-
-<br>
 
 ---
 
 **Quick Links:** [Website](https://eco-rewards-wheat.vercel.app) • [Code](https://github.com/Ojasvvv/Eco-rewards) • [Email](mailto:teamapatheia@gmail.com)
 
-<br>
-
-<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="-----------------------------------------------------" />
-
-<br>
-
 ### ⚡ Built with cutting-edge technology and passion for the environment ⚡
-
-<br>
 
 </div>
