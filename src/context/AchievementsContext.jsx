@@ -177,62 +177,98 @@ export const AchievementsProvider = ({ children }) => {
   // Load achievements and stats from Firestore (secure, server-side storage)
   useEffect(() => {
     const loadStats = async () => {
-      if (user?.uid) {
-        try {
-          setStatsLoading(true);
-          
-          // Load achievements from Firestore (SERVER-SIDE)
-          console.log('🔄 Loading achievements from Firestore...');
-          const firestoreAchievements = await getAchievements(user.uid);
-          
-          if (firestoreAchievements && firestoreAchievements.length > 0) {
-            console.log('📂 Loaded achievements from Firestore:', firestoreAchievements);
-            setUnlockedAchievements(firestoreAchievements);
-            // Also save to localStorage as backup/cache
-            localStorage.setItem(`achievements_${user.uid}`, JSON.stringify(firestoreAchievements));
-          } else {
-            // Fallback to localStorage if Firestore is empty (for migration)
-            const localAchievements = localStorage.getItem(`achievements_${user.uid}`);
-            if (localAchievements) {
-              const parsed = JSON.parse(localAchievements);
-              console.log('📂 Migrating achievements from localStorage to Firestore:', parsed);
-              setUnlockedAchievements(parsed);
-              // Immediately save to Firestore
-              if (parsed.length > 0) {
-                await saveAchievements(user.uid, parsed);
-              }
-            } else {
-              console.log('📂 No saved achievements found');
-            }
-          }
-          
-          // Initialize user stats in Firestore if first time
-          await initializeUserStats(user.uid);
-          
-          // Load stats from Firestore
-          const firestoreStats = await getUserStats(user.uid);
-          console.log('📊 Loaded stats from Firestore:', firestoreStats);
-          setStats(firestoreStats);
-          
-          // Check streak on load
-          checkStreak(firestoreStats);
-        } catch (error) {
-          console.error('Error loading stats:', error);
-          // Fallback to localStorage if Firestore fails
+      if (!user?.uid) {
+        // User logged out - clear all state
+        console.log('👋 User logged out, clearing achievements and stats');
+        setUnlockedAchievements([]);
+        setStats({
+          totalDeposits: 0,
+          earlyBirdDeposits: 0,
+          nightOwlDeposits: 0,
+          weekendDeposits: 0,
+          outletsVisited: {},
+          rewardsRedeemed: 0,
+          currentStreak: 0,
+          longestStreak: 0,
+          lastDepositDate: null,
+          streakRewardsCollected: []
+        });
+        setPendingNotifications([]);
+        setStatsLoading(false);
+        return;
+      }
+      
+      // User logged in - clear state first, then load fresh data
+      console.log('👤 User logged in:', user.uid);
+      setUnlockedAchievements([]);
+      setStats({
+        totalDeposits: 0,
+        earlyBirdDeposits: 0,
+        nightOwlDeposits: 0,
+        weekendDeposits: 0,
+        outletsVisited: {},
+        rewardsRedeemed: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        lastDepositDate: null,
+        streakRewardsCollected: []
+      });
+      setPendingNotifications([]);
+      
+      try {
+        setStatsLoading(true);
+        
+        // Load achievements from Firestore (SERVER-SIDE)
+        console.log('🔄 Loading achievements from Firestore...');
+        const firestoreAchievements = await getAchievements(user.uid);
+        
+        if (firestoreAchievements && firestoreAchievements.length > 0) {
+          console.log('📂 Loaded achievements from Firestore:', firestoreAchievements);
+          setUnlockedAchievements(firestoreAchievements);
+          // Also save to localStorage as backup/cache
+          localStorage.setItem(`achievements_${user.uid}`, JSON.stringify(firestoreAchievements));
+        } else {
+          // Fallback to localStorage if Firestore is empty (for migration)
           const localAchievements = localStorage.getItem(`achievements_${user.uid}`);
           if (localAchievements) {
-            setUnlockedAchievements(JSON.parse(localAchievements));
+            const parsed = JSON.parse(localAchievements);
+            console.log('📂 Migrating achievements from localStorage to Firestore:', parsed);
+            setUnlockedAchievements(parsed);
+            // Immediately save to Firestore
+            if (parsed.length > 0) {
+              await saveAchievements(user.uid, parsed);
+            }
+          } else {
+            console.log('📂 No saved achievements found');
           }
-          
-          const savedStats = localStorage.getItem(`stats_${user.uid}`);
-          if (savedStats) {
-            const parsedStats = JSON.parse(savedStats);
-            setStats(parsedStats);
-            checkStreak(parsedStats);
-          }
-        } finally {
-          setStatsLoading(false);
         }
+        
+        // Initialize user stats in Firestore if first time
+        await initializeUserStats(user.uid);
+        
+        // Load stats from Firestore
+        const firestoreStats = await getUserStats(user.uid);
+        console.log('📊 Loaded stats from Firestore:', firestoreStats);
+        setStats(firestoreStats);
+        
+        // Check streak on load
+        checkStreak(firestoreStats);
+      } catch (error) {
+        console.error('Error loading stats:', error);
+        // Fallback to localStorage if Firestore fails
+        const localAchievements = localStorage.getItem(`achievements_${user.uid}`);
+        if (localAchievements) {
+          setUnlockedAchievements(JSON.parse(localAchievements));
+        }
+        
+        const savedStats = localStorage.getItem(`stats_${user.uid}`);
+        if (savedStats) {
+          const parsedStats = JSON.parse(savedStats);
+          setStats(parsedStats);
+          checkStreak(parsedStats);
+        }
+      } finally {
+        setStatsLoading(false);
       }
     };
     
