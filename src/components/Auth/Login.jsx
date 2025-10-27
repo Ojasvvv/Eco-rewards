@@ -30,19 +30,16 @@ const Login = () => {
       
       const result = await signInWithGoogle();
       
-      // If we got a user result (from popup), show onboarding
-      if (result && result.uid) {
-        console.log('✅ Popup sign-in successful, setting onboarding flag');
-        sessionStorage.setItem('shouldShowOnboarding', 'true');
-        localStorage.removeItem(`hasVisitedDashboard_${result.uid}`);
-        window.location.href = '/dashboard';
+      // Popup sign-in successful
+      if (result) {
+        console.log('✅ Sign-in successful, user:', result.uid);
+        // Don't navigate here - let the useEffect in Login handle it
+        // (it will detect the user and redirect to dashboard or show onboarding)
       }
-      // If redirect was used (result is null), the page will redirect automatically
-      // The onboarding flag will be set by AuthContext after redirect completes
+      
     } catch (error) {
-      // Only show error if we're still on the same page (not redirected)
-      setError('Failed to sign in. Please try again or check your browser settings.');
-      console.error(error);
+      // Show error (message is already set by AuthContext)
+      console.error('Sign-in error:', error);
       setLoading(false);
     }
   };

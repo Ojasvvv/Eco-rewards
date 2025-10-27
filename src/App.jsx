@@ -40,7 +40,6 @@ function AppContent() {
       if (user && shouldShowOnboarding === 'true') {
         console.log('🎯 Showing onboarding for user:', user.uid);
         setShowOnboarding(true);
-        sessionStorage.removeItem('redirectAuthComplete');
       }
       
       setIsLoading(false);
@@ -50,7 +49,6 @@ function AppContent() {
   const handleOnboardingComplete = () => {
     console.log('✅ Onboarding complete, navigating to dashboard...');
     sessionStorage.removeItem('shouldShowOnboarding');
-    sessionStorage.removeItem('redirectAuthComplete');
     setShowOnboarding(false);
     
     // Navigate to dashboard after onboarding completes

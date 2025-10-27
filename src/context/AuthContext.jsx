@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
   signOut, 
   onAuthStateChanged,
   setPersistence,
@@ -28,172 +26,23 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     let unsubscribe;
     let validationInterval;
-    let redirectTimeout;
     
     // Set persistence FIRST, then listen for auth changes
     const initAuth = async () => {
       try {
+        console.log('🚀 Initializing auth with popup-only mode...');
+        
         // Set persistence to LOCAL (cached in browser)
         await setPersistence(auth, browserLocalPersistence);
+        console.log('✅ Persistence set to LOCAL');
         
-        // Check for redirect result (for mobile sign-in)
-        let redirectHandled = false;
-        let skipFirstAuthChange = false;
-        
-        console.log('🔍 Checking for redirect result...');
-        try {
-          const result = await getRedirectResult(auth);
-          console.log('📥 getRedirectResult returned:', result ? `User: ${result.user.uid}` : 'null (no pending redirect)');
-          
-          if (result) {
-            // User successfully signed in via redirect
-            console.log('✅ Sign-in completed via redirect, user:', result.user.uid);
-            redirectHandled = true;
-            skipFirstAuthChange = true; // We'll set user directly, skip first null from onAuthStateChanged
-            setUser(result.user);
-            setLoading(false);
-            
-            // Clear the visit flag to show "Welcome" instead of "Welcome Back"
-            if (result.user && result.user.uid) {
-              localStorage.removeItem(`hasVisitedDashboard_${result.user.uid}`);
-            }
-            
-            // IMPORTANT: Set flags to show onboarding after successful redirect
-            console.log('📝 Setting onboarding flag for redirect sign-in');
-            sessionStorage.setItem('shouldShowOnboarding', 'true');
-            sessionStorage.setItem('redirectAuthComplete', 'true');
-            sessionStorage.removeItem('signingIn');
-          } else {
-            // No redirect result - but check if we're in the middle of a sign-in flow
-            const wasSigningIn = sessionStorage.getItem('signingIn');
-            const hasOnboardingFlag = sessionStorage.getItem('shouldShowOnboarding');
-            
-            // Only clear stale flags if we're NOT currently signing in
-            if (hasOnboardingFlag === 'true' && wasSigningIn !== 'true') {
-              console.log('🧹 Clearing stale onboarding flag (no redirect result and not signing in)');
-              sessionStorage.removeItem('shouldShowOnboarding');
-              sessionStorage.removeItem('redirectAuthComplete');
-            } else if (wasSigningIn === 'true') {
-              console.log('⏳ No redirect result yet, but sign-in in progress - waiting for auth state change');
-              
-              // Check if the sign-in attempt is too old (abandoned/failed)
-              const signInTimestamp = sessionStorage.getItem('signInTimestamp');
-              const timeSinceSignIn = signInTimestamp ? Date.now() - parseInt(signInTimestamp) : 0;
-              const TWO_MINUTES = 2 * 60 * 1000;
-              
-              console.log(`⏱️  Time since sign-in initiated: ${Math.floor(timeSinceSignIn / 1000)}s`);
-              
-              if (timeSinceSignIn > TWO_MINUTES) {
-                console.log('🧹 Sign-in attempt is stale (>2min), clearing flags');
-                sessionStorage.removeItem('signingIn');
-                sessionStorage.removeItem('signInTimestamp');
-                sessionStorage.removeItem('shouldShowOnboarding');
-                sessionStorage.removeItem('redirectAuthComplete');
-                return; // Let the auth state set loading=false
-              }
-              
-              console.log('🔄 Will attempt to reload auth token...');
-              
-              // Debug: Check what's in storage
-              console.log('🔍 Checking storage for Firebase auth data...');
-              const storageKeys = Object.keys(localStorage).filter(k => k.includes('firebase'));
-              console.log('📦 Firebase localStorage keys:', storageKeys);
-              
-              // MOBILE FIX: Try to force reload the current user after a delay
-              // Sometimes the auth state needs a moment to sync on mobile
-              setTimeout(async () => {
-                try {
-                  console.log('🔃 Attempting to reload current user...');
-                  console.log('Current auth state:', auth.currentUser ? `User: ${auth.currentUser.uid}` : 'No user');
-                  
-                  if (auth.currentUser) {
-                    await auth.currentUser.reload();
-                    console.log('✅ User found after reload:', auth.currentUser.uid);
-                  } else {
-                    console.log('❌ Still no user after reload attempt');
-                    // Check if we need to clear the signing in flag due to a failed redirect
-                    console.log('⚠️ Possible redirect failure - user may have cancelled or session was blocked');
-                    console.log('💡 Tip: Check if third-party cookies are enabled and popup blockers are disabled');
-                  }
-                } catch (reloadError) {
-                  console.error('Error reloading user:', reloadError);
-                }
-              }, 1000);
-            }
-          }
-        } catch (redirectError) {
-          console.error('❌ Redirect sign-in error:', redirectError);
-          setError(redirectError.message);
-          // Clear onboarding and signing in flags on error
-          sessionStorage.removeItem('shouldShowOnboarding');
-          sessionStorage.removeItem('signingIn');
-        }
-        
-        // Now listen for auth state changes
+        // Listen for auth state changes
         unsubscribe = onAuthStateChanged(auth, (currentUser) => {
           console.log('🔄 Auth state changed:', currentUser ? `User: ${currentUser.uid}` : 'No user');
           
-          // If we just handled redirect and this is the first auth change, skip it
-          // (we already set the user from getRedirectResult)
-          if (skipFirstAuthChange) {
-            console.log('⏭️ Skipping first auth state change (already handled via redirect)');
-            skipFirstAuthChange = false;
-            return;
-          }
-          
-          // MOBILE FIX: If getRedirectResult returned null but we now have a user,
-          // and we don't have an onboarding flag yet, this might be a completed redirect
-          // Check if this is a new sign-in by looking at session storage
-          const wasSigningIn = sessionStorage.getItem('signingIn');
-          
-          if (currentUser && !redirectHandled) {
-            const hasOnboardingFlag = sessionStorage.getItem('shouldShowOnboarding');
-            const redirectAuthComplete = sessionStorage.getItem('redirectAuthComplete');
-            
-            // If we were signing in and now have a user, this is a successful redirect
-            if (wasSigningIn === 'true' && !hasOnboardingFlag) {
-              console.log('✅ Mobile redirect sign-in detected, setting onboarding flag');
-              sessionStorage.setItem('shouldShowOnboarding', 'true');
-              sessionStorage.setItem('redirectAuthComplete', 'true');
-              sessionStorage.removeItem('signingIn');
-              
-              // Clear the visit flag to show "Welcome" instead of "Welcome Back"
-              localStorage.removeItem(`hasVisitedDashboard_${currentUser.uid}`);
-            }
-          } else if (!currentUser && wasSigningIn === 'true') {
-            // CRITICAL FIX: If we're waiting for sign-in but got no user yet,
-            // keep loading=true and wait for the next auth state change
-            console.log('⏳ Waiting for user after redirect (keeping loading state)...');
-            
-            // Set a timeout to prevent infinite loading (10 seconds)
-            if (!redirectTimeout) {
-              redirectTimeout = setTimeout(() => {
-                console.log('⚠️ Redirect timeout - no user received, clearing flags');
-                sessionStorage.removeItem('signingIn');
-                sessionStorage.removeItem('shouldShowOnboarding');
-                setLoading(false);
-                setError('Sign-in timed out. Please try again.');
-              }, 10000);
-            }
-            
-            // Don't update user state or set loading to false yet
-            return;
-          } else if (currentUser && wasSigningIn === 'true') {
-            // Clear timeout if we got a user
-            if (redirectTimeout) {
-              clearTimeout(redirectTimeout);
-              redirectTimeout = null;
-            }
-          }
-          
-          // Always update user state to stay in sync
+          // Update user state
           setUser(currentUser);
           setLoading(false);
-          
-          // If we just handled a redirect and have a user, log it
-          if (redirectHandled && currentUser) {
-            console.log('✅ Auth state confirmed after redirect');
-          }
           
           // SECURITY: Set up periodic validation if user is logged in
           if (currentUser) {
@@ -244,70 +93,64 @@ export const AuthProvider = ({ children }) => {
       if (validationInterval) {
         clearInterval(validationInterval);
       }
-      if (redirectTimeout) {
-        clearTimeout(redirectTimeout);
-      }
     };
   }, []);
 
   const signInWithGoogle = async () => {
     try {
       setError(null);
+      console.log('🪟 Starting popup-based Google sign-in...');
       
-      // Detect if user is on mobile or in a restricted browser
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const isInAppBrowser = /FBAN|FBAV|Instagram|LinkedIn|Twitter/i.test(navigator.userAgent);
+      // POPUP-ONLY APPROACH: Works on all modern browsers (desktop + mobile)
+      const result = await signInWithPopup(auth, googleProvider);
       
-      console.log('🔍 Browser detection:', { isMobile, isInAppBrowser, userAgent: navigator.userAgent });
+      console.log('✅ Sign-in successful!', result.user.uid);
       
-      // NEW APPROACH: Try popup FIRST (works better on modern mobile browsers)
-      // Only use redirect for in-app browsers or if popup fails
-      if (isInAppBrowser) {
-        console.log('📱 In-app browser detected, using redirect');
-        sessionStorage.setItem('signingIn', 'true');
-        sessionStorage.setItem('signInTimestamp', Date.now().toString());
-        await signInWithRedirect(auth, googleProvider);
-        return null;
-      }
+      // Set onboarding flag for new sign-in
+      sessionStorage.setItem('shouldShowOnboarding', 'true');
+      localStorage.removeItem(`hasVisitedDashboard_${result.user.uid}`);
       
-      // Try popup for all other cases (desktop and mobile)
-      console.log('🪟 Attempting popup sign-in...');
-      try {
-        const result = await signInWithPopup(auth, googleProvider);
-        console.log('✅ Popup sign-in successful');
-        return result.user;
-      } catch (popupError) {
-        console.log('❌ Popup failed:', popupError.code);
-        
-        // If popup fails on mobile, fallback to redirect
-        if (isMobile && (popupError.code === 'auth/popup-blocked' || popupError.code === 'auth/popup-closed-by-user' || popupError.code === 'auth/cancelled-popup-request')) {
-          console.log('📱 Popup failed on mobile, falling back to redirect');
-          sessionStorage.setItem('signingIn', 'true');
-          sessionStorage.setItem('signInTimestamp', Date.now().toString());
-          await signInWithRedirect(auth, googleProvider);
-          return null;
-        }
-        
-        // Re-throw the error if we can't handle it
-        throw popupError;
-      }
+      return result.user;
+      
     } catch (error) {
-      console.error('❌ Error signing in with Google:', error);
-      console.error('Error details:', { code: error.code, message: error.message });
-      
-      // Clear signing in flag on error
-      sessionStorage.removeItem('signingIn');
-      sessionStorage.removeItem('signInTimestamp');
+      console.error('❌ Sign-in error:', error.code, error.message);
       
       // User-friendly error messages
-      if (error.code === 'auth/popup-closed-by-user') {
-        setError('Sign-in cancelled. Please try again.');
-      } else if (error.code === 'auth/network-request-failed') {
-        setError('Network error. Please check your connection and try again.');
-      } else {
-        setError('Failed to sign in. Please try again.');
+      let errorMessage = 'Failed to sign in. Please try again.';
+      
+      switch (error.code) {
+        case 'auth/popup-closed-by-user':
+          errorMessage = 'Sign-in cancelled. Please try again.';
+          break;
+        case 'auth/popup-blocked':
+          errorMessage = 'Popup was blocked by your browser. Please enable popups for this site and try again.';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Network error. Please check your internet connection.';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many attempts. Please wait a moment and try again.';
+          break;
+        case 'auth/unauthorized-domain':
+          errorMessage = 'This domain is not authorized. Please contact support.';
+          break;
+        case 'auth/operation-not-allowed':
+          errorMessage = 'Google sign-in is not enabled. Please contact support.';
+          break;
+        case 'auth/internal-error':
+          errorMessage = 'Internal error. Please try again in a moment.';
+          break;
+        case 'auth/cancelled-popup-request':
+          // Multiple popups opened, ignore this error (just log it)
+          console.log('⚠️ Multiple popup requests detected, using the latest one');
+          return null;
+        default:
+          if (error.message) {
+            errorMessage = `Sign-in failed: ${error.message}`;
+          }
       }
       
+      setError(errorMessage);
       throw error;
     }
   };
