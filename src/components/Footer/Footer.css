@@ -151,10 +151,19 @@
   align-items: center;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 11px;
   color: rgba(255, 255, 255, 0.65);
   margin-top: 4px;
+}
+
+.footer-hackathon-winner {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .copyright-separator {
@@ -212,6 +221,12 @@
 
   .footer-copyright {
     font-size: 10px;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .footer-hackathon-winner {
+    font-size: 9px;
   }
 
   .copyright-winner {
