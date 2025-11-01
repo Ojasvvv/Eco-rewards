@@ -10,7 +10,7 @@
   justify-content: center;
   z-index: 9999;
   overflow: hidden;
-  position: relative;
+  padding: 20px;
 }
 
 .onboarding-container::before {
@@ -64,11 +64,16 @@
   border-radius: 30px;
   padding: 48px;
   max-width: 500px;
-  width: 90%;
+  width: 100%;
+  max-height: 90vh;
+  margin: auto;
   box-shadow: 0 25px 60px rgba(16, 185, 129, 0.25);
   border: 2px solid rgba(16, 185, 129, 0.3);
   animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes slideIn {
@@ -686,6 +691,274 @@
   }
 }
 
+/* Missions Animation */
+.missions-animation {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mission-card-animated {
+  font-size: 60px;
+  animation: missionCardBounce 2s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+
+.mission-check {
+  position: absolute;
+  top: 20%;
+  right: 20%;
+  font-size: 30px;
+  color: #10b981;
+  background: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: checkPop 1.5s ease-in-out infinite;
+  z-index: 3;
+}
+
+.mission-progress {
+  position: absolute;
+  bottom: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.progress-bar-animated {
+  width: 70%;
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  border-radius: 4px;
+  animation: progressFill 2s ease-in-out infinite;
+}
+
+.mission-rewards {
+  position: absolute;
+  bottom: 10%;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.reward-badge {
+  font-size: 24px;
+  animation: rewardFloat 2s ease-in-out infinite;
+}
+
+.reward-1 {
+  animation-delay: 0s;
+}
+
+.reward-2 {
+  animation-delay: 0.3s;
+}
+
+.reward-3 {
+  animation-delay: 0.6s;
+}
+
+@keyframes missionCardBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-15px) scale(1.05);
+  }
+}
+
+@keyframes checkPop {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes progressFill {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    width: 70%;
+  }
+}
+
+@keyframes rewardFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(10deg);
+  }
+}
+
+/* Partners Animation */
+.partners-animation {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.partner-badge {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 50px;
+  color: #10b981;
+  background: white;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  animation: badgePulse 2s ease-in-out infinite;
+  z-index: 2;
+}
+
+.partner-shield {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 80px;
+  animation: shieldRotate 3s ease-in-out infinite;
+  z-index: 1;
+}
+
+.partner-checkmarks {
+  position: absolute;
+  top: 30%;
+  display: flex;
+  gap: 15px;
+  z-index: 2;
+}
+
+.checkmark {
+  font-size: 20px;
+  color: #10b981;
+  background: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: checkmarkPop 1.5s ease-in-out infinite;
+}
+
+.check-1 {
+  animation-delay: 0s;
+}
+
+.check-2 {
+  animation-delay: 0.3s;
+}
+
+.check-3 {
+  animation-delay: 0.6s;
+}
+
+.partner-stars {
+  position: absolute;
+  bottom: 15%;
+  display: flex;
+  gap: 5px;
+  z-index: 2;
+}
+
+.star-star {
+  font-size: 20px;
+  animation: starTwinkle 1.5s ease-in-out infinite;
+}
+
+.star-1 {
+  animation-delay: 0s;
+}
+
+.star-2 {
+  animation-delay: 0.2s;
+}
+
+.star-3 {
+  animation-delay: 0.4s;
+}
+
+.star-4 {
+  animation-delay: 0.6s;
+}
+
+.star-5 {
+  animation-delay: 0.8s;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.1);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+  }
+}
+
+@keyframes shieldRotate {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(10deg);
+  }
+}
+
+@keyframes checkmarkPop {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.7;
+  }
+}
+
+@keyframes starTwinkle {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
 .earth {
   font-size: 100px;
   animation: earthSpin 10s linear infinite;
@@ -871,9 +1144,14 @@
 
 /* Mobile Responsive */
 @media (max-width: 600px) {
+  .onboarding-container {
+    padding: 16px;
+  }
+
   .onboarding-content {
     padding: 32px 24px;
     border-radius: 20px;
+    max-height: 95vh;
   }
 
   .welcome-text {

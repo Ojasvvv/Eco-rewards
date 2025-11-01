@@ -130,6 +130,52 @@ const Onboarding = ({ onComplete }) => {
           </div>
         </div>
       )
+    },
+    {
+      icon: '🎯',
+      title: 'tutorialStep7Title',
+      description: 'tutorialStep7Desc',
+      illustration: (
+        <div className="illustration">
+          <div className="missions-animation">
+            <div className="mission-card-animated">🎯</div>
+            <div className="mission-check">✓</div>
+            <div className="mission-progress">
+              <div className="progress-bar-animated"></div>
+            </div>
+            <div className="mission-rewards">
+              <span className="reward-badge reward-1">💰</span>
+              <span className="reward-badge reward-2">🏆</span>
+              <span className="reward-badge reward-3">⭐</span>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      icon: '✅',
+      title: 'tutorialStep8Title',
+      description: 'tutorialStep8Desc',
+      illustration: (
+        <div className="illustration">
+          <div className="partners-animation">
+            <div className="partner-badge">✓</div>
+            <div className="partner-shield">🛡️</div>
+            <div className="partner-checkmarks">
+              <span className="checkmark check-1">✓</span>
+              <span className="checkmark check-2">✓</span>
+              <span className="checkmark check-3">✓</span>
+            </div>
+            <div className="partner-stars">
+              <span className="star-star star-1">⭐</span>
+              <span className="star-star star-2">⭐</span>
+              <span className="star-star star-3">⭐</span>
+              <span className="star-star star-4">⭐</span>
+              <span className="star-star star-5">⭐</span>
+            </div>
+          </div>
+        </div>
+      )
     }
   ];
 

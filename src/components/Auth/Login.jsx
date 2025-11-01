@@ -86,36 +86,85 @@ const Login = () => {
         <div className="blob blob-3"></div>
       </div>
 
-      <div className="login-content animate-slideUp">
-        <div className="login-card">
+      {/* Left Side - Features */}
+      <div className="login-left">
+        <div className="login-left-content">
+          <div className="brand-section">
+            <div className="brand-mark">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div className="brand-text">
+              <h1>EcoRewards</h1>
+              <p className="brand-tagline">Sustainability Made Rewarding</p>
+            </div>
+          </div>
+
+          <div className="features-showcase">
+            <h2>Why Choose EcoRewards?</h2>
+            <div className="feature-grid">
+              <div className="showcase-feature">
+                <div className="feature-icon-large">🌱</div>
+                <div>
+                  <h3>Earn Rewards</h3>
+                  <p>Get points every time you recycle. Turn your eco-friendly actions into rewards!</p>
+                </div>
+              </div>
+              <div className="showcase-feature">
+                <div className="feature-icon-large">🎁</div>
+                <div>
+                  <h3>Redeem Coupons</h3>
+                  <p>Use your points to get discounts at partner stores like Domino's, Starbucks, and more!</p>
+                </div>
+              </div>
+              <div className="showcase-feature">
+                <div className="feature-icon-large">🔥</div>
+                <div>
+                  <h3>Track Your Streak</h3>
+                  <p>Build daily recycling habits and maintain your streak for bonus rewards.</p>
+                </div>
+              </div>
+              <div className="showcase-feature">
+                <div className="feature-icon-large">🏆</div>
+                <div>
+                  <h3>Achievements & Leaderboards</h3>
+                  <p>Unlock achievements and compete with others in city-wide leaderboards.</p>
+                </div>
+              </div>
+              <div className="showcase-feature">
+                <div className="feature-icon-large">🗑️</div>
+                <div>
+                  <h3>Smart Bin Finder</h3>
+                  <p>Find the nearest EcoRewards bins and schedule pickups with KabadConnect.</p>
+                </div>
+              </div>
+              <div className="showcase-feature">
+                <div className="feature-icon-large">🌍</div>
+                <div>
+                  <h3>Save the Planet</h3>
+                  <p>Join thousands making a real impact on environmental sustainability.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Sign In */}
+      <div className="login-right">
+        <div className="login-card animate-slideUp">
           {/* Logo and Header */}
           <div className="login-header">
             <div className="logo-container">
               <div className="logo-icon">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M19 11H5M19 11C20.1046 11 21 11.8954 21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.8954 3.89543 11 5 11M19 11V9C19 7.89543 18.1046 7 17 7M5 11V9C5 7.89543 5.89543 7 7 7M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7M7 7H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M12 15L12 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
             </div>
-            <h1 className="login-title">EcoRewards</h1>
-            <p className="login-subtitle">Recycle Smart, Earn Rewards</p>
-          </div>
-
-          {/* Features */}
-          <div className="features-list">
-            <div className="feature-item">
-              <div className="feature-icon">🌱</div>
-              <span>Earn rewards for recycling</span>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">🎁</div>
-              <span>Get discounts at partner stores</span>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">🌍</div>
-              <span>Help create a cleaner planet</span>
-            </div>
+            <h1 className="login-title">Welcome!</h1>
+            <p className="login-subtitle">Start your sustainable journey today</p>
           </div>
 
           {/* Sign In Button */}
@@ -158,15 +207,9 @@ const Login = () => {
             </p>
           </div>
         </div>
-
-        {/* Bottom Info */}
-        <div className="bottom-info">
-          <p>Scan the QR code on any EcoRewards dustbin to get started!</p>
-        </div>
       </div>
     </div>
   );
 };
 
 export default Login;
-
