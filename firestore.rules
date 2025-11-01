@@ -140,6 +140,37 @@ service cloud.firestore {
       allow update, delete: if false;
     }
     
+    // ==================== PICKUPS ====================
+    
+    match /pickups/{pickupId} {
+      allow read: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid;
+      
+      allow create: if isAuthenticated()
+        && isValidEmail()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.userEmail is string
+        && request.resource.data.userEmail == request.auth.token.email
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt is string
+        && request.resource.data.updatedAt is string
+        && request.resource.data.wasteCategory is string
+        && request.resource.data.address is string
+        && request.resource.data.address.size() > 0
+        && request.resource.data.date is string
+        && request.resource.data.timeSlot is string;
+      
+      allow update: if isAuthenticated() 
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid
+        && !('userId' in request.resource.data.diff(resource.data).affectedKeys())
+        && !('userEmail' in request.resource.data.diff(resource.data).affectedKeys())
+        && !('createdAt' in request.resource.data.diff(resource.data).affectedKeys())
+        && (request.resource.data.status in ['pending', 'confirmed', 'completed', 'cancelled']);
+      
+      allow delete: if false;
+    }
+    
     // ==================== ADMIN ====================
     
     match /admin/{document=**} {

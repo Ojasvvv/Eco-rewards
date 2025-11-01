@@ -39,8 +39,8 @@
   display: grid;
   grid-template-columns: 1fr 400px;
   gap: 1.5rem;
-  height: 600px;
   margin-bottom: 1.5rem;
+  position: relative;
 }
 
 /* Map Section */
@@ -54,6 +54,9 @@
   touch-action: pan-x pan-y;
   /* Ensure map stays below navbar (z-index 100) */
   z-index: 1;
+  /* Extend map to show smart bins */
+  height: 600px;
+  width: 100%;
 }
 
 .map-loading {
@@ -152,7 +155,8 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  overflow: hidden;
+  height: 600px;
 }
 
 .bins-list-header {
@@ -197,29 +201,32 @@
 
 .bins-list {
   flex: 1;
-  overflow-y: visible;
-  overflow-x: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  padding-right: 0.5rem;
+  margin-right: -0.5rem;
 }
 
+/* Hide scrollbar but keep functionality */
 .bins-list::-webkit-scrollbar {
-  width: 6px;
+  width: 0px;
+  background: transparent;
+}
+
+.bins-list {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .bins-list::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-  border-radius: 3px;
+  background: transparent;
 }
 
 .bins-list::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 3px;
-}
-
-.bins-list::-webkit-scrollbar-thumb:hover {
-  background: #10b981;
+  background: transparent;
 }
 
 .no-bins {
@@ -371,21 +378,26 @@
   color: #10b981;
 }
 
-/* Map Legend */
+/* Map Legend - Positioned at left bottom of map */
 .map-legend {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
-  padding: 1rem;
-  background: var(--card-bg);
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  flex-wrap: wrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .dark-theme .map-legend {
-  background: #1f2937;
+  background: rgba(31, 41, 55, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .legend-item {
@@ -399,6 +411,32 @@
 .legend-icon {
   font-size: 1.2rem;
   line-height: 1;
+}
+
+.legend-icon.user {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #3B82F6;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.legend-icon.user::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .legend-icon.bin {
@@ -432,10 +470,16 @@
   .map-section {
     height: 400px;
   }
+  
+  .map-legend {
+    left: 0.5rem;
+    bottom: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+  }
 
   .bins-list-section {
-    max-height: none;
-    height: auto;
+    height: 400px;
   }
 }
 
@@ -455,10 +499,31 @@
   .map-section {
     height: 300px;
   }
+  
+  .map-legend {
+    left: 0.5rem;
+    bottom: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .legend-item {
+    font-size: 0.8rem;
+  }
+  
+  .legend-icon.user {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .legend-icon.user::before {
+    width: 6px;
+    height: 6px;
+  }
 
   .bins-list-section {
-    max-height: none;
-    height: auto;
+    height: 300px;
   }
 
   .bin-item-actions {

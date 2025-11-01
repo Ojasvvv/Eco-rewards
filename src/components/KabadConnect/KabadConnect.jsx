@@ -1,24 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
+import { checkDailyPickupLimit } from '../../services/pickupService';
 import SchedulePickup from './SchedulePickup';
 import PastOrders from './PastOrders';
 import Missions from './Missions';
 import './KabadConnect.css';
 
 const KabadConnect = () => {
+  const { user } = useAuth();
   const { t } = useLanguage();
   const { isDark } = useTheme();
   const [activeTab, setActiveTab] = useState('schedule');
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [activeOrders, setActiveOrders] = useState([]);
   const [notification, setNotification] = useState(null);
+  const [dailyLimitInfo, setDailyLimitInfo] = useState(null);
 
   const tabs = [
     { id: 'schedule', label: t('schedulePickup'), icon: '📅' },
     { id: 'orders', label: t('pastDeliveries'), icon: '📦' },
     { id: 'missions', label: t('ecoMissions'), icon: '🎯' }
   ];
+
+  // Check daily pickup limit on mount and when active orders change
+  useEffect(() => {
+    const checkLimit = async () => {
+      if (user?.uid) {
+        try {
+          const limitInfo = await checkDailyPickupLimit(user.uid, 2);
+          setDailyLimitInfo(limitInfo);
+        } catch (error) {
+          // Silently handle error
+        }
+      }
+    };
+    checkLimit();
+  }, [user, activeOrders]);
+
+  const handleOpenScheduleModal = async () => {
+    // Check limit before opening modal
+    if (user?.uid) {
+      try {
+        const limitCheck = await checkDailyPickupLimit(user.uid, 2);
+        if (!limitCheck.allowed) {
+          showNotification('⚠️ Limit Over! You cannot schedule more pickups today. Please try again tomorrow.', 'error');
+          return;
+        }
+      } catch (error) {
+        // Silently handle error
+      }
+    }
+    setShowScheduleModal(true);
+  };
 
   const handlePickupSuccess = (pickupRequest) => {
     // Add order with unique ID
@@ -29,6 +64,13 @@ const KabadConnect = () => {
     };
     setActiveOrders(prev => [...prev, newOrder]);
     setShowScheduleModal(false);
+    
+    // Update limit info after successful pickup
+    if (user?.uid) {
+      checkDailyPickupLimit(user.uid, 2).then(limitInfo => {
+        setDailyLimitInfo(limitInfo);
+      });
+    }
   };
 
   const showNotification = (message, type = 'success') => {
@@ -83,7 +125,7 @@ const KabadConnect = () => {
           {activeTab === 'schedule' && (
             <button 
               className="btn-new-pickup"
-              onClick={() => setShowScheduleModal(true)}
+              onClick={handleOpenScheduleModal}
             >
               <span>+</span>
               {t('newPickup')}
@@ -120,11 +162,24 @@ const KabadConnect = () => {
                   <li>{t('pickupStep5')}</li>
                 </ol>
                 <button 
-                  className="btn-schedule-now"
-                  onClick={() => setShowScheduleModal(true)}
+                  className={`btn-schedule-now ${dailyLimitInfo && !dailyLimitInfo.allowed ? 'disabled' : ''}`}
+                  onClick={handleOpenScheduleModal}
+                  disabled={dailyLimitInfo && !dailyLimitInfo.allowed}
+                  title={dailyLimitInfo && !dailyLimitInfo.allowed ? `❌ Cannot schedule more pickups! You've reached your daily limit of ${dailyLimitInfo.limit} pickup(s).` : ''}
                 >
-                  {t('scheduleNow')}
+                  {dailyLimitInfo && !dailyLimitInfo.allowed ? '❌ Cannot Schedule - Limit Reached' : t('scheduleNow')}
                 </button>
+                
+                {dailyLimitInfo && !dailyLimitInfo.allowed && (
+                  <div className="limit-warning-card">
+                    <div className="warning-icon">⚠️</div>
+                    <div className="warning-content">
+                      <h4>Daily Pickup Limit Reached</h4>
+                      <p>You cannot schedule more pickups. You've already scheduled <strong>{dailyLimitInfo.count}</strong> pickup(s) today out of your daily limit of <strong>{dailyLimitInfo.limit}</strong>.</p>
+                      <p className="warning-note">Please try again tomorrow to schedule a new pickup.</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {activeOrders.length > 0 ? (

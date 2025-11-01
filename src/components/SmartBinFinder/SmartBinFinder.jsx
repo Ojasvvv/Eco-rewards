@@ -210,83 +210,105 @@ const SmartBinFinder = () => {
               <p>Getting your location...</p>
             </div>
           ) : (
-            <MapContainer
-              center={mapCenter || [0, 0]}
-              zoom={15}
-              style={{ height: '100%', width: '100%' }}
-              className="leaflet-map"
-              scrollWheelZoom={true}
-              dragging={true}
-              touchZoom={true}
-              doubleClickZoom={true}
-              zoomControl={true}
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              
-              {/* User Location */}
-              {userLocation && (
-                <>
-                  <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
+            <>
+              <MapContainer
+                center={mapCenter || [0, 0]}
+                zoom={15}
+                style={{ height: '100%', width: '100%' }}
+                className="leaflet-map"
+                scrollWheelZoom={true}
+                dragging={true}
+                touchZoom={true}
+                doubleClickZoom={true}
+                zoomControl={true}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                
+                {/* User Location */}
+                {userLocation && (
+                  <>
+                    <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
+                      <Popup>
+                        <div className="popup-content">
+                          <strong>📍 Your Location</strong>
+                        </div>
+                      </Popup>
+                    </Marker>
+                    
+                    {/* Radius circle */}
+                    <Circle
+                      center={[userLocation.lat, userLocation.lng]}
+                      radius={1000}
+                      pathOptions={{ 
+                        color: '#3B82F6', 
+                        fillColor: '#3B82F6',
+                        fillOpacity: 0.1,
+                        weight: 2,
+                        dashArray: '5, 5'
+                      }}
+                    />
+                  </>
+                )}
+                
+                {/* Smart Bins */}
+                {smartBins.map((bin) => (
+                  <Marker
+                    key={bin.id}
+                    position={[bin.lat, bin.lng]}
+                    icon={binIcon}
+                    eventHandlers={{
+                      click: () => handleBinClick(bin),
+                    }}
+                  >
                     <Popup>
                       <div className="popup-content">
-                        <strong>📍 Your Location</strong>
+                        <h3>{bin.name}</h3>
+                        <p><strong>Code:</strong> {bin.code}</p>
+                        <p><strong>Distance:</strong> {bin.distance}m away</p>
+                        <p>
+                          <strong>Status:</strong>{' '}
+                          <span className={`status-badge ${bin.status}`}>
+                            {bin.status === 'available' ? '✅ Available' : '🔴 Full'}
+                          </span>
+                        </p>
+                        <p><strong>Capacity:</strong> {bin.capacity}% used</p>
+                        <button 
+                          className="directions-btn"
+                          onClick={() => getDirections(bin)}
+                        >
+                          📍 Get Directions
+                        </button>
                       </div>
                     </Popup>
                   </Marker>
-                  
-                  {/* Radius circle */}
-                  <Circle
-                    center={[userLocation.lat, userLocation.lng]}
-                    radius={1000}
-                    pathOptions={{ 
-                      color: '#3B82F6', 
-                      fillColor: '#3B82F6',
-                      fillOpacity: 0.1,
-                      weight: 2,
-                      dashArray: '5, 5'
-                    }}
-                  />
-                </>
-              )}
+                ))}
+                
+                <MapRecenter center={mapCenter} />
+              </MapContainer>
               
-              {/* Smart Bins */}
-              {smartBins.map((bin) => (
-                <Marker
-                  key={bin.id}
-                  position={[bin.lat, bin.lng]}
-                  icon={binIcon}
-                  eventHandlers={{
-                    click: () => handleBinClick(bin),
-                  }}
-                >
-                  <Popup>
-                    <div className="popup-content">
-                      <h3>{bin.name}</h3>
-                      <p><strong>Code:</strong> {bin.code}</p>
-                      <p><strong>Distance:</strong> {bin.distance}m away</p>
-                      <p>
-                        <strong>Status:</strong>{' '}
-                        <span className={`status-badge ${bin.status}`}>
-                          {bin.status === 'available' ? '✅ Available' : '🔴 Full'}
-                        </span>
-                      </p>
-                      <p><strong>Capacity:</strong> {bin.capacity}% used</p>
-                      <button 
-                        className="directions-btn"
-                        onClick={() => getDirections(bin)}
-                      >
-                        📍 Get Directions
-                      </button>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
-              
-              <MapRecenter center={mapCenter} />
-            </MapContainer>
+              {/* Legend - Now inside map section */}
+              <div className="map-legend">
+                <div className="legend-item">
+                  <span className="legend-icon user"></span>
+                  <span>Your Location</span>
+                </div>
+                <div className="legend-item">
+                  <span className="legend-icon bin">🗑️</span>
+                  <span>Smart Bin</span>
+                </div>
+                <div className="legend-item">
+                  <span className="status-indicator available">●</span>
+                  <span>Available</span>
+                </div>
+                <div className="legend-item">
+                  <span className="status-indicator full">●</span>
+                  <span>Full</span>
+                </div>
+              </div>
+            </>
           )}
         </div>
 
@@ -365,26 +387,6 @@ const SmartBinFinder = () => {
               ))
             )}
           </div>
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div className="map-legend">
-        <div className="legend-item">
-          <span className="legend-icon user">📍</span>
-          <span>Your Location</span>
-        </div>
-        <div className="legend-item">
-          <span className="legend-icon bin">🗑️</span>
-          <span>Smart Bin</span>
-        </div>
-        <div className="legend-item">
-          <span className="status-indicator available">●</span>
-          <span>Available</span>
-        </div>
-        <div className="legend-item">
-          <span className="status-indicator full">●</span>
-          <span>Full</span>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
+import { checkDailyPickupLimit, schedulePickup } from '../../services/pickupService';
 import './SchedulePickup.css';
 
 const SchedulePickup = ({ onClose, onSuccess }) => {
@@ -21,6 +22,7 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
   const [assignedPartner, setAssignedPartner] = useState(null);
   const [estimatedPrice, setEstimatedPrice] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [dailyLimitInfo, setDailyLimitInfo] = useState(null);
 
   // Get minimum date (tomorrow)
   const getMinDate = () => {
@@ -28,6 +30,21 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split('T')[0];
   };
+
+  // Check daily pickup limit on mount and when user changes
+  useEffect(() => {
+    const checkLimit = async () => {
+      if (user?.uid) {
+        try {
+          const limitInfo = await checkDailyPickupLimit(user.uid, 2);
+          setDailyLimitInfo(limitInfo);
+        } catch (error) {
+          console.error('Error checking pickup limit:', error);
+        }
+      }
+    };
+    checkLimit();
+  }, [user]);
 
   const wasteCategories = [
     { id: 'paper', name: t('wastePaper'), icon: '📄', description: t('wastePaperDesc') },
@@ -55,6 +72,12 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
   };
 
   const handleNext = () => {
+    // Prevent progression if limit is reached
+    if (dailyLimitInfo && !dailyLimitInfo.allowed) {
+      alert(`❌ Cannot Schedule Pickup!\n\nYou cannot schedule more pickups. You've reached your daily limit of ${dailyLimitInfo.limit} pickup(s).\n\nPlease try again tomorrow.`);
+      return;
+    }
+
     if (step === 1 && !formData.wasteCategory) {
       alert(t('selectWasteCategory'));
       return;
@@ -89,25 +112,48 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
   };
 
   const handleSubmit = async () => {
+    // Check daily limit before submitting
+    if (dailyLimitInfo && !dailyLimitInfo.allowed) {
+      alert(`❌ Cannot Schedule Pickup!\n\nYou cannot schedule more pickups. You've reached your daily limit of ${dailyLimitInfo.limit} pickup(s).\n\nYou've already scheduled ${dailyLimitInfo.count} pickup(s) today.\n\nPlease try again tomorrow.`);
+      return;
+    }
+
     setLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // TODO: Save pickup request to Firestore
-    const pickupRequest = {
-      userId: user.uid,
-      ...formData,
-      partner: assignedPartner,
-      status: 'pending',
-      timestamp: new Date().toISOString()
-    };
-    
-    setLoading(false);
-    onSuccess && onSuccess(pickupRequest);
-    
-    alert(t('pickupScheduled'));
-    onClose && onClose();
+    try {
+      // Check limit again just before submitting (double-check)
+      const limitCheck = await checkDailyPickupLimit(user.uid, 2);
+      if (!limitCheck.allowed) {
+        setLoading(false);
+        alert(`❌ Cannot Schedule Pickup!\n\nYou cannot schedule more pickups. You've reached your daily limit of ${limitCheck.limit} pickup(s).\n\nYou've already scheduled ${limitCheck.count} pickup(s) today.\n\nPlease try again tomorrow.`);
+        return;
+      }
+
+      // Save pickup request to Firestore
+      const pickupRequest = {
+        ...formData,
+        partner: assignedPartner,
+      };
+
+      const createdPickup = await schedulePickup(pickupRequest);
+      
+      // Update limit info after successful creation
+      const updatedLimitInfo = await checkDailyPickupLimit(user.uid, 2);
+      setDailyLimitInfo(updatedLimitInfo);
+      
+      setLoading(false);
+      onSuccess && onSuccess({
+        ...createdPickup,
+        timestamp: createdPickup.createdAt
+      });
+      
+      alert(t('pickupScheduled'));
+      onClose && onClose();
+    } catch (error) {
+      console.error('Error scheduling pickup:', error);
+      setLoading(false);
+      alert(`❌ Failed to schedule pickup: ${error.message || 'Please try again later.'}`);
+    }
   };
 
   const renderStep1 = () => (
@@ -287,6 +333,18 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
           </h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
+        
+        {/* Daily Limit Indicator */}
+        {dailyLimitInfo && (
+          <div className={`daily-limit-indicator ${!dailyLimitInfo.allowed ? 'limit-reached' : ''}`}>
+            <span className="limit-text">
+              {dailyLimitInfo.allowed 
+                ? `📅 ${dailyLimitInfo.remaining} pickup${dailyLimitInfo.remaining !== 1 ? 's' : ''} remaining today (${dailyLimitInfo.count}/${dailyLimitInfo.limit})`
+                : `❌ Cannot Schedule More Pickups! Daily limit reached - You've scheduled ${dailyLimitInfo.count} out of ${dailyLimitInfo.limit} allowed pickup(s) today. Please try again tomorrow.`
+              }
+            </span>
+          </div>
+        )}
 
         <div className="pickup-progress">
           <div className={`progress-step ${step >= 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`}>
@@ -318,14 +376,18 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
             </button>
           )}
           {step < 3 ? (
-            <button className="btn-primary" onClick={handleNext}>
+            <button 
+              className="btn-primary" 
+              onClick={handleNext}
+              disabled={dailyLimitInfo && !dailyLimitInfo.allowed}
+            >
               {t('next')}
             </button>
           ) : (
             <button 
               className="btn-primary" 
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || (dailyLimitInfo && !dailyLimitInfo.allowed)}
             >
               {loading ? t('scheduling') : t('confirmBooking')}
             </button>

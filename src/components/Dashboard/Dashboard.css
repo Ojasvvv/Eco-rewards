@@ -1,6 +1,8 @@
 .dashboard-container {
   min-height: 100vh;
   background: var(--background-gradient);
+  display: flex;
+  flex-direction: column;
 }
 
 /* Header */
@@ -441,6 +443,18 @@
   width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.binfinder-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
 }
 
 /* View Toggle Tabs */

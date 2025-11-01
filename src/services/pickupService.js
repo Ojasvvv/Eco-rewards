@@ -1,5 +1,5 @@
 import { db, auth } from '../firebase/config';
-import { collection, addDoc, getDocs, query, where, orderBy, limit, updateDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, orderBy, limit, updateDoc, doc, Timestamp } from 'firebase/firestore';
 
 /**
  * Schedule a new pickup request
@@ -127,6 +127,67 @@ export const reschedulePickup = async (pickupId, newSchedule) => {
   } catch (error) {
     console.error('Error rescheduling pickup:', error);
     throw error;
+  }
+};
+
+/**
+ * Check daily pickup limit for a user
+ * @param {string} userId - User ID
+ * @param {number} maxPickupsPerDay - Maximum pickups allowed per day (default: 2)
+ * @returns {Promise<Object>} - { allowed: boolean, count: number, limit: number }
+ */
+export const checkDailyPickupLimit = async (userId, maxPickupsPerDay = 2) => {
+  try {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+
+    // Get start and end of today
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+
+    // Convert to ISO strings for Firestore query (createdAt is stored as ISO string)
+    const startOfDayISO = startOfDay.toISOString();
+    const endOfDayISO = endOfDay.toISOString();
+
+    // Query pickups created today
+    // Note: We query all pickups for the user and filter by date in code for better compatibility
+    const q = query(
+      collection(db, 'pickups'),
+      where('userId', '==', userId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    
+    // Count only non-cancelled pickups created today
+    let count = 0;
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const createdAt = data.createdAt;
+      
+      // Check if pickup was created today and is not cancelled
+      if (createdAt && createdAt >= startOfDayISO && createdAt < endOfDayISO && data.status !== 'cancelled') {
+        count++;
+      }
+    });
+
+    return {
+      allowed: count < maxPickupsPerDay,
+      count,
+      limit: maxPickupsPerDay,
+      remaining: Math.max(0, maxPickupsPerDay - count)
+    };
+  } catch (error) {
+    console.error('Error checking daily pickup limit:', error);
+    // In case of error, allow the pickup (fail open)
+    return {
+      allowed: true,
+      count: 0,
+      limit: maxPickupsPerDay,
+      remaining: maxPickupsPerDay
+    };
   }
 };
 

@@ -78,6 +78,7 @@
   gap: 20px;
 }
 
+
 .kabadconnect-header .header-text h2 {
   font-size: 28px;
   font-weight: 700;
@@ -116,6 +117,75 @@
   gap: 8px;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
   white-space: nowrap;
+}
+
+/* Limit Warning Card */
+.limit-warning-card {
+  margin-top: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border: 2px solid #ef4444;
+  border-radius: 12px;
+  display: flex;
+  gap: 16px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.dark-theme .limit-warning-card {
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  border-color: #dc2626;
+}
+
+.warning-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.warning-content {
+  flex: 1;
+}
+
+.warning-content h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #991b1b;
+  margin: 0 0 12px 0;
+}
+
+.dark-theme .warning-content h4 {
+  color: #fee2e2;
+}
+
+.warning-content p {
+  font-size: 14px;
+  color: #7f1d1d;
+  line-height: 1.6;
+  margin: 8px 0;
+}
+
+.dark-theme .warning-content p {
+  color: #fecaca;
+}
+
+.warning-content strong {
+  color: #991b1b;
+  font-weight: 700;
+}
+
+.dark-theme .warning-content strong {
+  color: #fee2e2;
+}
+
+.warning-note {
+  font-size: 13px;
+  font-style: italic;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(153, 27, 27, 0.3);
+}
+
+.dark-theme .warning-note {
+  border-top-color: rgba(254, 226, 226, 0.3);
 }
 
 .btn-new-pickup span:first-child {
@@ -313,9 +383,23 @@
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-.btn-schedule-now:hover {
+.btn-schedule-now:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-schedule-now.disabled,
+.btn-schedule-now:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: none;
+}
+
+.btn-schedule-now.disabled:hover,
+.btn-schedule-now:disabled:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 /* Active Orders Card */
