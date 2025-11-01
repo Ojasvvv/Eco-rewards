@@ -6,7 +6,6 @@ import './LanguageSelector.css';
 const LanguageSelector = () => {
   const { language, changeLanguage, supportedLanguages } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);
 
   // Use API supported languages, fallback to basic list if not available
@@ -39,24 +38,18 @@ const LanguageSelector = () => {
     };
   }, [isOpen, isMobile]);
 
-  // Filter languages based on search
-  const filteredLanguages = languages.filter(lang => 
-    lang.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    lang.native.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    lang.code.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // No filtering needed since search is removed
+  const filteredLanguages = languages;
 
   const currentLang = languages.find(lang => lang.code === language) || languages[0];
 
   const handleSelect = (langCode) => {
     changeLanguage(langCode);
     setIsOpen(false);
-    setSearchQuery('');
   };
 
   const handleClose = () => {
     setIsOpen(false);
-    setSearchQuery('');
   };
 
   const dropdownContent = isOpen ? (
@@ -66,27 +59,6 @@ const LanguageSelector = () => {
             <div className="dropdown-header">
               <h3>Select Language</h3>
               <p className="language-count">{filteredLanguages.length} languages available</p>
-              
-              {/* Search Bar */}
-              <div className="search-container">
-                <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input
-                  type="text"
-                  className="language-search"
-                  placeholder="Search languages..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
-                />
-                {searchQuery && (
-                  <button className="clear-search" onClick={() => setSearchQuery('')}>
-                    ×
-                  </button>
-                )}
-              </div>
-
             </div>
 
             <div className="language-list">

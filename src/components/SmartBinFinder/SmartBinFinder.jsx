@@ -92,10 +92,14 @@ const generateRandomBins = (userLat, userLng, count = 10) => {
       lat,
       lng,
       distance: distanceInMeters,
-      status: Math.random() > 0.3 ? 'available' : 'full',
       capacity: Math.round(Math.random() * 100)
     });
   }
+  
+  // Set status based on capacity
+  bins.forEach(bin => {
+    bin.status = bin.capacity >= 80 ? 'full' : 'available';
+  });
   
   // Sort by distance
   return bins.sort((a, b) => a.distance - b.distance);
@@ -205,6 +209,11 @@ const SmartBinFinder = () => {
               zoom={15}
               style={{ height: '100%', width: '100%' }}
               className="leaflet-map"
+              scrollWheelZoom={true}
+              dragging={true}
+              touchZoom={true}
+              doubleClickZoom={true}
+              zoomControl={true}
             >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -305,9 +314,7 @@ const SmartBinFinder = () => {
                       <h4>{bin.name}</h4>
                       <p className="bin-code">{bin.code}</p>
                     </div>
-                    <span className={`status-indicator ${bin.status}`}>
-                      {bin.status === 'available' ? '●' : '●'}
-                    </span>
+                    <span className={`status-indicator ${bin.status}`}>●</span>
                   </div>
                   
                   <div className="bin-item-details">

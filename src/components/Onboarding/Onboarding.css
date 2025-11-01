@@ -778,6 +778,14 @@
   margin-bottom: 12px;
 }
 
+.dark-theme .step-title {
+  color: #f9fafb;
+}
+
+.onboarding-container.dark-theme .step-title {
+  color: #f9fafb;
+}
+
 .step-description {
   font-size: 16px;
   color: #6b7280;

@@ -50,6 +50,8 @@
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   background: var(--card-bg);
+  /* Prevent scroll issues with map */
+  touch-action: pan-x pan-y;
 }
 
 .map-loading {
@@ -76,6 +78,13 @@
 
 .leaflet-map {
   border-radius: 1rem;
+  /* Prevent map from causing page scroll issues */
+  touch-action: pan-x pan-y;
+}
+
+.leaflet-container {
+  /* Prevent map dragging when scrolling page */
+  pointer-events: auto;
 }
 
 .popup-content {
@@ -277,6 +286,7 @@
   font-size: 1.5rem;
   line-height: 1;
   flex-shrink: 0;
+  display: inline-block;
 }
 
 .status-indicator.available {

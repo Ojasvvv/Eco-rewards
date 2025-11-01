@@ -1,6 +1,6 @@
 .language-selector {
   position: relative;
-  z-index: 1;
+  z-index: 101;
 }
 
 .language-button {
@@ -62,7 +62,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 999;
+  z-index: 998;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
   /* Allow touch events to pass through on mobile */
@@ -91,6 +91,13 @@
   /* Ensure it doesn't overflow viewport */
   max-height: calc(100vh - 100px);
   overflow-y: auto;
+  /* Prevent header blur by ensuring proper stacking */
+  isolation: isolate;
+}
+
+/* Ensure dropdown doesn't get blurred by header backdrop-filter */
+.dashboard-header {
+  isolation: isolate;
 }
 
 .language-dropdown.enhanced {
