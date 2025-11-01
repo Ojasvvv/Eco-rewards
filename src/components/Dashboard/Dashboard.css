@@ -438,6 +438,9 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* View Toggle Tabs */
@@ -450,6 +453,9 @@
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border: 2px solid #e5e7eb;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .dark-theme .view-toggle-tabs {
@@ -472,6 +478,15 @@
   cursor: pointer;
   transition: all 0.3s;
   color: #6b7280;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.view-tab > span:not(.tab-icon) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .dark-theme .view-tab {
@@ -495,6 +510,7 @@
 
 .view-tab .tab-icon {
   font-size: 20px;
+  flex-shrink: 0;
 }
 
 .kabadconnect-view {
@@ -925,6 +941,23 @@
   .activity-section h3 {
     font-size: 18px;
   }
+
+  /* View Toggle Tabs Mobile */
+  .view-toggle-tabs {
+    gap: 8px;
+    padding: 6px;
+    margin-bottom: 24px;
+  }
+
+  .view-tab {
+    padding: 10px 12px;
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .view-tab .tab-icon {
+    font-size: 18px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -995,6 +1028,28 @@
     max-width: 60px;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  /* View Toggle Tabs - Very Small Screens */
+  .view-toggle-tabs {
+    gap: 6px;
+    padding: 4px;
+    margin-bottom: 20px;
+  }
+
+  .view-tab {
+    padding: 8px 8px;
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .view-tab .tab-icon {
+    font-size: 16px;
+  }
+
+  /* Hide text on very small screens if needed, show only icons */
+  .view-tab span:not(.tab-icon) {
+    display: inline;
   }
 
   .language-button {
