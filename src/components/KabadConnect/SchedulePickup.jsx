@@ -165,7 +165,7 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
         {wasteCategories.map(category => (
           <div
             key={category.id}
-            className={`waste-category-card ${formData.wasteCategory === category.id ? 'selected' : ''}`}
+            className={`waste-category-card ${formData.wasteCategory === category.id ? 'selected' : ''} ${category.id === 'mixed' ? 'waste-category-mixed' : ''}`}
             onClick={() => handleInputChange('wasteCategory', category.id)}
           >
             <h4>{category.name}</h4>
@@ -346,22 +346,6 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
           </div>
         )}
 
-        <div className="pickup-progress">
-          <div className={`progress-step ${step >= 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`}>
-            <div className="step-circle">1</div>
-            <span>{t('wasteType')}</span>
-          </div>
-          <div className="progress-line"></div>
-          <div className={`progress-step ${step >= 2 ? 'active' : ''} ${step > 2 ? 'completed' : ''}`}>
-            <div className="step-circle">2</div>
-            <span>{t('details')}</span>
-          </div>
-          <div className="progress-line"></div>
-          <div className={`progress-step ${step >= 3 ? 'active' : ''}`}>
-            <div className="step-circle">3</div>
-            <span>{t('confirm')}</span>
-          </div>
-        </div>
 
         <div className="modal-body">
           {step === 1 && renderStep1()}

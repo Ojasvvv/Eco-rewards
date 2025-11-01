@@ -1,16 +1,57 @@
 .kabadconnect-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 50%, #e9ecef 100%);
+  padding-bottom: 0;
+  margin-bottom: 0;
+  transition: background 0.3s ease;
+  position: relative;
   width: 100%;
   animation: fadeIn 0.3s ease-out;
+}
+
+.kabadconnect-container::before {
+  content: '🌿';
+  position: fixed;
+  top: -30px;
+  right: -30px;
+  font-size: 200px;
+  opacity: 0.1;
+  transform: rotate(-15deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.kabadconnect-container::after {
+  content: '🌿';
+  position: fixed;
+  bottom: -50px;
+  left: -50px;
+  font-size: 250px;
+  opacity: 0.08;
+  transform: rotate(25deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.kabadconnect-container > * {
   position: relative;
+  z-index: 1;
+}
+
+.kabadconnect-container .eco-footer {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 /* Order Notification */
 .order-notification {
   position: fixed;
-  top: 20px;
+  /* Position below navbar - navbar height is ~76px (2px accent + 12px padding + ~50px content + 12px padding) */
+  top: 90px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 10001;
+  z-index: 99999;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -789,6 +830,12 @@ body:has(.kabadconnect-container .modal-overlay) .eco-footer {
     font-size: 18px;
   }
 
+  /* Notification positioning for mobile */
+  .order-notification {
+    /* Navbar on mobile is smaller (~60px) */
+    top: 75px;
+  }
+
   /* Rating Modal Responsive - Tablet */
   .kabadconnect-container .modal-overlay {
     /* Navbar on mobile is smaller (~60px) */
@@ -834,6 +881,12 @@ body:has(.kabadconnect-container .modal-overlay) .eco-footer {
 
   .tab-icon {
     font-size: 16px;
+  }
+
+  /* Notification positioning for small mobile */
+  .order-notification {
+    /* Navbar on small mobile is even smaller (~55px) */
+    top: 70px;
   }
 
   /* Rating Modal Responsive - Mobile */
@@ -888,5 +941,15 @@ body:has(.kabadconnect-container .modal-overlay) .eco-footer {
     padding: 14px 20px;
     font-size: 15px;
   }
+}
+
+/* Dark Theme */
+.dark-theme .kabadconnect-container {
+  background: linear-gradient(180deg, #0a1f14 0%, #0d2818 50%, #0f1419 100%);
+}
+
+.dark-theme .kabadconnect-container::before,
+.dark-theme .kabadconnect-container::after {
+  opacity: 0.05;
 }
 

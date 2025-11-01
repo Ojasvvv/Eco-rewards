@@ -1,8 +1,47 @@
 .smart-bin-finder {
-  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 50%, #e9ecef 100%);
   padding: 2rem;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  transition: background 0.3s ease;
+  position: relative;
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+.smart-bin-finder::before {
+  content: '🌿';
+  position: fixed;
+  top: -30px;
+  right: -30px;
+  font-size: 200px;
+  opacity: 0.1;
+  transform: rotate(-15deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.smart-bin-finder::after {
+  content: '🌿';
+  position: fixed;
+  bottom: -50px;
+  left: -50px;
+  font-size: 250px;
+  opacity: 0.08;
+  transform: rotate(25deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.smart-bin-finder > * {
+  position: relative;
+  z-index: 1;
+}
+
+.smart-bin-finder .eco-footer {
+  margin-top: 0;
 }
 
 .bin-finder-header {
@@ -602,6 +641,16 @@
     height: 36px;
     font-size: 1rem;
   }
+}
+
+/* Dark Theme */
+.dark-theme .smart-bin-finder {
+  background: linear-gradient(180deg, #0a1f14 0%, #0d2818 50%, #0f1419 100%);
+}
+
+.dark-theme .smart-bin-finder::before,
+.dark-theme .smart-bin-finder::after {
+  opacity: 0.05;
 }
 
 /* Dark mode adjustments */
