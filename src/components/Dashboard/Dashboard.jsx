@@ -462,7 +462,7 @@ const Dashboard = () => {
               <button onClick={() => setShowRewards(!showRewards)} className="nav-action-btn rewards-action">
                 <div className="action-icon-wrapper">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                   </svg>
                   {rewards > 0 && <span className="rewards-badge">{rewards}</span>}
                 </div>
@@ -641,8 +641,8 @@ const Dashboard = () => {
         <div className="dashboard-content">
           {/* Welcome Section */}
           <section className="welcome-section animate-slideUp">
-            <h2>{t(isFirstVisit ? 'welcome' : 'welcomeBack')}, {sanitizeDisplayName(user?.displayName)?.split(' ')[0] || 'Eco Warrior'}! 👋</h2>
-            <p>{t('scanQRPrompt')}</p>
+            <h2>{t(isFirstVisit ? 'welcome' : 'welcomeBack')}, {sanitizeDisplayName(user?.displayName)?.split(' ')[0] || 'Eco Warrior'}! 👋🌱</h2>
+            <p>✨ {t('scanQRPrompt')} 🗑️</p>
           </section>
 
           {/* Stats Cards */}
@@ -654,7 +654,7 @@ const Dashboard = () => {
                 </svg>
               </div>
               <div className="stat-info">
-                <p className="stat-label">{t('myRewards')}</p>
+                <p className="stat-label">💰 {t('myRewards')}</p>
                 <p className="stat-value">{rewards} {t('points')}</p>
               </div>
             </div>
@@ -666,7 +666,7 @@ const Dashboard = () => {
                 </svg>
               </div>
               <div className="stat-info">
-                <p className="stat-label">{t('scanHistory')}</p>
+                <p className="stat-label">📊 {t('scanHistory')}</p>
                 <p className="stat-value">{Math.floor(rewards / 10)}</p>
               </div>
             </div>
@@ -689,8 +689,8 @@ const Dashboard = () => {
           <section className="code-section-split animate-slideUp">
             <div className="code-card-left">
               <div className="code-header">
-                <h3>{t('enterCode')}</h3>
-                <p>{t('scanQRPrompt')}</p>
+                <h3>🔑 {t('enterCode')}</h3>
+                <p>📱 {t('scanQRPrompt')} 🎯</p>
               </div>
 
               <form onSubmit={handleSubmitCode} className={`code-form ${!error && !success ? 'idle-state' : ''}`}>
@@ -746,7 +746,7 @@ const Dashboard = () => {
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      {t('submit')}
+                      ✨ {t('submit')} 🚀
                     </>
                   )}
                 </button>
@@ -759,7 +759,7 @@ const Dashboard = () => {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="info-icon">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <h3>{t('howItWorks')}</h3>
+                  <h3>💡 {t('howItWorks')}</h3>
                 </div>
                 <ol className="info-steps">
                   <li>{t('step1Desc')}</li>
@@ -774,7 +774,7 @@ const Dashboard = () => {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="info-icon">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
-                  <h3>{t('usageLimit')}</h3>
+                  <h3>⚡ {t('usageLimit')}</h3>
                 </div>
                 <p className="usage-limit-text">
                   {t('usageLimitDesc')}
