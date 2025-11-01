@@ -69,6 +69,13 @@
   pointer-events: auto;
 }
 
+/* Don't blur navbar on desktop - overlay only for mobile */
+@media (min-width: 769px) {
+  .language-overlay {
+    display: none; /* Hide overlay on desktop */
+  }
+}
+
 .language-dropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -93,6 +100,20 @@
   overflow-y: auto;
   /* Prevent header blur by ensuring proper stacking */
   isolation: isolate;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* On desktop, ensure smooth animation and proper positioning */
+@media (min-width: 769px) {
+  .language-dropdown {
+    /* Ensure it appears below the navbar, not behind it */
+    z-index: 101; /* Just above navbar (100) */
+    /* Smooth entrance animation */
+    animation: dropdownSlideSmooth 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Prevent backdrop filter from affecting it */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 /* Ensure dropdown doesn't get blurred by header backdrop-filter */
@@ -297,6 +318,17 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdownSlideSmooth {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

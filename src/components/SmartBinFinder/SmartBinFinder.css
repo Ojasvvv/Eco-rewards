@@ -52,6 +52,8 @@
   background: var(--card-bg);
   /* Prevent scroll issues with map */
   touch-action: pan-x pan-y;
+  /* Ensure map stays below navbar (z-index 100) */
+  z-index: 1;
 }
 
 .map-loading {
@@ -80,11 +82,16 @@
   border-radius: 1rem;
   /* Prevent map from causing page scroll issues */
   touch-action: pan-x pan-y;
+  /* Ensure map container stays below navbar */
+  z-index: 1;
+  position: relative;
 }
 
 .leaflet-container {
   /* Prevent map dragging when scrolling page */
   pointer-events: auto;
+  /* Ensure leaflet map doesn't overlap navbar */
+  z-index: 1;
 }
 
 .popup-content {

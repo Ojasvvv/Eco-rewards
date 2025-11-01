@@ -54,7 +54,8 @@ const LanguageSelector = () => {
 
   const dropdownContent = isOpen ? (
     <>
-      <div className="language-overlay" onClick={handleClose} />
+      {/* Only show overlay on mobile */}
+      {isMobile && <div className="language-overlay" onClick={handleClose} />}
       <div className="language-dropdown enhanced">
             <div className="dropdown-header">
               <h3>Select Language</h3>

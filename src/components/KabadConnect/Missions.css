@@ -201,6 +201,8 @@
   margin-bottom: 16px;
   gap: 12px;
   min-height: 64px;
+  position: relative;
+  padding-right: 90px; /* Add padding to prevent collision with difficulty badge */
 }
 
 .mission-icon-wrapper {
@@ -244,6 +246,8 @@
   color: white;
   white-space: nowrap;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .mission-content h3 {
@@ -401,7 +405,10 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
-  z-index: 2;
+  z-index: 3;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Mission Tips */
