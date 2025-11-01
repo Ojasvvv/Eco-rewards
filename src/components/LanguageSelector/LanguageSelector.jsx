@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import './LanguageSelector.css';
 
@@ -6,6 +7,7 @@ const LanguageSelector = () => {
   const { language, changeLanguage, supportedLanguages } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
 
   // Use API supported languages, fallback to basic list if not available
   const languages = supportedLanguages || [
@@ -14,6 +16,28 @@ const LanguageSelector = () => {
     { code: 'te', name: 'Telugu', native: 'తెలుగు' },
     { code: 'ta', name: 'Tamil', native: 'தமிழ்' }
   ];
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Prevent body scroll when modal is open on mobile
+  useEffect(() => {
+    if (isOpen && isMobile) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, isMobile]);
 
   // Filter languages based on search
   const filteredLanguages = languages.filter(lang => 
@@ -30,31 +54,15 @@ const LanguageSelector = () => {
     setSearchQuery('');
   };
 
-  return (
-    <>
-      <div className="language-selector">
-        <button 
-          className="language-button" 
-          onClick={() => setIsOpen(!isOpen)}
-          title="Change Language"
-        >
-          <span className="lang-icon">🌐</span>
-          <span className="lang-code">{currentLang.code.toUpperCase()}</span>
-          <svg 
-            className={`chevron ${isOpen ? 'open' : ''}`} 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-      </div>
+  const handleClose = () => {
+    setIsOpen(false);
+    setSearchQuery('');
+  };
 
-      {isOpen && (
-        <>
-          <div className="language-overlay" onClick={() => { setIsOpen(false); setSearchQuery(''); }} />
-          <div className="language-dropdown enhanced">
+  const dropdownContent = isOpen ? (
+    <>
+      <div className="language-overlay" onClick={handleClose} />
+      <div className="language-dropdown enhanced">
             <div className="dropdown-header">
               <h3>Select Language</h3>
               <p className="language-count">{filteredLanguages.length} languages available</p>
@@ -107,8 +115,35 @@ const LanguageSelector = () => {
               )}
             </div>
           </div>
-        </>
-      )}
+    </>
+  ) : null;
+
+  return (
+    <>
+      <div className="language-selector">
+        <button 
+          className="language-button" 
+          onClick={() => setIsOpen(!isOpen)}
+          title="Change Language"
+        >
+          <span className="lang-icon">🌐</span>
+          <span className="lang-code">{currentLang.code.toUpperCase()}</span>
+          <svg 
+            className={`chevron ${isOpen ? 'open' : ''}`} 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Render dropdown via portal on mobile, inline on desktop */}
+      {isMobile && typeof document !== 'undefined' 
+        ? createPortal(dropdownContent, document.body)
+        : dropdownContent
+      }
     </>
   );
 };
