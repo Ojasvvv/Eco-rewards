@@ -113,6 +113,16 @@
     /* Prevent backdrop filter from affecting it */
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    /* Align dropdown to button's right edge - ensure proper alignment */
+    right: 0;
+    /* Ensure dropdown aligns with button by using the same right edge */
+    transform-origin: top right;
+  }
+  
+  /* Ensure the selector container aligns properly */
+  .language-selector {
+    display: inline-block;
+    position: relative;
   }
 }
 
