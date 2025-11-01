@@ -1,6 +1,7 @@
 .schedule-pickup-overlay {
   position: fixed;
-  top: 0;
+  /* Start from end of navbar - navbar height is ~76px (2px accent + 12px padding + ~50px content + 12px padding) */
+  top: 76px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -10,8 +11,29 @@
   align-items: center;
   justify-content: center;
   z-index: 10000;
-  padding: 20px;
+  /* Equal padding top and bottom from navbar end */
+  padding-top: 40px;
+  padding-bottom: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
   overflow-y: auto;
+  overflow-x: hidden;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Hide footer when schedule modal is open */
+.schedule-pickup-overlay ~ * .eco-footer,
+body:has(.schedule-pickup-overlay) .eco-footer {
+  display: none !important;
 }
 
 .schedule-pickup-modal {
@@ -19,11 +41,14 @@
   border-radius: 20px;
   width: 100%;
   max-width: 800px;
-  max-height: 90vh;
+  /* Account for navbar (76px) + padding top (40px) + padding bottom (40px) */
+  max-height: calc(100vh - 76px - 80px);
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.3s ease-out;
+  animation: slideUpSmooth 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  margin: auto;
+  will-change: transform, opacity;
 }
 
 .dark-theme .schedule-pickup-modal {
@@ -39,6 +64,17 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slideUpSmooth {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -128,83 +164,60 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 30px 24px;
-  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-}
-
-.dark-theme .pickup-progress {
-  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+  padding: 24px;
+  gap: 8px;
 }
 
 .progress-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  opacity: 0.4;
-  transition: all 0.3s;
+  flex: 1;
+  height: 4px;
+  background: rgba(16, 185, 129, 0.15);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.progress-step.active,
-.progress-step.completed {
-  opacity: 1;
+.dark-theme .progress-step {
+  background: rgba(16, 185, 129, 0.2);
 }
 
-.step-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: #6b7280;
-  transition: all 0.3s;
+.step-indicator {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
 }
 
-.progress-step.active .step-circle {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+.progress-step.active .step-indicator {
+  width: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
-.progress-step.completed .step-circle {
-  background: #10b981;
-  color: white;
+.progress-step.completed .step-indicator {
+  width: 100%;
 }
 
-.progress-step span {
-  font-size: 12px;
-  font-weight: 600;
-  color: #6b7280;
-}
-
-.progress-step.active span,
-.progress-step.completed span {
-  color: #10b981;
-}
-
-.dark-theme .progress-step.active span,
-.dark-theme .progress-step.completed span {
-  color: #34d399;
-}
-
-.progress-line {
-  width: 80px;
-  height: 2px;
-  background: #e5e7eb;
-  margin: 0 16px;
-}
-
-.dark-theme .progress-line {
-  background: #374151;
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .modal-body {
   flex: 1;
   overflow-y: auto;
   padding: 24px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.modal-body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .pickup-step {
@@ -335,6 +348,11 @@
   color: #e2e8f0;
 }
 
+.dark-theme .form-group input::placeholder,
+.dark-theme .form-group textarea::placeholder {
+  color: #9ca3af;
+}
+
 /* Date picker styling for dark theme */
 .dark-theme .form-group input[type="date"] {
   background: #0f172a;
@@ -427,27 +445,42 @@
 }
 
 /* Pickup Summary */
-  .pickup-summary {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+.pickup-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  max-height: 55vh;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
 
-  .summary-section {
-    padding: 12px;
-    background: #f9fafb;
-    border-radius: 8px;
+.pickup-summary::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+@media (min-width: 769px) {
+  .pickup-summary {
+    max-height: none;
+    overflow-y: visible;
   }
+}
+
+.summary-section {
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
 
 .dark-theme .summary-section {
   background: #0f172a;
 }
 
 .summary-section h4 {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   color: #6b7280;
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -457,51 +490,53 @@
 }
 
 .summary-value {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
+  line-height: 1.4;
 }
 
 /* Partner Card */
-  .partner-card {
-    padding: 16px;
-    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-    border: 2px solid #10b981;
-    border-radius: 12px;
-  }
+.partner-card {
+  padding: 14px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 2px solid #10b981;
+  border-radius: 12px;
+  grid-column: 1 / -1;
+}
 
 .dark-theme .partner-card {
   background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
   border-color: #10b981;
 }
 
-  .partner-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
+.partner-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
 
 .partner-avatar {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
 }
 
 .partner-info h4 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  margin: 0 0 4px 0;
+  margin: 0 0 3px 0;
 }
 
 .partner-info p {
-  font-size: 14px;
+  font-size: 12px;
   color: #10b981;
   margin: 0;
   font-weight: 500;
@@ -511,16 +546,16 @@
   color: #34d399;
 }
 
-  .partner-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 10px;
-  }
+.partner-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
 
 .partner-stat {
   display: flex;
   align-items: center;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .stat-icon {
@@ -528,12 +563,13 @@
 }
 
 /* Price Info */
-  .price-info {
-    padding: 12px;
-    background: #fef3c7;
-    border-radius: 8px;
-    border-left: 4px solid #f59e0b;
-  }
+.price-info {
+  padding: 10px;
+  background: #fef3c7;
+  border-radius: 8px;
+  border-left: 3px solid #f59e0b;
+  grid-column: 1 / -1;
+}
 
 .dark-theme .price-info {
   background: #78350f;
@@ -551,8 +587,8 @@
 
 .price-note p {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 /* Modal Footer */
@@ -580,6 +616,19 @@
 }
 
 @media (max-width: 768px) {
+  .schedule-pickup-overlay {
+    /* Navbar on mobile is smaller (~60px) */
+    top: 60px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .schedule-pickup-modal {
+    max-height: calc(100vh - 60px - 60px);
+  }
+
   .btn-primary,
   .btn-secondary {
     padding: 8px 16px;
@@ -628,16 +677,17 @@
 /* Responsive */
 @media (max-width: 768px) {
   .schedule-pickup-overlay {
-    padding: 0;
-    align-items: flex-start;
+    padding-top: 70px;
+    padding-bottom: 70px;
+    align-items: center;
   }
 
   .schedule-pickup-modal {
     max-width: 100%;
-    max-height: 100vh;
-    height: 100vh;
+    max-height: calc(100vh - 140px);
+    height: calc(100vh - 140px);
     border-radius: 0;
-    margin: 0;
+    margin: auto 0;
     display: flex;
     flex-direction: column;
   }
@@ -750,6 +800,19 @@
 }
 
 @media (max-width: 480px) {
+  .schedule-pickup-overlay {
+    /* Navbar on small mobile is even smaller (~55px) */
+    top: 55px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .schedule-pickup-modal {
+    max-height: calc(100vh - 55px - 40px);
+  }
+
   .modal-header h2 {
     font-size: 18px;
   }

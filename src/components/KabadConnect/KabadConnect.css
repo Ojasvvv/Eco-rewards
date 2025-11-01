@@ -507,16 +507,58 @@
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
+/* Rating Modal Overlay - Position below navbar and prevent footer */
+.kabadconnect-container .modal-overlay {
+  position: fixed;
+  /* Start from end of navbar - navbar height is ~76px */
+  top: 76px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  /* Equal padding top and bottom from navbar end */
+  padding-top: 40px;
+  padding-bottom: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Hide footer when modal is open */
+.kabadconnect-container .modal-overlay ~ * .eco-footer,
+body:has(.kabadconnect-container .modal-overlay) .eco-footer {
+  display: none !important;
+}
+
 /* Rating Modal */
 .rating-modal {
   background: var(--surface);
   border-radius: 20px;
   max-width: 550px;
   width: 90%;
-  max-height: 90vh;
+  /* Account for navbar (76px) + padding top (40px) + padding bottom (40px) */
+  max-height: calc(100vh - 76px - 80px);
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: modalSlideUp 0.3s ease-out;
+  animation: modalSlideUpSmooth 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  margin: auto;
+  will-change: transform, opacity;
 }
 
 @keyframes modalSlideUp {
@@ -527,6 +569,17 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes modalSlideUpSmooth {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -648,6 +701,17 @@
   color: var(--text-primary);
 }
 
+.dark-theme .review-section textarea,
+.dark-theme .complaint-section textarea {
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.dark-theme .review-section textarea::placeholder,
+.dark-theme .complaint-section textarea::placeholder {
+  color: var(--text-secondary);
+}
+
 .review-section textarea:focus,
 .complaint-section textarea:focus {
   outline: none;
@@ -726,8 +790,18 @@
   }
 
   /* Rating Modal Responsive - Tablet */
+  .kabadconnect-container .modal-overlay {
+    /* Navbar on mobile is smaller (~60px) */
+    top: 60px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    align-items: center;
+  }
+
   .rating-modal {
     width: 95%;
+    max-height: calc(100vh - 60px - 60px);
+    margin: auto;
   }
 
   .rating-modal-header h2 {
@@ -763,9 +837,18 @@
   }
 
   /* Rating Modal Responsive - Mobile */
+  .kabadconnect-container .modal-overlay {
+    /* Navbar on small mobile is even smaller (~55px) */
+    top: 55px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
   .rating-modal {
     width: 96%;
-    max-height: 90vh;
+    max-height: calc(100vh - 55px - 40px);
   }
 
   .rating-modal-header {

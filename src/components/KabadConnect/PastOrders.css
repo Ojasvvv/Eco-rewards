@@ -353,10 +353,28 @@
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(5px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   z-index: 10000;
-  padding: 20px;
+  padding: 100px 20px 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Hide footer when order details modal is open */
+.order-details-overlay ~ * .eco-footer,
+body:has(.order-details-overlay) .eco-footer {
+  display: none !important;
 }
 
 .order-details-modal {
@@ -364,8 +382,12 @@
   border-radius: 16px;
   width: 100%;
   max-width: 500px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.3s ease-out;
+  animation: slideUpSmooth 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 0;
+  will-change: transform, opacity;
 }
 
 .dark-theme .order-details-modal {
@@ -380,6 +402,17 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slideUpSmooth {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -399,6 +432,11 @@
   font-size: 20px;
   font-weight: 700;
   margin: 0;
+  color: var(--text-primary);
+}
+
+.dark-theme .order-details-modal .modal-header h3 {
+  color: var(--text-primary);
 }
 
 .close-btn {
@@ -441,8 +479,26 @@
   border-bottom: 1px solid #f3f4f6;
 }
 
+.detail-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.detail-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 .dark-theme .detail-row {
   border-bottom-color: #1e293b;
+}
+
+.dark-theme .detail-label {
+  color: #9ca3af;
+}
+
+.dark-theme .detail-value {
+  color: #e2e8f0;
 }
 
 .detail-row:last-child {
@@ -451,6 +507,14 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .order-details-overlay {
+    padding-top: 70px;
+  }
+
+  .order-details-modal {
+    max-height: calc(100vh - 70px);
+  }
+
   .past-orders-container {
     width: 100%;
     min-height: auto;

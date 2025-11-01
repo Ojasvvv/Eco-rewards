@@ -641,7 +641,7 @@ const Dashboard = () => {
         <div className="dashboard-content">
           {/* Welcome Section */}
           <section className="welcome-section animate-slideUp">
-            <h2>{t(isFirstVisit ? 'welcome' : 'welcomeBack')}, {sanitizeDisplayName(user?.displayName)?.split(' ')[0] || 'Eco Warrior'}! 👋🌱</h2>
+            <h2>{t(isFirstVisit ? 'welcome' : 'welcomeBack')}, {sanitizeDisplayName(user?.displayName)?.split(' ')[0] || 'Eco Warrior'}! <span style={{fontWeight: 'normal', WebkitTextFillColor: 'initial', background: 'none'}}>👋🌱</span></h2>
             <p>✨ {t('scanQRPrompt')} 🗑️</p>
           </section>
 
@@ -759,7 +759,7 @@ const Dashboard = () => {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="info-icon">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <h3>💡 {t('howItWorks')}</h3>
+                  <h3>{t('howItWorks')}</h3>
                 </div>
                 <ol className="info-steps">
                   <li>{t('step1Desc')}</li>
@@ -774,7 +774,7 @@ const Dashboard = () => {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="info-icon">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
-                  <h3>⚡ {t('usageLimit')}</h3>
+                  <h3>{t('usageLimit')}</h3>
                 </div>
                 <p className="usage-limit-text">
                   {t('usageLimitDesc')}

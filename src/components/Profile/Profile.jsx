@@ -5,6 +5,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { getSafeImageURL, sanitizeDisplayName, sanitizeEmail } from '../../utils/sanitize';
+import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import Footer from '../Footer/Footer';
 import './Profile.css';
 
@@ -12,8 +13,9 @@ const Profile = () => {
   const { user, logout } = useAuth();
   const { unlockedAchievements, stats, getAchievementProgress } = useAchievements();
   const { t } = useLanguage();
-  const { isDark } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const [showProfileMenu, setShowProfileMenu] = React.useState(false);
 
   const handleLogout = async () => {
     try {

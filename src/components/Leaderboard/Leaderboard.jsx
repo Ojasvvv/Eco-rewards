@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
+import { getSafeImageURL, sanitizeDisplayName } from '../../utils/sanitize';
 import './Leaderboard.css';
 
 const Leaderboard = () => {
@@ -197,28 +198,65 @@ const Leaderboard = () => {
 
       {/* Header */}
       <header className="dashboard-header">
+        <div className="header-accent-line"></div>
         <div className="header-content">
           <div className="header-left">
-            <div className="header-logo">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 11H5M19 11C20.1046 11 21 11.8954 21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.8954 3.89543 11 5 11M19 11V9C19 7.89543 18.1046 7 17 7M5 11V9C5 7.89543 5.89543 7 7 7M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7M7 7H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <button onClick={() => navigate('/dashboard')} className="back-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
               </svg>
+              {t('back')}
+            </button>
+            <div className="header-brand" onClick={() => navigate('/dashboard')}>
+              <div className="brand-mark">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <div className="brand-text">
+                <h1>EcoRewards</h1>
+                <div className="brand-tagline">Sustainability Made Rewarding</div>
+              </div>
             </div>
-            <h1 onClick={() => navigate('/dashboard')}>EcoRewards</h1>
           </div>
           
           <div className="header-right">
-            <LanguageSelector />
-            <button onClick={() => navigate('/dashboard')} className="back-btn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              <span>{t('back')}</span>
-            </button>
-            <div className="user-profile" onClick={() => setShowProfileMenu(!showProfileMenu)}>
+            <div className="header-actions">
+              <LanguageSelector />
+              
+              <button onClick={toggleTheme} className="nav-action-btn" title={isDark ? "Light mode" : "Dark mode"}>
+                <div className="action-icon-wrapper">
+                  {isDark ? (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                  )}
+                </div>
+              </button>
+              
+              <button onClick={handleReport} className="nav-action-btn" title="Report an issue">
+                <div className="action-icon-wrapper">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+              </button>
+            </div>
+            
+            <div className="header-divider"></div>
+            
+            <div className="user-section" onClick={() => setShowProfileMenu(!showProfileMenu)}>
+              <div className="user-info">
+                <span className="user-greeting">Hi, {sanitizeDisplayName(user?.displayName)?.split(' ')[0] || 'User'}</span>
+                <span className="user-email">{user?.email?.substring(0, 20)}{user?.email?.length > 20 ? '...' : ''}</span>
+              </div>
               <img 
-                src={user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || 'User')}&background=10b981&color=fff`} 
-                alt={user?.displayName || 'User'} 
+                src={getSafeImageURL(user?.photoURL, user?.displayName || 'User')} 
+                alt={sanitizeDisplayName(user?.displayName)} 
                 className="user-avatar"
                 referrerPolicy="no-referrer"
                 crossOrigin="anonymous"
@@ -227,7 +265,6 @@ const Leaderboard = () => {
                   e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || 'User')}&background=10b981&color=fff`;
                 }}
               />
-              <span className="user-name">{user?.displayName?.split(' ')[0] || 'User'}</span>
               {showProfileMenu && (
                 <>
                   <div className="profile-menu-overlay" onClick={(e) => { e.stopPropagation(); setShowProfileMenu(false); }} />
@@ -236,39 +273,18 @@ const Leaderboard = () => {
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
-                      View Profile & Achievements
+                      Profile & Achievements
                     </button>
                     <button onClick={(e) => { e.stopPropagation(); handleLogout(); }} className="profile-menu-logout">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                       </svg>
-                      Logout
+                      Sign Out
                     </button>
                   </div>
                 </>
               )}
             </div>
-            <button onClick={toggleTheme} className="theme-toggle-btn" title={isDark ? "Light mode" : "Dark mode"}>
-              {isDark ? (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              ) : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-              )}
-            </button>
-            <button onClick={handleReport} className="report-btn" title="Report an issue">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </button>
-            <button onClick={handleLogout} className="logout-btn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-            </button>
           </div>
         </div>
       </header>
