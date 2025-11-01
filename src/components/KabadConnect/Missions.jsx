@@ -218,8 +218,13 @@ const Missions = () => {
                   )}
                 </div>
                 
-                <div className="mission-type-badge" style={{ background: getDifficultyColor(mission.difficulty) }}>
-                  {mission.type}
+                <div className="mission-badges-container">
+                  <div className="difficulty-badge" style={{ background: getDifficultyColor(mission.difficulty), color: 'white' }}>
+                    {t(mission.difficulty)}
+                  </div>
+                  <div className="mission-type-badge" style={{ background: getDifficultyColor(mission.difficulty) }}>
+                    {mission.type}
+                  </div>
                 </div>
               </div>
 
@@ -256,25 +261,11 @@ const Missions = () => {
                   </div>
                 </div>
 
-                {isCompleted ? (
+                {isCompleted && (
                   <button className="btn-claim-reward">
                     {t('claimReward')}
                   </button>
-                ) : (
-                  <button className="btn-view-mission">
-                    {t('viewMission')}
-                  </button>
                 )}
-              </div>
-
-              <div 
-                className="difficulty-badge"
-                style={{ 
-                  background: getDifficultyColor(mission.difficulty),
-                  color: 'white'
-                }}
-              >
-                {t(mission.difficulty)}
               </div>
             </div>
           );

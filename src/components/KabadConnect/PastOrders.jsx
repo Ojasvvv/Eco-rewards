@@ -248,11 +248,6 @@ const PastOrders = () => {
                 >
                   {t('viewDetails')}
                 </button>
-                {order.status === 'completed' && (
-                  <button className="btn-reorder">
-                    {t('reorder')}
-                  </button>
-                )}
               </div>
             </div>
           ))

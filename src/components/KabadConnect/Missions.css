@@ -201,8 +201,6 @@
   margin-bottom: 16px;
   gap: 12px;
   min-height: 64px;
-  position: relative;
-  padding-right: 90px; /* Add padding to prevent collision with difficulty badge */
 }
 
 .mission-icon-wrapper {
@@ -236,6 +234,14 @@
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
 }
 
+.mission-badges-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
 .mission-type-badge {
   padding: 4px 12px;
   border-radius: 12px;
@@ -245,9 +251,16 @@
   letter-spacing: 0.5px;
   color: white;
   white-space: nowrap;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
+}
+
+.difficulty-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .mission-content h3 {
@@ -393,23 +406,6 @@
   background: #064e3b;
 }
 
-/* Difficulty Badge */
-.difficulty-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-  z-index: 3;
-  max-width: 80px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 /* Mission Tips */
 .mission-tips {
