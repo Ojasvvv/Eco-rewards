@@ -127,7 +127,6 @@ const translations = {
     // EcoRevive
     kabadConnect: "EcoRevive",
     kabadConnectDesc: "Schedule pickups for recyclable waste from your home",
-    smartDustbins: "Smart Dustbins",
     schedulePickup: "Schedule Pickup",
     newPickup: "New Pickup",
     pastDeliveries: "Past Deliveries",
