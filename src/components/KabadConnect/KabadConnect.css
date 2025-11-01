@@ -1,0 +1,294 @@
+.kabadconnect-container {
+  width: 100%;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.kabadconnect-header {
+  margin-bottom: 24px;
+}
+
+.kabadconnect-header .header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.kabadconnect-header .header-text h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-icon {
+  font-size: 32px;
+}
+
+.header-subtitle {
+  color: #6b7280;
+  margin: 0;
+  font-size: 15px;
+}
+
+.dark-theme .header-subtitle {
+  color: #9ca3af;
+}
+
+.btn-new-pickup {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  white-space: nowrap;
+}
+
+.btn-new-pickup span:first-child {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.btn-new-pickup:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+/* Tabs */
+.kabadconnect-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e5e7eb;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dark-theme .kabadconnect-tabs {
+  border-bottom-color: #374151;
+}
+
+.kabad-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 600;
+  font-size: 15px;
+  color: #6b7280;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dark-theme .kabad-tab {
+  color: #9ca3af;
+}
+
+.kabad-tab:hover {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.kabad-tab.active {
+  color: #10b981;
+  border-bottom-color: #10b981;
+}
+
+.tab-icon {
+  font-size: 20px;
+}
+
+.tab-label {
+  font-weight: 600;
+}
+
+/* Content */
+.kabadconnect-content {
+  min-height: 400px;
+}
+
+/* Schedule Content */
+.schedule-content {
+  width: 100%;
+}
+
+.schedule-info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.info-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 28px;
+  transition: all 0.3s;
+}
+
+.info-card:hover {
+  border-color: #10b981;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.1);
+  transform: translateY(-4px);
+}
+
+.dark-theme .info-card {
+  background: #0f172a;
+  border-color: #374151;
+}
+
+.info-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.info-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+}
+
+.info-list {
+  margin: 0 0 24px 0;
+  padding-left: 20px;
+}
+
+.info-list li {
+  margin-bottom: 12px;
+  line-height: 1.6;
+  font-size: 15px;
+  color: #374151;
+}
+
+.dark-theme .info-list li {
+  color: #e2e8f0;
+}
+
+.info-list li:last-child {
+  margin-bottom: 0;
+}
+
+.benefits-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.benefits-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  font-size: 15px;
+  line-height: 1.6;
+  transition: all 0.3s;
+}
+
+.benefits-list li:hover {
+  background: #f0fdf4;
+  transform: translateX(4px);
+}
+
+.dark-theme .benefits-list li {
+  background: #1e293b;
+}
+
+.dark-theme .benefits-list li:hover {
+  background: #064e3b;
+}
+
+.benefits-list li:last-child {
+  margin-bottom: 0;
+}
+
+.benefit-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.btn-schedule-now {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-schedule-now:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .kabadconnect-header .header-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-new-pickup {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .schedule-info-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .kabadconnect-tabs {
+    gap: 8px;
+  }
+
+  .kabad-tab {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .tab-icon {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .kabadconnect-header .header-text h2 {
+    font-size: 24px;
+  }
+
+  .header-icon {
+    font-size: 28px;
+  }
+
+  .info-card {
+    padding: 20px;
+  }
+}
+

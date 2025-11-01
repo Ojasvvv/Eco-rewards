@@ -567,6 +567,99 @@
   justify-content: center;
 }
 
+/* Pickup Animation */
+.pickup-animation {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.phone-pickup {
+  font-size: 48px;
+  animation: phonePickupBounce 2s ease-in-out infinite;
+}
+
+.truck {
+  font-size: 48px;
+  animation: truckMove 3s ease-in-out infinite;
+}
+
+.house {
+  font-size: 48px;
+  animation: houseScale 2s ease-in-out infinite;
+}
+
+.dots {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  transform: translateY(-50%);
+}
+
+.dot {
+  font-size: 24px;
+  opacity: 0.3;
+}
+
+.dot-1 {
+  animation: dotFade 1.5s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.dot-2 {
+  animation: dotFade 1.5s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+.dot-3 {
+  animation: dotFade 1.5s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+
+@keyframes phonePickupBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes truckMove {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-20px);
+  }
+}
+
+@keyframes houseScale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes dotFade {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 .earth {
   font-size: 100px;
   animation: earthSpin 10s linear infinite;

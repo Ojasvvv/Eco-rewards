@@ -111,6 +111,25 @@ const Onboarding = ({ onComplete }) => {
           </div>
         </div>
       )
+    },
+    {
+      icon: '♻️',
+      title: 'tutorialStep6Title',
+      description: 'tutorialStep6Desc',
+      illustration: (
+        <div className="illustration">
+          <div className="pickup-animation">
+            <div className="phone-pickup">📱</div>
+            <div className="truck">🚚</div>
+            <div className="house">🏠</div>
+            <div className="dots">
+              <span className="dot dot-1">•</span>
+              <span className="dot dot-2">•</span>
+              <span className="dot dot-3">•</span>
+            </div>
+          </div>
+        </div>
+      )
     }
   ];
 

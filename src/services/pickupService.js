@@ -1,0 +1,132 @@
+import { db, auth } from '../firebase/config';
+import { collection, addDoc, getDocs, query, where, orderBy, limit, updateDoc, doc } from 'firebase/firestore';
+
+/**
+ * Schedule a new pickup request
+ * @param {Object} pickupData - Pickup request data
+ * @returns {Promise<Object>} - Created pickup document
+ */
+export const schedulePickup = async (pickupData) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('User must be authenticated');
+    }
+
+    const pickup = {
+      userId: user.uid,
+      userEmail: user.email,
+      userName: user.displayName || 'User',
+      ...pickupData,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    const docRef = await addDoc(collection(db, 'pickups'), pickup);
+    
+    return {
+      id: docRef.id,
+      ...pickup
+    };
+  } catch (error) {
+    console.error('Error scheduling pickup:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get user's pickup history
+ * @param {string} userId - User ID
+ * @param {number} limitCount - Number of results to return
+ * @returns {Promise<Array>} - Array of pickup documents
+ */
+export const getUserPickups = async (userId, limitCount = 20) => {
+  try {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+
+    const q = query(
+      collection(db, 'pickups'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount)
+    );
+
+    const querySnapshot = await getDocs(q);
+    const pickups = [];
+    
+    querySnapshot.forEach((doc) => {
+      pickups.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+
+    return pickups;
+  } catch (error) {
+    console.error('Error fetching user pickups:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update pickup status
+ * @param {string} pickupId - Pickup document ID
+ * @param {string} status - New status
+ * @param {Object} additionalData - Additional data to update
+ * @returns {Promise<void>}
+ */
+export const updatePickupStatus = async (pickupId, status, additionalData = {}) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('User must be authenticated');
+    }
+
+    const pickupRef = doc(db, 'pickups', pickupId);
+    await updateDoc(pickupRef, {
+      status,
+      ...additionalData,
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error updating pickup status:', error);
+    throw error;
+  }
+};
+
+/**
+ * Cancel a pickup request
+ * @param {string} pickupId - Pickup document ID
+ * @returns {Promise<void>}
+ */
+export const cancelPickup = async (pickupId) => {
+  try {
+    await updatePickupStatus(pickupId, 'cancelled');
+  } catch (error) {
+    console.error('Error cancelling pickup:', error);
+    throw error;
+  }
+};
+
+/**
+ * Reschedule a pickup request
+ * @param {string} pickupId - Pickup document ID
+ * @param {Object} newSchedule - New schedule data (date, timeSlot)
+ * @returns {Promise<void>}
+ */
+export const reschedulePickup = async (pickupId, newSchedule) => {
+  try {
+    await updatePickupStatus(pickupId, 'pending', {
+      date: newSchedule.date,
+      timeSlot: newSchedule.timeSlot,
+      rescheduled: true
+    });
+  } catch (error) {
+    console.error('Error rescheduling pickup:', error);
+    throw error;
+  }
+};
+

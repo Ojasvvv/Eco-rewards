@@ -6,6 +6,8 @@ import { useAchievements } from '../../context/AchievementsContext';
 import { useNavigate } from 'react-router-dom';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import Footer from '../Footer/Footer';
+import KabadConnect from '../KabadConnect/KabadConnect';
+import SmartBinFinder from '../SmartBinFinder/SmartBinFinder';
 import { 
   initializeUserRewards, 
   getUserRewards, 
@@ -38,6 +40,7 @@ const Dashboard = () => {
   const [outletRewards, setOutletRewards] = useState({});
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isFirstVisit, setIsFirstVisit] = useState(false);
+  const [activeView, setActiveView] = useState('dashboard'); // 'dashboard' or 'kabadconnect'
 
   // Check if this is first visit to dashboard EVER (not just this session)
   useEffect(() => {
@@ -576,6 +579,40 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="dashboard-main">
+        {/* View Toggle Tabs */}
+        <div className="view-toggle-tabs">
+          <button 
+            className={`view-tab ${activeView === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setActiveView('dashboard')}
+          >
+            <span className="tab-icon">🏠</span>
+            <span>{t('smartDustbins')}</span>
+          </button>
+          <button 
+            className={`view-tab ${activeView === 'binfinder' ? 'active' : ''}`}
+            onClick={() => setActiveView('binfinder')}
+          >
+            <span className="tab-icon">🗺️</span>
+            <span>Bin Finder</span>
+          </button>
+          <button 
+            className={`view-tab ${activeView === 'kabadconnect' ? 'active' : ''}`}
+            onClick={() => setActiveView('kabadconnect')}
+          >
+            <span className="tab-icon">♻️</span>
+            <span>{t('kabadConnect')}</span>
+          </button>
+        </div>
+
+        {activeView === 'binfinder' ? (
+          <div className="binfinder-view">
+            <SmartBinFinder />
+          </div>
+        ) : activeView === 'kabadconnect' ? (
+          <div className="kabadconnect-view">
+            <KabadConnect />
+          </div>
+        ) : (
         <div className="dashboard-content">
           {/* Welcome Section */}
           <section className="welcome-section animate-slideUp">
@@ -826,6 +863,7 @@ const Dashboard = () => {
           </section>
 
         </div>
+        )}
       </main>
 
       {/* Rewards Modal */}

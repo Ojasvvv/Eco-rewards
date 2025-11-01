@@ -440,6 +440,78 @@
   padding: 32px 20px;
 }
 
+/* View Toggle Tabs */
+.view-toggle-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+  padding: 8px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 2px solid #e5e7eb;
+}
+
+.dark-theme .view-toggle-tabs {
+  background: #0f172a;
+  border-color: #374151;
+}
+
+.view-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #6b7280;
+}
+
+.dark-theme .view-tab {
+  color: #9ca3af;
+}
+
+.view-tab:hover {
+  background: #f9fafb;
+  color: #10b981;
+}
+
+.dark-theme .view-tab:hover {
+  background: #1e293b;
+}
+
+.view-tab.active {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.view-tab .tab-icon {
+  font-size: 20px;
+}
+
+.kabadconnect-view {
+  animation: fadeInSlide 0.3s ease-out;
+}
+
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .dashboard-content {
   display: flex;
   flex-direction: column;
