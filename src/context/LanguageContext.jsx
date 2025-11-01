@@ -1,10 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  translateText, 
-  getBaseTranslation, 
-  preloadTranslations,
-  SUPPORTED_LANGUAGES 
-} from '../services/translationService';
+import React, { createContext, useContext, useState } from 'react';
+import { SUPPORTED_LANGUAGES } from '../services/translationService';
 
 const LanguageContext = createContext({});
 
@@ -979,67 +974,16 @@ export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState(() => {
     return localStorage.getItem('language') || 'en';
   });
-  const [useApiTranslation, setUseApiTranslation] = useState(() => {
-    return localStorage.getItem('useApiTranslation') === 'true';
-  });
-  const [translationCache, setTranslationCache] = useState({});
-
-  // Preload translations when language changes
-  useEffect(() => {
-    if (useApiTranslation && language !== 'en') {
-      preloadTranslations(language).catch(err => {
-        console.error('Failed to preload translations:', err);
-      });
-    }
-  }, [language, useApiTranslation]);
 
   const changeLanguage = (lang) => {
     setLanguage(lang);
     localStorage.setItem('language', lang);
   };
 
-  const toggleApiTranslation = (enabled) => {
-    setUseApiTranslation(enabled);
-    localStorage.setItem('useApiTranslation', enabled ? 'true' : 'false');
-  };
-
-  // Translation function with API support
+  // Translation function - only uses hardcoded translations
   const t = (key) => {
-    // For English or if API translation is disabled, use hardcoded translations
-    if (language === 'en' || !useApiTranslation) {
-      return translations[language || 'en']?.[key] || key;
-    }
-
-    // Check if we have a hardcoded translation for this language
-    const hardcodedTranslation = translations[language]?.[key];
-    if (hardcodedTranslation) {
-      return hardcodedTranslation;
-    }
-
-    // Check cache first
-    const cacheKey = `${language}_${key}`;
-    if (translationCache[cacheKey]) {
-      return translationCache[cacheKey];
-    }
-
-    // Get English base text
-    const baseText = getBaseTranslation(key) || translations['en']?.[key] || key;
-
-    // For non-cached translations, return base text and translate in background
-    if (language !== 'en') {
-      translateText(baseText, language, 'en')
-        .then(translatedText => {
-          setTranslationCache(prev => ({
-            ...prev,
-            [cacheKey]: translatedText
-          }));
-        })
-        .catch(err => {
-          console.error('Translation error:', err);
-        });
-    }
-
-    return baseText; // Return base text while translation loads
+    // Use hardcoded translations only
+    return translations[language || 'en']?.[key] || translations['en']?.[key] || key;
   };
 
   const value = {
@@ -1047,9 +991,7 @@ export const LanguageProvider = ({ children }) => {
     changeLanguage,
     t,
     translations,
-    supportedLanguages: SUPPORTED_LANGUAGES,
-    useApiTranslation,
-    toggleApiTranslation
+    supportedLanguages: SUPPORTED_LANGUAGES
   };
 
   return (

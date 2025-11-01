@@ -3,7 +3,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import './LanguageSelector.css';
 
 const LanguageSelector = () => {
-  const { language, changeLanguage, supportedLanguages, useApiTranslation, toggleApiTranslation } = useLanguage();
+  const { language, changeLanguage, supportedLanguages } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -28,12 +28,6 @@ const LanguageSelector = () => {
     changeLanguage(langCode);
     setIsOpen(false);
     setSearchQuery('');
-    
-    // Enable API translation for languages other than the hardcoded ones
-    const hardcodedLangs = ['en', 'hi', 'te', 'ta'];
-    if (!hardcodedLangs.includes(langCode) && !useApiTranslation) {
-      toggleApiTranslation(true);
-    }
   };
 
   return (
@@ -83,28 +77,6 @@ const LanguageSelector = () => {
                 )}
               </div>
 
-              {/* API Translation Toggle */}
-              {language !== 'en' && (
-                <div className="api-translation-toggle">
-                  <label className="toggle-label">
-                    <input
-                      type="checkbox"
-                      checked={useApiTranslation}
-                      onChange={(e) => toggleApiTranslation(e.target.checked)}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <span className="toggle-slider"></span>
-                    <span className="toggle-text">
-                      {useApiTranslation ? '✅ Live Translation' : '❌ Static Only'}
-                    </span>
-                  </label>
-                  <p className="toggle-hint">
-                    {useApiTranslation 
-                      ? 'Using real-time translation API' 
-                      : 'Using pre-translated text only'}
-                  </p>
-                </div>
-              )}
             </div>
 
             <div className="language-list">
