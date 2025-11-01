@@ -31,23 +31,25 @@ const LanguageSelector = () => {
   };
 
   return (
-    <div className="language-selector">
-      <button 
-        className="language-button" 
-        onClick={() => setIsOpen(!isOpen)}
-        title="Change Language"
-      >
-        <span className="lang-icon">🌐</span>
-        <span className="lang-code">{currentLang.code.toUpperCase()}</span>
-        <svg 
-          className={`chevron ${isOpen ? 'open' : ''}`} 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor"
+    <>
+      <div className="language-selector">
+        <button 
+          className="language-button" 
+          onClick={() => setIsOpen(!isOpen)}
+          title="Change Language"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
+          <span className="lang-icon">🌐</span>
+          <span className="lang-code">{currentLang.code.toUpperCase()}</span>
+          <svg 
+            className={`chevron ${isOpen ? 'open' : ''}`} 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
 
       {isOpen && (
         <>
@@ -107,7 +109,7 @@ const LanguageSelector = () => {
           </div>
         </>
       )}
-    </div>
+    </>
   );
 };
 

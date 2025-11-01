@@ -1,5 +1,6 @@
 .language-selector {
   position: relative;
+  z-index: 1;
 }
 
 .language-button {
@@ -62,6 +63,8 @@
   right: 0;
   bottom: 0;
   z-index: 999;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
   /* Allow touch events to pass through on mobile */
   pointer-events: auto;
 }
@@ -85,6 +88,9 @@
   -webkit-backface-visibility: hidden;
   perspective: 1000px;
   -webkit-perspective: 1000px;
+  /* Ensure it doesn't overflow viewport */
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 
 .language-dropdown.enhanced {
@@ -351,6 +357,11 @@
 
 /* Mobile */
 @media (max-width: 768px) {
+  .language-selector {
+    position: relative;
+    z-index: 1001;
+  }
+
   .language-button {
     padding: 6px 10px;
     min-width: 70px;
@@ -366,6 +377,11 @@
     padding: 2px 4px;
   }
 
+  /* Force fixed positioning on mobile - create new stacking context */
+  .language-overlay {
+    z-index: 9998;
+  }
+
   .language-dropdown {
     position: fixed !important;
     top: auto !important;
@@ -379,12 +395,13 @@
     border-radius: 20px 20px 0 0 !important;
     overflow-y: auto;
     overflow-x: hidden;
+    z-index: 9999 !important;
     /* Enhanced smooth scrolling for mobile */
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     /* Force GPU acceleration */
-    transform: translate3d(0, 0, 0);
-    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
     will-change: scroll-position;
     /* Reduce rendering load */
     contain: layout style paint;
@@ -392,9 +409,12 @@
     touch-action: pan-y;
     overscroll-behavior: contain;
     /* Bottom sheet animation */
-    animation: slideUpFromBottom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: slideUpFromBottom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
     margin: 0 !important;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    /* Reset any absolute positioning */
+    top: auto !important;
+    right: auto !important;
   }
 
   .language-dropdown.enhanced {
