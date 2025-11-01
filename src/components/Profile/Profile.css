@@ -44,19 +44,83 @@
   z-index: 1;
 }
 
-.profile-header {
-  background: var(--surface-elevated);
-  padding: 1rem 1.5rem;
+/* Profile uses dashboard-header now, but keep back button styling */
+.dashboard-header .header-left .back-btn {
+  margin-right: 1rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  border: 2px solid rgba(16, 185, 129, 0.2);
   display: flex;
   align-items: center;
-  gap: 1rem;
-  box-shadow: var(--shadow-md);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  border-bottom: 1px solid var(--border);
-  transition: all 0.3s ease;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+  position: relative;
+  overflow: hidden;
 }
+
+.dashboard-header .header-left .back-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.dashboard-header .header-left .back-btn:hover::before {
+  left: 100%;
+}
+
+.dashboard-header .header-left .back-btn:hover {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border-color: #10b981;
+  color: #10b981;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+  transform: translateY(-2px);
+}
+
+.dark-theme .dashboard-header .header-left .back-btn {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.dark-theme .dashboard-header .header-left .back-btn:hover {
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+  border-color: #10b981;
+}
+
+.dashboard-header .header-left .back-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.1);
+}
+
+.dashboard-header .header-left .back-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  transition: transform 0.2s ease;
+}
+
+.dashboard-header .header-left .back-btn:hover svg {
+  transform: translateX(-2px);
+}
+
+.dashboard-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+/* Old profile-header styles removed - using dashboard-header now */
 
 .back-btn {
   background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
@@ -126,18 +190,10 @@
   transform: translateX(-2px);
 }
 
-.profile-header h1 {
-  font-size: 1.5rem;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 700;
-  margin: 0;
-}
+/* Old profile-header h1 styles removed - using dashboard header brand now */
 
 .profile-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   flex: 1;
   padding: 2rem 1.5rem;
@@ -145,6 +201,14 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .profile-content {
+    max-width: 1600px;
+    padding: 2.5rem 2rem;
+  }
 }
 
 /* User Info Card */
@@ -486,6 +550,20 @@
   gap: 1.5rem;
 }
 
+@media (min-width: 1024px) {
+  .achievements-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .achievements-grid {
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 2rem;
+  }
+}
+
 .achievement-card {
   position: relative;
   background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
@@ -496,6 +574,13 @@
   gap: 1rem;
   transition: all 0.3s;
   overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .achievement-card {
+    padding: 2rem;
+    gap: 1.5rem;
+  }
 }
 
 .achievement-card::before {
@@ -730,9 +815,7 @@
     gap: 1rem;
   }
 
-  .profile-header h1 {
-    font-size: 1.2rem;
-  }
+  /* Profile header removed - using dashboard-header now */
 
   .section-header {
     flex-direction: column;
@@ -869,9 +952,7 @@
     height: 16px;
   }
 
-  .profile-header h1 {
-    font-size: 1.1rem;
-  }
+  /* Profile header removed - using dashboard-header now */
 }
 
 /* Hide scrollbars but keep functionality on mobile */
