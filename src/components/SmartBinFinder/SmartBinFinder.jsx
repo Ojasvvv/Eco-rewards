@@ -26,17 +26,23 @@ const userIcon = new L.Icon({
   popupAnchor: [0, -16],
 });
 
-// Custom smart bin icon using trash bin emoji
+// Custom smart bin icon using trash bin emoji with green box
 const binIcon = new L.DivIcon({
   html: `<div style="
-    font-size: 32px;
-    text-align: center;
-    line-height: 1;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    border: 2px solid white;
   ">🗑️</div>`,
   iconSize: [40, 40],
-  iconAnchor: [20, 35],
-  popupAnchor: [0, -35],
+  iconAnchor: [20, 20],
+  popupAnchor: [0, -20],
   className: 'bin-emoji-icon'
 });
 
@@ -364,47 +370,21 @@ const SmartBinFinder = () => {
 
       {/* Legend */}
       <div className="map-legend">
-        <div className="legend-section">
-          <h4 className="legend-title">Map Legend</h4>
-          <div className="legend-items">
-            <div className="legend-item">
-              <span className="legend-icon user">📍</span>
-              <div className="legend-text">
-                <span className="legend-label">Your Location</span>
-                <span className="legend-desc">Blue marker shows where you are</span>
-              </div>
-            </div>
-            <div className="legend-item">
-              <span className="legend-icon bin">🗑️</span>
-              <div className="legend-text">
-                <span className="legend-label">Smart Bin</span>
-                <span className="legend-desc">Recycling bins near you</span>
-              </div>
-            </div>
-            <div className="legend-item">
-              <span className="status-indicator available">●</span>
-              <div className="legend-text">
-                <span className="legend-label">Available</span>
-                <span className="legend-desc">Bin has space (under 80% full)</span>
-              </div>
-            </div>
-            <div className="legend-item">
-              <span className="status-indicator full">●</span>
-              <div className="legend-text">
-                <span className="legend-label">Full</span>
-                <span className="legend-desc">Bin is full (80% or more)</span>
-              </div>
-            </div>
-          </div>
+        <div className="legend-item">
+          <span className="legend-icon user">📍</span>
+          <span>Your Location</span>
         </div>
-        <div className="legend-tips">
-          <p className="legend-tip-title">💡 Tips:</p>
-          <ul className="legend-tip-list">
-            <li>Click on any bin marker to see details</li>
-            <li>Use the list on the right to find nearest bins</li>
-            <li>Click "Directions" to navigate to a bin</li>
-            <li>Refresh to update bin locations and status</li>
-          </ul>
+        <div className="legend-item">
+          <span className="legend-icon bin">🗑️</span>
+          <span>Smart Bin</span>
+        </div>
+        <div className="legend-item">
+          <span className="status-indicator available">●</span>
+          <span>Available</span>
+        </div>
+        <div className="legend-item">
+          <span className="status-indicator full">●</span>
+          <span>Full</span>
         </div>
       </div>
     </div>

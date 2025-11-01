@@ -153,18 +153,16 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
               type="date"
               value={formData.date}
               onChange={(e) => {
+                handleInputChange('date', e.target.value);
+              }}
+              onBlur={(e) => {
                 const selectedDate = e.target.value;
                 if (selectedDate) {
                   const minDate = getMinDate();
-                  if (selectedDate >= minDate) {
-                    handleInputChange('date', selectedDate);
-                  } else {
+                  if (selectedDate < minDate) {
                     alert('Please select a date from tomorrow onwards');
-                    // Reset to empty if invalid date
                     handleInputChange('date', '');
                   }
-                } else {
-                  handleInputChange('date', '');
                 }
               }}
               min={getMinDate()}
