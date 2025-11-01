@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -45,6 +46,14 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
     };
     checkLimit();
   }, [user]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   const wasteCategories = [
     { id: 'paper', name: t('wastePaper'), icon: '📄', description: t('wastePaperDesc') },
@@ -324,7 +333,7 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
     </div>
   );
 
-  return (
+  const modalContent = (
     <div className="schedule-pickup-overlay" onClick={onClose}>
       <div className="schedule-pickup-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -380,6 +389,8 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default SchedulePickup;

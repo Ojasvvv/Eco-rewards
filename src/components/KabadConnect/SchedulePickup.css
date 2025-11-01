@@ -1,24 +1,22 @@
 .schedule-pickup-overlay {
   position: fixed;
-  /* Start from end of navbar - navbar height is ~76px (2px accent + 12px padding + ~50px content + 12px padding) */
-  top: 76px;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10000;
-  /* Equal padding top and bottom from navbar end */
-  padding-top: 40px;
-  padding-bottom: 40px;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding: 20px;
   overflow-y: auto;
   overflow-x: hidden;
   animation: fadeIn 0.2s ease-out;
+  margin: 0;
 }
 
 @keyframes fadeIn {
@@ -41,14 +39,14 @@ body:has(.schedule-pickup-overlay) .eco-footer {
   border-radius: 20px;
   width: 100%;
   max-width: 800px;
-  /* Account for navbar (76px) + padding top (40px) + padding bottom (40px) */
-  max-height: calc(100vh - 76px - 80px);
+  max-height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUpSmooth 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   margin: auto;
   will-change: transform, opacity;
+  position: relative;
 }
 
 .dark-theme .schedule-pickup-modal {
@@ -618,27 +616,6 @@ body:has(.schedule-pickup-overlay) .eco-footer {
   border: none;
 }
 
-@media (max-width: 768px) {
-  .schedule-pickup-overlay {
-    /* Navbar on mobile is smaller (~60px) */
-    top: 60px;
-    padding-top: 30px;
-    padding-bottom: 30px;
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .schedule-pickup-modal {
-    max-height: calc(100vh - 60px - 60px);
-  }
-
-  .btn-primary,
-  .btn-secondary {
-    padding: 8px 16px;
-    font-size: 12px;
-  }
-}
-
 .btn-primary {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
@@ -680,18 +657,24 @@ body:has(.schedule-pickup-overlay) .eco-footer {
 /* Responsive */
 @media (max-width: 768px) {
   .schedule-pickup-overlay {
-    padding-top: 20px;
-    padding-bottom: 20px;
-    align-items: flex-start;
+    padding: 16px;
+    align-items: center;
+    justify-content: center;
   }
 
   .schedule-pickup-modal {
     max-width: 100%;
-    max-height: calc(100vh - 60px - 40px);
+    max-height: calc(100vh - 32px);
     border-radius: 12px;
     margin: auto;
     display: flex;
     flex-direction: column;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 8px 16px;
+    font-size: 12px;
   }
 
   .daily-limit-indicator {
@@ -812,16 +795,13 @@ body:has(.schedule-pickup-overlay) .eco-footer {
 
 @media (max-width: 480px) {
   .schedule-pickup-overlay {
-    /* Navbar on small mobile is even smaller (~55px) */
-    top: 55px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding: 12px;
+    align-items: center;
+    justify-content: center;
   }
 
   .schedule-pickup-modal {
-    max-height: calc(100vh - 55px - 40px);
+    max-height: calc(100vh - 24px);
   }
 
   .modal-header h2 {
