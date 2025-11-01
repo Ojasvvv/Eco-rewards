@@ -82,8 +82,6 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
       timestamp: new Date().toISOString()
     };
     
-    console.log('Pickup request:', pickupRequest);
-    
     setLoading(false);
     onSuccess && onSuccess(pickupRequest);
     
@@ -133,8 +131,20 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
             <input
               type="date"
               value={formData.date}
-              onChange={(e) => handleInputChange('date', e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
+              onChange={(e) => {
+                const selectedDate = e.target.value;
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const tomorrowStr = tomorrow.toISOString().split('T')[0];
+                if (selectedDate >= tomorrowStr) {
+                  handleInputChange('date', selectedDate);
+                }
+              }}
+              min={(() => {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                return tomorrow.toISOString().split('T')[0];
+              })()}
             />
           </div>
 
@@ -143,8 +153,12 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
             <input
               type="tel"
               value={formData.phone}
-              onChange={(e) => handleInputChange('phone', e.target.value)}
-              placeholder="+91 XXXXX XXXXX"
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                handleInputChange('phone', value);
+              }}
+              placeholder="Enter phone number"
+              maxLength="15"
             />
           </div>
         </div>

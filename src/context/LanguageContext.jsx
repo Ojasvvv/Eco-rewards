@@ -238,10 +238,8 @@ const translations = {
     missionEcoWarrior: "Ultimate Eco Warrior",
     missionEcoWarriorDesc: "Complete all other missions to unlock this legendary achievement",
     
-    missionTip1: "Complete daily pickups to maintain streaks and earn bonus points",
-    missionTip2: "Separate your waste properly to maximize mission progress",
-    missionTip3: "Weekly missions reset every Monday at midnight",
-    missionTip4: "Share missions with friends to compete on the leaderboard",
+    missionTip1: "Separate your waste properly to maximize mission progress",
+    missionTip2: "Share missions with friends to compete on the leaderboard",
     
     // Schedule Info
     howItWorksTitle: "How Pickup Works",
@@ -485,10 +483,8 @@ const translations = {
     missionEcoWarrior: "परम इको योद्धा",
     missionEcoWarriorDesc: "इस महान उपलब्धि को अनलॉक करने के लिए अन्य सभी मिशन पूरे करें",
     
-    missionTip1: "स्ट्रीक बनाए रखने और बोनस अंक अर्जित करने के लिए दैनिक पिकअप पूरा करें",
-    missionTip2: "मिशन प्रगति को अधिकतम करने के लिए अपने कचरे को ठीक से अलग करें",
-    missionTip3: "साप्ताहिक मिशन हर सोमवार आधी रात को रीसेट होते हैं",
-    missionTip4: "लीडरबोर्ड पर प्रतिस्पर्धा करने के लिए दोस्तों के साथ मिशन साझा करें",
+    missionTip1: "मिशन प्रगति को अधिकतम करने के लिए अपने कचरे को ठीक से अलग करें",
+    missionTip2: "लीडरबोर्ड पर प्रतिस्पर्धा करने के लिए दोस्तों के साथ मिशन साझा करें",
     
     // Schedule Info
     howItWorksTitle: "पिकअप कैसे काम करता है",
@@ -717,10 +713,8 @@ const translations = {
     missionPaper10kgDesc: "ఈ నెలలో 10kg కాగితాన్ని రీసైకిల్ చేయడం ద్వారా చెట్లను కాపాడండి",
     missionEcoWarrior: "అంతిమ ఎకో యోధుడు",
     missionEcoWarriorDesc: "ఈ పురాణ సాధనను అన్‌లాక్ చేయడానికి అన్ని ఇతర మిషన్లను పూర్తి చేయండి",
-    missionTip1: "స్ట్రీక్‌లను నిర్వహించడానికి మరియు బోనస్ పాయింట్లను సంపాదించడానికి రోజువారీ పికప్‌లను పూర్తి చేయండి",
-    missionTip2: "మిషన్ పురోగతిని పెంచడానికి మీ వ్యర్థాలను సరిగ్గా వేరు చేయండి",
-    missionTip3: "వారంవారీ మిషన్లు ప్రతి సోమవారం అర్ధరాత్రి రీసెట్ అవుతాయి",
-    missionTip4: "లీడర్‌బోర్డ్‌లో పోటీపడటానికి స్నేహితులతో మిషన్లను భాగస్వామ్యం చేయండి",
+    missionTip1: "మిషన్ పురోగతిని పెంచడానికి మీ వ్యర్థాలను సరిగ్గా వేరు చేయండి",
+    missionTip2: "లీడర్‌బోర్డ్‌లో పోటీపడటానికి స్నేహితులతో మిషన్లను భాగస్వామ్యం చేయండి",
     howItWorksTitle: "పికప్ ఎలా పనిచేస్తుంది",
     pickupStep1: "మీ వ్యర్థ వర్గాన్ని ఎంచుకోండి (కాగితం, ప్లాస్టిక్, మెటల్, ఇ-వ్యర్థం, మిశ్రమ)",
     pickupStep2: "పికప్ చిరునామా, తేదీ మరియు ఇష్టమైన సమయ స్లాట్‌ను నమోదు చేయండి",
@@ -946,10 +940,8 @@ const translations = {
     missionPaper10kgDesc: "இந்த மாதம் 10kg காகிதத்தை மறுசுழற்சி செய்வதன் மூலம் மரங்களைக் காப்பாற்றவும்",
     missionEcoWarrior: "இறுதி ஈகோ வீரர்",
     missionEcoWarriorDesc: "இந்த புராண சாதனையைத் திறக்க மற்ற அனைத்து மிஷன்களையும் முடிக்கவும்",
-    missionTip1: "ஸ்ட்ரீக்குகளைப் பராமரிக்கவும் போனஸ் புள்ளிகளை சம்பாதிக்கவும் தினசரி பிக்அப்களை முடிக்கவும்",
-    missionTip2: "மிஷன் முன்னேற்றத்தை அதிகரிக்க உங்கள் கழிவுகளைச் சரியாக பிரிக்கவும்",
-    missionTip3: "வாராந்திர மிஷன்கள் ஒவ்வொரு திங்கட்கிழமை நள்ளிரவில் மீட்டமைக்கப்படும்",
-    missionTip4: "லீடர்போர்டில் போட்டியிட நண்பர்களுடன் மிஷன்களைப் பகிரவும்",
+    missionTip1: "மிஷன் முன்னேற்றத்தை அதிகரிக்க உங்கள் கழிவுகளைச் சரியாக பிரிக்கவும்",
+    missionTip2: "லீடர்போர்டில் போட்டியிட நண்பர்களுடன் மிஷன்களைப் பகிரவும்",
     howItWorksTitle: "பிக்அப் எப்படி வேலை செய்கிறது",
     pickupStep1: "உங்கள் கழிவு வகையைத் தேர்ந்தெடுக்கவும் (காகிதம், பிளாஸ்டிக், உலோகம், மின்னணு கழிவு, கலவை)",
     pickupStep2: "பிக்அப் முகவரி, தேதி மற்றும் விருப்பமான நேர இடைவெளியை உள்ளிடவும்",

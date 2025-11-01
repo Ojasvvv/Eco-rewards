@@ -278,8 +278,6 @@ const Missions = () => {
         <ul>
           <li>{t('missionTip1')}</li>
           <li>{t('missionTip2')}</li>
-          <li>{t('missionTip3')}</li>
-          <li>{t('missionTip4')}</li>
         </ul>
       </div>
     </div>

@@ -11,6 +11,7 @@ const KabadConnect = () => {
   const { isDark } = useTheme();
   const [activeTab, setActiveTab] = useState('schedule');
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [activeOrders, setActiveOrders] = useState([]);
 
   const tabs = [
     { id: 'schedule', label: t('schedulePickup'), icon: '📅' },
@@ -19,8 +20,28 @@ const KabadConnect = () => {
   ];
 
   const handlePickupSuccess = (pickupRequest) => {
-    console.log('Pickup scheduled:', pickupRequest);
-    // Refresh orders list or show success message
+    // Add order with unique ID
+    const newOrder = {
+      id: `ORDER-${Date.now()}`,
+      ...pickupRequest,
+      status: 'pending'
+    };
+    setActiveOrders(prev => [...prev, newOrder]);
+    setShowScheduleModal(false);
+  };
+
+  const handleEndPickup = (orderId) => {
+    setActiveOrders(prev => prev.filter(order => order.id !== orderId));
+  };
+
+  const handleCompletePickup = (orderId) => {
+    setActiveOrders(prev => prev.map(order => 
+      order.id === orderId ? { ...order, status: 'completed' } : order
+    ));
+    // Move to past orders after a delay
+    setTimeout(() => {
+      setActiveOrders(prev => prev.filter(order => order.id !== orderId));
+    }, 2000);
   };
 
   return (
@@ -81,32 +102,68 @@ const KabadConnect = () => {
                 </button>
               </div>
 
-              <div className="info-card">
-                <div className="info-icon">✅</div>
-                <h3>{t('whyChooseUs')}</h3>
-                <ul className="benefits-list">
-                  <li>
-                    <span className="benefit-icon">👤</span>
-                    <span>{t('benefit1')}</span>
-                  </li>
-                  <li>
-                    <span className="benefit-icon">💰</span>
-                    <span>{t('benefit2')}</span>
-                  </li>
-                  <li>
-                    <span className="benefit-icon">⏰</span>
-                    <span>{t('benefit3')}</span>
-                  </li>
-                  <li>
-                    <span className="benefit-icon">♻️</span>
-                    <span>{t('benefit4')}</span>
-                  </li>
-                  <li>
-                    <span className="benefit-icon">🌍</span>
-                    <span>{t('benefit5')}</span>
-                  </li>
-                </ul>
-              </div>
+              {activeOrders.length > 0 ? (
+                <div className="info-card active-orders-card">
+                  <h3>Your Orders</h3>
+                  <div className="active-orders-list">
+                    {activeOrders.map(order => (
+                      <div key={order.id} className="active-order-item">
+                        <div className="order-info">
+                          <h4>{order.wasteCategory ? order.wasteCategory.charAt(0).toUpperCase() + order.wasteCategory.slice(1) : 'Mixed'}</h4>
+                          <p>{order.address}</p>
+                          <p className="order-date">
+                            {order.date ? new Date(order.date).toLocaleDateString() : ''} • {order.timeSlot || 'Not specified'}
+                          </p>
+                          {order.partner && (
+                            <p className="order-partner">Partner: {order.partner.name}</p>
+                          )}
+                        </div>
+                        <div className="order-actions">
+                          <button
+                            className="btn-end-pickup"
+                            onClick={() => handleEndPickup(order.id)}
+                          >
+                            End Pickup
+                          </button>
+                          <button
+                            className="btn-complete-pickup"
+                            onClick={() => handleCompletePickup(order.id)}
+                          >
+                            Complete Pickup
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="info-card">
+                  <div className="info-icon">✅</div>
+                  <h3>{t('whyChooseUs')}</h3>
+                  <ul className="benefits-list">
+                    <li>
+                      <span className="benefit-icon">👤</span>
+                      <span>{t('benefit1')}</span>
+                    </li>
+                    <li>
+                      <span className="benefit-icon">💰</span>
+                      <span>{t('benefit2')}</span>
+                    </li>
+                    <li>
+                      <span className="benefit-icon">⏰</span>
+                      <span>{t('benefit3')}</span>
+                    </li>
+                    <li>
+                      <span className="benefit-icon">♻️</span>
+                      <span>{t('benefit4')}</span>
+                    </li>
+                    <li>
+                      <span className="benefit-icon">🌍</span>
+                      <span>{t('benefit5')}</span>
+                    </li>
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         )}
