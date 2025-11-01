@@ -12,6 +12,7 @@ const KabadConnect = () => {
   const [activeTab, setActiveTab] = useState('schedule');
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [activeOrders, setActiveOrders] = useState([]);
+  const [notification, setNotification] = useState(null);
 
   const tabs = [
     { id: 'schedule', label: t('schedulePickup'), icon: '📅' },
@@ -30,14 +31,28 @@ const KabadConnect = () => {
     setShowScheduleModal(false);
   };
 
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification(null);
+    }, 7000);
+  };
+
   const handleEndPickup = (orderId) => {
-    setActiveOrders(prev => prev.filter(order => order.id !== orderId));
+    const order = activeOrders.find(o => o.id === orderId);
+    const confirmed = window.confirm('Are you sure you want to cancel this pickup order?');
+    
+    if (confirmed) {
+      setActiveOrders(prev => prev.filter(order => order.id !== orderId));
+      showNotification('Order cancelled', 'error');
+    }
   };
 
   const handleCompletePickup = (orderId) => {
     setActiveOrders(prev => prev.map(order => 
       order.id === orderId ? { ...order, status: 'completed' } : order
     ));
+    showNotification('Order completed', 'success');
     // Move to past orders after a delay
     setTimeout(() => {
       setActiveOrders(prev => prev.filter(order => order.id !== orderId));
@@ -46,6 +61,16 @@ const KabadConnect = () => {
 
   return (
     <div className="kabadconnect-container">
+      {/* Notification */}
+      {notification && (
+        <div className={`order-notification ${notification.type}`}>
+          <span className="notification-icon">
+            {notification.type === 'success' ? '✓' : '✕'}
+          </span>
+          <span className="notification-message">{notification.message}</span>
+        </div>
+      )}
+
       <div className="kabadconnect-header">
         <div className="header-content">
           <div className="header-text">

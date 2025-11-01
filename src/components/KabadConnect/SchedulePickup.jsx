@@ -22,6 +22,13 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
   const [estimatedPrice, setEstimatedPrice] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Get minimum date (tomorrow)
+  const getMinDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  };
+
   const wasteCategories = [
     { id: 'paper', name: t('wastePaper'), icon: '📄', description: t('wastePaperDesc') },
     { id: 'plastic', name: t('wastePlastic'), icon: '♻️', description: t('wastePlasticDesc') },
@@ -57,6 +64,20 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
         alert(t('fillAllFields'));
         return;
       }
+      
+      // Validate phone number
+      if (!formData.phone || formData.phone.length !== 10) {
+        alert('Please enter a valid 10-digit phone number');
+        return;
+      }
+      
+      // Validate date is after today
+      const minDate = getMinDate();
+      if (formData.date < minDate) {
+        alert('Please select a date from tomorrow onwards');
+        return;
+      }
+      
       // Simulate partner assignment
       const randomPartner = partners[Math.floor(Math.random() * partners.length)];
       setAssignedPartner(randomPartner);
@@ -133,18 +154,21 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
               value={formData.date}
               onChange={(e) => {
                 const selectedDate = e.target.value;
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                const tomorrowStr = tomorrow.toISOString().split('T')[0];
-                if (selectedDate >= tomorrowStr) {
-                  handleInputChange('date', selectedDate);
+                if (selectedDate) {
+                  const minDate = getMinDate();
+                  if (selectedDate >= minDate) {
+                    handleInputChange('date', selectedDate);
+                  } else {
+                    alert('Please select a date from tomorrow onwards');
+                    // Reset to empty if invalid date
+                    handleInputChange('date', '');
+                  }
+                } else {
+                  handleInputChange('date', '');
                 }
               }}
-              min={(() => {
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                return tomorrow.toISOString().split('T')[0];
-              })()}
+              min={getMinDate()}
+              required
             />
           </div>
 
@@ -154,11 +178,12 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
               type="tel"
               value={formData.phone}
               onChange={(e) => {
-                const value = e.target.value.replace(/[^0-9]/g, '');
+                const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
                 handleInputChange('phone', value);
               }}
-              placeholder="Enter phone number"
-              maxLength="15"
+              placeholder="Enter 10 digit phone number"
+              maxLength="10"
+              pattern="[0-9]{10}"
             />
           </div>
         </div>
