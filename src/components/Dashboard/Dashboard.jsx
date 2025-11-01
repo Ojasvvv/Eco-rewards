@@ -119,6 +119,15 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error checking eligibility:', error);
       
+      // Check if it's a daily limit error
+      if (error.message && (error.message.includes('Daily limit') || error.message.includes('daily deposit limit') || error.message.includes('DAILY_LIMIT_REACHED'))) {
+        return {
+          eligible: false,
+          reason: 'daily_limit_reached',
+          message: `❌ Daily limit reached! You've already used dustbins 5 times today. Please try again tomorrow.`
+        };
+      }
+      
       // Check if it's a rate limit error
       if (error.message && error.message.includes('Rate limit exceeded')) {
         const match = error.message.match(/(\d+) seconds/);
