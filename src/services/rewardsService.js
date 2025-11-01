@@ -48,11 +48,9 @@ async function callAPI(endpoint, data, throttleKey = null, throttleMs = 2000) {
         error = JSON.parse(text);
       } catch (jsonError) {
         // Not JSON, treat as plain text error
-        console.error('Server returned non-JSON error:', text);
         error = { error: text || 'Server error occurred' };
       }
     } catch (textError) {
-      console.error('Failed to read response:', textError);
       error = { error: 'Failed to read server response' };
     }
     
@@ -64,8 +62,8 @@ async function callAPI(endpoint, data, throttleKey = null, throttleMs = 2000) {
         window.location.href = '/';
         // Show alert before redirect
         alert('Your account no longer exists. You have been logged out.');
-      } catch (logoutError) {
-        console.error('Error during forced logout:', logoutError);
+          } catch (logoutError) {
+        // Silent error handling
       }
       throw new Error('Account no longer exists');
     }
@@ -110,7 +108,6 @@ export const initializeUserRewards = async (userId) => {
     
     return rewardsDoc.data();
   } catch (error) {
-    console.error('Error initializing user rewards:', error);
     throw error;
   }
 };
@@ -134,7 +131,6 @@ export const getUserRewards = async (userId) => {
       };
     }
   } catch (error) {
-    console.error('Error getting user rewards:', error);
     throw error;
   }
 };
@@ -175,8 +171,6 @@ export const addRewardPoints = async (userId, pointsToAdd, reason = 'deposit', d
       throw new Error('Failed to add reward points');
     }
   } catch (error) {
-    console.error('Error adding reward points:', error);
-    
     // Check if it's a rate limit error
     const rateLimitInfo = handleRateLimitError(error);
     if (rateLimitInfo.isRateLimit) {
@@ -205,8 +199,6 @@ export const deductRewardPoints = async (userId, pointsToDeduct, couponName) => 
       throw new Error('Failed to redeem reward points');
     }
   } catch (error) {
-    console.error('Error deducting reward points:', error);
-    
     // Check if it's a rate limit error
     const rateLimitInfo = handleRateLimitError(error);
     if (rateLimitInfo.isRateLimit) {
@@ -249,7 +241,6 @@ export const getUserTransactions = async (userId) => {
     
     return transactions;
   } catch (error) {
-    console.error('Error getting user transactions:', error);
     throw error;
   }
 };
@@ -281,7 +272,6 @@ export const initializeUserStats = async (userId) => {
       };
     }
   } catch (error) {
-    console.error('Error initializing user stats:', error);
     throw error;
   }
 };
@@ -312,7 +302,6 @@ export const getUserStats = async (userId) => {
       };
     }
   } catch (error) {
-    console.error('Error getting user stats:', error);
     throw error;
   }
 };
@@ -334,7 +323,6 @@ export const updateUserStats = async (userId, statsUpdate) => {
       throw new Error('Failed to update user stats');
     }
   } catch (error) {
-    console.error('Error updating user stats:', error);
     throw error;
   }
 };
@@ -355,8 +343,6 @@ export const checkDepositEligibility = async (userId) => {
       emailVerified: result.emailVerified
     };
   } catch (error) {
-    console.error('Error checking deposit eligibility:', error);
-    
     // Parse the error for specific codes
     if (error.message.includes('Email not verified')) {
       return {
@@ -384,12 +370,9 @@ export const checkDepositEligibility = async (userId) => {
  */
 export const clearRateLimit = async () => {
   try {
-    console.log('🧹 Clearing rate limits...');
     const result = await callAPI('clearRateLimit', {}, null, 0);
-    console.log('✅ Rate limits cleared successfully');
     return result;
   } catch (error) {
-    console.error('❌ Error clearing rate limits:', error);
     throw error;
   }
 };
@@ -411,7 +394,6 @@ export const saveAchievements = async (userId, achievements) => {
       throw new Error('Failed to save achievements');
     }
   } catch (error) {
-    console.error('Error saving achievements:', error);
     throw error;
   }
 };
@@ -431,8 +413,7 @@ export const getAchievements = async (userId) => {
       throw new Error('Failed to get achievements');
     }
   } catch (error) {
-    console.error('Error getting achievements:', error);
-    // Return empty array on error instead of throwing
+    // Silently fail and return empty array
     return [];
   }
 };

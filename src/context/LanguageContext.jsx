@@ -374,7 +374,6 @@ const translations = {
     // EcoRevive
     kabadConnect: "EcoRevive",
     kabadConnectDesc: "घर से रीसायकल योग्य कचरे के लिए पिकअप शेड्यूल करें",
-    smartDustbins: "स्मार्ट डस्टबिन",
     schedulePickup: "पिकअप शेड्यूल करें",
     newPickup: "नया पिकअप",
     pastDeliveries: "पिछली डिलीवरी",
@@ -622,7 +621,6 @@ const translations = {
     // EcoRevive (Telugu - using simplified translations)
     kabadConnect: "EcoRevive",
     kabadConnectDesc: "ఇంటి నుండి రీసైకిల్ చేయదగిన వ్యర్థాల కోసం పికప్ షెడ్యూల్ చేయండి",
-    smartDustbins: "స్మార్ట్ డస్ట్‌బిన్‌లు",
     schedulePickup: "పికప్ షెడ్యూల్ చేయండి",
     newPickup: "కొత్త పికప్",
     pastDeliveries: "గత డెలివరీలు",
@@ -852,7 +850,6 @@ const translations = {
     // EcoRevive (Tamil - using same structure as Telugu for consistency)
     kabadConnect: "EcoRevive",
     kabadConnectDesc: "வீட்டிலிருந்து மறுசுழற்சி செய்யக்கூடிய கழிவுகளுக்கு பிக்அப்பை திட்டமிடுங்கள்",
-    smartDustbins: "ஸ்மார்ட் டஸ்ட்பின்கள்",
     schedulePickup: "பிக்அப் திட்டமிடுங்கள்",
     newPickup: "புதிய பிக்அப்",
     pastDeliveries: "கடந்த டெலிவரிகள்",

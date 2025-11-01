@@ -1,5 +1,8 @@
 .past-orders-container {
   width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .orders-header {
@@ -108,6 +111,8 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex: 1;
+  width: 100%;
 }
 
 .no-orders {
@@ -446,12 +451,46 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .past-orders-container {
+    width: 100%;
+    min-height: auto;
+  }
+
+  .orders-list {
+    gap: 20px;
+    padding-bottom: 20px;
+  }
+
   .impact-stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .impact-stat {
+    padding: 12px;
+  }
+
+  .impact-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .impact-value {
+    font-size: 20px;
+  }
+
+  .impact-label {
+    font-size: 12px;
+  }
+
+  .order-card {
+    padding: 16px;
   }
 
   .order-details {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .order-actions {
@@ -460,6 +499,7 @@
 
   .impact-items {
     flex-direction: column;
+    gap: 10px;
   }
 
   .order-header {
@@ -469,6 +509,37 @@
   .order-status {
     width: 100%;
     text-align: center;
+    margin-top: 8px;
+  }
+
+  .order-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 32px;
+  }
+
+  .impact-summary {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .impact-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .impact-summary {
+    padding: 16px;
+  }
+
+  .impact-summary h3 {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .orders-header h2 {
+    font-size: 20px;
   }
 }
 

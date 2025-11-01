@@ -103,7 +103,6 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
             className={`waste-category-card ${formData.wasteCategory === category.id ? 'selected' : ''}`}
             onClick={() => handleInputChange('wasteCategory', category.id)}
           >
-            <div className="category-icon">{category.icon}</div>
             <h4>{category.name}</h4>
             <p>{category.description}</p>
           </div>
@@ -188,7 +187,6 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
         <div className="summary-section">
           <h4>{t('wasteType')}</h4>
           <div className="summary-value">
-            {wasteCategories.find(c => c.id === formData.wasteCategory)?.icon}{' '}
             {wasteCategories.find(c => c.id === formData.wasteCategory)?.name}
           </div>
         </div>
@@ -219,19 +217,15 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
             
             <div className="partner-details">
               <div className="partner-stat">
-                <span className="stat-icon">⭐</span>
                 <span>{assignedPartner.rating} {t('rating')}</span>
               </div>
               <div className="partner-stat">
-                <span className="stat-icon">📍</span>
                 <span>{assignedPartner.locality} ({assignedPartner.distance})</span>
               </div>
               <div className="partner-stat">
-                <span className="stat-icon">💼</span>
                 <span>{assignedPartner.experience} {t('yearsExp')}</span>
               </div>
               <div className="partner-stat">
-                <span className="stat-icon">🕒</span>
                 <span>{t('expectedArrival')}: {t('nextDay')}</span>
               </div>
             </div>
@@ -240,7 +234,6 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
 
         <div className="price-info">
           <div className="price-note">
-            <span className="info-icon">💰</span>
             <p>{t('priceNote')}</p>
           </div>
         </div>
@@ -253,7 +246,6 @@ const SchedulePickup = ({ onClose, onSuccess }) => {
       <div className="schedule-pickup-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>
-            <span className="header-icon">♻️</span>
             {t('schedulePickup')}
           </h2>
           <button className="close-btn" onClick={onClose}>×</button>

@@ -468,6 +468,24 @@
     gap: 8px;
     align-items: flex-start;
   }
+
+  .mission-badges-container {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .difficulty-badge,
+  .mission-type-badge {
+    font-size: 9px;
+    padding: 3px 10px;
+  }
+
+  .mission-header {
+    min-height: auto;
+  }
 }
 
 @media (max-width: 480px) {

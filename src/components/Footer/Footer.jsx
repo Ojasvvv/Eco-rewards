@@ -74,8 +74,6 @@ const Footer = () => {
         {/* Copyright */}
         <div className="footer-copyright">
           <span>{new Date().getFullYear()} EcoRewards</span>
-          <span className="copyright-separator">•</span>
-          <span className="copyright-winner">🏆 GeeksForGeeks Hackathon Winner</span>
         </div>
       </div>
     </footer>

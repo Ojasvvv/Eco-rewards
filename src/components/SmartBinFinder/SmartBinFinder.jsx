@@ -155,7 +155,6 @@ const SmartBinFinder = () => {
         setLoading(false);
       },
       (error) => {
-        console.error('Error getting location:', error);
         setError('Unable to retrieve your location. Please enable location services.');
         
         // Fallback to a default location (e.g., Times Square, NYC)
