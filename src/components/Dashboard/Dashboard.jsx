@@ -445,7 +445,7 @@ const Dashboard = () => {
           <div className="header-left">
             <div className="header-logo">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 11H5M19 11C20.1046 11 21 11.8954 21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.8954 3.89543 11 5 11M19 11V9C19 7.89543 18.1046 7 17 7M5 11V9C5 7.89543 5.89543 7 7 7M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7M7 7H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
             <h1 onClick={() => navigate('/dashboard')}>EcoRewards</h1>
@@ -585,21 +585,28 @@ const Dashboard = () => {
             className={`view-tab ${activeView === 'dashboard' ? 'active' : ''}`}
             onClick={() => setActiveView('dashboard')}
           >
-            <span className="tab-icon">🏠</span>
+            <svg className="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
             <span>{t('smartDustbins')}</span>
           </button>
           <button 
             className={`view-tab ${activeView === 'binfinder' ? 'active' : ''}`}
             onClick={() => setActiveView('binfinder')}
           >
-            <span className="tab-icon">🗑️</span>
+            <svg className="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
             <span>Bin Finder</span>
           </button>
           <button 
             className={`view-tab ${activeView === 'kabadconnect' ? 'active' : ''}`}
             onClick={() => setActiveView('kabadconnect')}
           >
-            <span className="tab-icon">♻️</span>
+            <svg className="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
             <span>{t('kabadConnect')}</span>
           </button>
         </div>
@@ -660,15 +667,15 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Code Entry Form */}
-          <section className="code-section animate-slideUp">
-            <div className="code-card">
+          {/* Code Entry Form - Split Layout */}
+          <section className="code-section-split animate-slideUp">
+            <div className="code-card-left">
               <div className="code-header">
                 <h3>{t('enterCode')}</h3>
                 <p>{t('scanQRPrompt')}</p>
               </div>
 
-              <form onSubmit={handleSubmitCode} className="code-form">
+              <form onSubmit={handleSubmitCode} className={`code-form ${!error && !success ? 'idle-state' : ''}`}>
                 <div className="input-group">
                   <div className="input-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -726,17 +733,33 @@ const Dashboard = () => {
                   )}
                 </button>
               </form>
+            </div>
 
-              <div className="code-help">
-                <p>💡 <strong>{t('howItWorks')}:</strong></p>
-                <ol>
+            <div className="code-info-right">
+              <div className="info-card">
+                <div className="info-header">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="info-icon">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <h3>{t('howItWorks')}</h3>
+                </div>
+                <ol className="info-steps">
                   <li>{t('step1Desc')}</li>
                   <li>{t('step2Desc')}</li>
                   <li>{t('step3Desc')}</li>
                   <li>{t('step4Desc')}</li>
                 </ol>
-                <p className="code-help-highlight">
-                  ⚠️ {t('usageLimit')}: {t('usageLimitDesc')}
+              </div>
+
+              <div className="info-card">
+                <div className="info-header">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="info-icon">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <h3>{t('usageLimit')}</h3>
+                </div>
+                <p className="usage-limit-text">
+                  {t('usageLimitDesc')}
                 </p>
               </div>
             </div>

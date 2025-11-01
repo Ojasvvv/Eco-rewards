@@ -17,6 +17,11 @@ const KabadConnect = () => {
   const [activeOrders, setActiveOrders] = useState([]);
   const [notification, setNotification] = useState(null);
   const [dailyLimitInfo, setDailyLimitInfo] = useState(null);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [currentOrderId, setCurrentOrderId] = useState(null);
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState('');
+  const [complaint, setComplaint] = useState('');
 
   const tabs = [
     { id: 'schedule', label: t('schedulePickup'), icon: '📅' },
@@ -91,13 +96,39 @@ const KabadConnect = () => {
   };
 
   const handleCompletePickup = (orderId) => {
+    setCurrentOrderId(orderId);
+    setShowRatingModal(true);
+  };
+
+  const handleSubmitRating = () => {
+    if (rating === 0) {
+      showNotification('Please select a rating', 'error');
+      return;
+    }
+
+    // Update order status with rating
     setActiveOrders(prev => prev.map(order => 
-      order.id === orderId ? { ...order, status: 'completed' } : order
+      order.id === currentOrderId ? { 
+        ...order, 
+        status: 'completed',
+        rating,
+        review,
+        complaint 
+      } : order
     ));
-    showNotification('Order completed', 'success');
+
+    showNotification('Thank you for your feedback!', 'success');
+    
+    // Reset modal state
+    setShowRatingModal(false);
+    setRating(0);
+    setReview('');
+    setComplaint('');
+    setCurrentOrderId(null);
+    
     // Move to past orders after a delay
     setTimeout(() => {
-      setActiveOrders(prev => prev.filter(order => order.id !== orderId));
+      setActiveOrders(prev => prev.filter(order => order.id !== currentOrderId));
     }, 2000);
   };
 
@@ -257,6 +288,81 @@ const KabadConnect = () => {
           onClose={() => setShowScheduleModal(false)}
           onSuccess={handlePickupSuccess}
         />
+      )}
+
+      {/* Rating & Review Modal */}
+      {showRatingModal && (
+        <div className="modal-overlay" onClick={() => setShowRatingModal(false)}>
+          <div className="rating-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="rating-modal-header">
+              <h2>Rate Your Experience</h2>
+              <button className="modal-close-btn" onClick={() => setShowRatingModal(false)}>
+                ×
+              </button>
+            </div>
+
+            <div className="rating-modal-body">
+              {/* Star Rating */}
+              <div className="rating-section">
+                <label>How would you rate the service?</label>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      className={`star ${rating >= star ? 'active' : ''}`}
+                      onClick={() => setRating(star)}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+                {rating > 0 && (
+                  <p className="rating-text">
+                    {rating === 1 && 'Poor'}
+                    {rating === 2 && 'Fair'}
+                    {rating === 3 && 'Good'}
+                    {rating === 4 && 'Very Good'}
+                    {rating === 5 && 'Excellent'}
+                  </p>
+                )}
+              </div>
+
+              {/* Review */}
+              <div className="review-section">
+                <label htmlFor="review">Write a review (optional)</label>
+                <textarea
+                  id="review"
+                  value={review}
+                  onChange={(e) => setReview(e.target.value)}
+                  placeholder="Share your experience with us..."
+                  rows="4"
+                  maxLength="500"
+                />
+                <small>{review.length}/500 characters</small>
+              </div>
+
+              {/* Complaint */}
+              <div className="complaint-section">
+                <label htmlFor="complaint">Any complaints or issues? (optional)</label>
+                <textarea
+                  id="complaint"
+                  value={complaint}
+                  onChange={(e) => setComplaint(e.target.value)}
+                  placeholder="Let us know if something went wrong..."
+                  rows="3"
+                  maxLength="300"
+                />
+                <small>{complaint.length}/300 characters</small>
+              </div>
+
+              {/* Submit Button */}
+              <button className="btn-submit-rating" onClick={handleSubmitRating}>
+                Submit Feedback
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
