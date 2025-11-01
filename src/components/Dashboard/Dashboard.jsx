@@ -592,7 +592,7 @@ const Dashboard = () => {
             className={`view-tab ${activeView === 'binfinder' ? 'active' : ''}`}
             onClick={() => setActiveView('binfinder')}
           >
-            <span className="tab-icon">🗺️</span>
+            <span className="tab-icon">🗑️</span>
             <span>Bin Finder</span>
           </button>
           <button 

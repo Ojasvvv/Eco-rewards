@@ -132,10 +132,25 @@ const SmartBinFinder = () => {
   const [error, setError] = useState(null);
   const [selectedBin, setSelectedBin] = useState(null);
   const [mapCenter, setMapCenter] = useState(null);
+  const [showLegend, setShowLegend] = useState(true);
+
+  // Load legend visibility preference from localStorage
+  useEffect(() => {
+    const savedPreference = localStorage.getItem('binFinder_showLegend');
+    if (savedPreference !== null) {
+      setShowLegend(savedPreference === 'true');
+    }
+  }, []);
 
   useEffect(() => {
     getUserLocation();
   }, []);
+
+  const toggleLegend = () => {
+    const newValue = !showLegend;
+    setShowLegend(newValue);
+    localStorage.setItem('binFinder_showLegend', newValue.toString());
+  };
 
   const getUserLocation = () => {
     setLoading(true);
@@ -192,7 +207,7 @@ const SmartBinFinder = () => {
   return (
     <div className="smart-bin-finder">
       <div className="bin-finder-header">
-        <h2>🗺️ Smart Bin Finder</h2>
+        <h2>🗑️ Smart Bin Finder</h2>
         <p>Find the nearest smart recycling bins near you</p>
         {error && (
           <div className="location-warning">
@@ -289,25 +304,36 @@ const SmartBinFinder = () => {
                 <MapRecenter center={mapCenter} />
               </MapContainer>
               
+              {/* Legend Toggle Button (Mobile Only) */}
+              <button 
+                className="legend-toggle-btn"
+                onClick={toggleLegend}
+                aria-label={showLegend ? 'Hide legend' : 'Show legend'}
+              >
+                {showLegend ? '✕' : 'ℹ️'}
+              </button>
+              
               {/* Legend - Now inside map section */}
-              <div className="map-legend">
-                <div className="legend-item">
-                  <span className="legend-icon user"></span>
-                  <span>Your Location</span>
+              {showLegend && (
+                <div className="map-legend">
+                  <div className="legend-item">
+                    <span className="legend-icon user"></span>
+                    <span>Your Location</span>
+                  </div>
+                  <div className="legend-item">
+                    <span className="legend-icon bin">🗑️</span>
+                    <span>Smart Bin</span>
+                  </div>
+                  <div className="legend-item">
+                    <span className="status-indicator available">●</span>
+                    <span>Available</span>
+                  </div>
+                  <div className="legend-item">
+                    <span className="status-indicator full">●</span>
+                    <span>Full</span>
+                  </div>
                 </div>
-                <div className="legend-item">
-                  <span className="legend-icon bin">🗑️</span>
-                  <span>Smart Bin</span>
-                </div>
-                <div className="legend-item">
-                  <span className="status-indicator available">●</span>
-                  <span>Available</span>
-                </div>
-                <div className="legend-item">
-                  <span className="status-indicator full">●</span>
-                  <span>Full</span>
-                </div>
-              </div>
+              )}
             </>
           )}
         </div>

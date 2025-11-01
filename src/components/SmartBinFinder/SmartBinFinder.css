@@ -460,6 +460,50 @@
   border: none;
 }
 
+/* Legend Toggle Button - Hidden on desktop, visible on mobile */
+.legend-toggle-btn {
+  display: none; /* Hidden by default, shown on mobile via media query */
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  font-size: 1.2rem;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+}
+
+.legend-toggle-btn:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 1);
+}
+
+.dark-theme .legend-toggle-btn {
+  background: rgba(31, 41, 55, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.dark-theme .legend-toggle-btn:hover {
+  background: rgba(31, 41, 55, 1);
+}
+
+/* Hide toggle button on desktop */
+@media (min-width: 769px) {
+  .legend-toggle-btn {
+    display: none;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .bin-finder-content {
@@ -547,6 +591,16 @@
     width: 20px;
     height: 20px;
     font-size: 14px;
+  }
+
+  /* Show toggle button on mobile */
+  .legend-toggle-btn {
+    display: flex;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
   }
 }
 
