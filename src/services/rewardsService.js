@@ -335,6 +335,16 @@ export const checkDepositEligibility = async (userId) => {
   try {
     const result = await callAPI('checkDepositEligibility', {}, null, 0); // No throttling for eligibility checks
     
+    // Handle case where API returns eligible: false (though API typically returns 429)
+    if (result.eligible === false && result.reason === 'daily_limit_reached') {
+      return {
+        eligible: false,
+        reason: 'daily_limit_reached',
+        message: '❌ Daily limit reached! You\'ve already used dustbins 5 times today. Please try again tomorrow.',
+        remainingDeposits: result.remainingDeposits || 0
+      };
+    }
+    
     return {
       eligible: result.eligible,
       reason: result.reason || null,
@@ -344,7 +354,9 @@ export const checkDepositEligibility = async (userId) => {
     };
   } catch (error) {
     // Parse the error for specific codes
-    if (error.message.includes('Email not verified')) {
+    const errorMsg = error.message || '';
+    
+    if (errorMsg.includes('Email not verified') || errorMsg.includes('email not verified')) {
       return {
         eligible: false,
         reason: 'email_not_verified',
@@ -352,11 +364,12 @@ export const checkDepositEligibility = async (userId) => {
       };
     }
     
-    if (error.message.includes('Daily limit')) {
+    // Check for daily limit error (case-insensitive)
+    if (errorMsg.toLowerCase().includes('daily limit') || errorMsg.includes('DAILY_LIMIT_REACHED') || errorMsg.toLowerCase().includes('daily deposit limit')) {
       return {
         eligible: false,
         reason: 'daily_limit_reached',
-        message: 'You\'ve reached your daily deposit limit. Try again tomorrow!'
+        message: '❌ Daily limit reached! You\'ve already used dustbins 5 times today. Please try again tomorrow.'
       };
     }
     
