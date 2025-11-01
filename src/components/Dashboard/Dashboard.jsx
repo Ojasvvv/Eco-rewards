@@ -115,12 +115,22 @@ const Dashboard = () => {
   const checkEligibility = async () => {
     try {
       const eligibility = await checkDepositEligibility(user?.uid);
+      
+      // If eligibility check returned a result (even if not eligible), return it
+      if (eligibility && eligibility.reason === 'daily_limit_reached') {
+        return {
+          eligible: false,
+          reason: 'daily_limit_reached',
+          message: `❌ Daily limit reached! You've already used dustbins 5 times today. Please try again tomorrow.`
+        };
+      }
+      
       return eligibility;
     } catch (error) {
       console.error('Error checking eligibility:', error);
       
-      // Check if it's a daily limit error
-      if (error.message && (error.message.includes('Daily limit') || error.message.includes('daily deposit limit') || error.message.includes('DAILY_LIMIT_REACHED'))) {
+      // Check if it's a daily limit error (catch errors that weren't handled by checkDepositEligibility)
+      if (error.message && (error.message.includes('Daily limit') || error.message.includes('daily deposit limit') || error.message.includes('DAILY_LIMIT_REACHED') || error.message.includes('Daily deposit limit reached'))) {
         return {
           eligible: false,
           reason: 'daily_limit_reached',
