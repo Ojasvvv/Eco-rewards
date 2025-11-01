@@ -34,7 +34,7 @@ const translations = {
     tutorialStep5Title: "Make an Impact",
     tutorialStep5Desc: "Track your environmental contribution and see your impact",
     tutorialStep6Title: "Schedule Home Pickups",
-    tutorialStep6Desc: "Book doorstep pickup for your recyclable waste through KabadConnect",
+    tutorialStep6Desc: "Book doorstep pickup for your recyclable waste through EcoRevive",
     next: "Next",
     finish: "Finish",
     signIn: "Sign In with Google",
@@ -124,8 +124,8 @@ const translations = {
     success: "Success!",
     earnedPoints: "You've earned",
     
-    // KabadConnect
-    kabadConnect: "KabadConnect",
+    // EcoRevive
+    kabadConnect: "EcoRevive",
     kabadConnectDesc: "Schedule pickups for recyclable waste from your home",
     smartDustbins: "Smart Dustbins",
     schedulePickup: "Schedule Pickup",
@@ -252,7 +252,7 @@ const translations = {
     pickupStep4: "Partner arrives, collects material, and weighs it",
     pickupStep5: "Get paid and earn EcoPoints instantly",
     
-    whyChooseUs: "Why Choose KabadConnect?",
+    whyChooseUs: "Why Choose EcoRevive?",
     benefit1: "Verified & Background-Checked Partners",
     benefit2: "Fair & Dynamic Pricing",
     benefit3: "Flexible Scheduling",
@@ -372,8 +372,8 @@ const translations = {
     success: "सफलता!",
     earnedPoints: "आपने कमाए",
     
-    // KabadConnect
-    kabadConnect: "कबाड कनेक्ट",
+    // EcoRevive
+    kabadConnect: "EcoRevive",
     kabadConnectDesc: "घर से रीसायकल योग्य कचरे के लिए पिकअप शेड्यूल करें",
     smartDustbins: "स्मार्ट डस्टबिन",
     schedulePickup: "पिकअप शेड्यूल करें",
@@ -620,8 +620,8 @@ const translations = {
     success: "విజయం!",
     earnedPoints: "మీరు సంపాదించారు",
     
-    // KabadConnect (Telugu - using simplified translations)
-    kabadConnect: "కబాడ్ కనెక్ట్",
+    // EcoRevive (Telugu - using simplified translations)
+    kabadConnect: "EcoRevive",
     kabadConnectDesc: "ఇంటి నుండి రీసైకిల్ చేయదగిన వ్యర్థాల కోసం పికప్ షెడ్యూల్ చేయండి",
     smartDustbins: "స్మార్ట్ డస్ట్‌బిన్‌లు",
     schedulePickup: "పికప్ షెడ్యూల్ చేయండి",
@@ -850,8 +850,8 @@ const translations = {
     success: "வெற்றி!",
     earnedPoints: "நீங்கள் சம்பாதித்துள்ளீர்கள்",
     
-    // KabadConnect (Tamil - using same structure as Telugu for consistency)
-    kabadConnect: "கபாட் கனெக்ட்",
+    // EcoRevive (Tamil - using same structure as Telugu for consistency)
+    kabadConnect: "EcoRevive",
     kabadConnectDesc: "வீட்டிலிருந்து மறுசுழற்சி செய்யக்கூடிய கழிவுகளுக்கு பிக்அப்பை திட்டமிடுங்கள்",
     smartDustbins: "ஸ்மார்ட் டஸ்ட்பின்கள்",
     schedulePickup: "பிக்அப் திட்டமிடுங்கள்",

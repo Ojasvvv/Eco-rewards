@@ -479,14 +479,13 @@
   transition: all 0.3s;
   color: #6b7280;
   min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
+  text-align: center;
 }
 
 .view-tab > span:not(.tab-icon) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
+  text-align: center;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .dark-theme .view-tab {
@@ -953,6 +952,8 @@
     padding: 10px 12px;
     font-size: 13px;
     gap: 6px;
+    flex-direction: column;
+    min-height: auto;
   }
 
   .view-tab .tab-icon {
@@ -1038,18 +1039,14 @@
   }
 
   .view-tab {
-    padding: 8px 8px;
-    font-size: 12px;
+    padding: 8px 6px;
+    font-size: 11px;
     gap: 4px;
+    flex-direction: column;
   }
 
   .view-tab .tab-icon {
     font-size: 16px;
-  }
-
-  /* Hide text on very small screens if needed, show only icons */
-  .view-tab span:not(.tab-icon) {
-    display: inline;
   }
 
   .language-button {

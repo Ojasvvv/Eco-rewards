@@ -75,8 +75,9 @@
   gap: 12px;
   margin-bottom: 24px;
   border-bottom: 2px solid #e5e7eb;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .dark-theme .kabadconnect-tabs {
@@ -86,6 +87,7 @@
 .kabad-tab {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 12px 20px;
   background: none;
@@ -96,8 +98,9 @@
   font-weight: 600;
   font-size: 15px;
   color: #6b7280;
-  white-space: nowrap;
-  flex-shrink: 0;
+  text-align: center;
+  flex: 1;
+  min-width: 0;
 }
 
 .dark-theme .kabad-tab {
@@ -116,10 +119,14 @@
 
 .tab-icon {
   font-size: 20px;
+  flex-shrink: 0;
 }
 
 .tab-label {
   font-weight: 600;
+  text-align: center;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Content */
@@ -269,8 +276,10 @@
   }
 
   .kabad-tab {
-    padding: 10px 16px;
-    font-size: 14px;
+    padding: 10px 12px;
+    font-size: 13px;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .tab-icon {
@@ -289,6 +298,16 @@
 
   .info-card {
     padding: 20px;
+  }
+
+  .kabad-tab {
+    padding: 8px 8px;
+    font-size: 12px;
+    gap: 3px;
+  }
+
+  .tab-icon {
+    font-size: 16px;
   }
 }
 
