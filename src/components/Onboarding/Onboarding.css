@@ -692,7 +692,7 @@
   }
 }
 
-/* Missions Animation */
+/* Missions Animation - Minimalistic */
 .missions-animation {
   position: relative;
   width: 200px;
@@ -703,38 +703,25 @@
 }
 
 .mission-card-animated {
-  font-size: 60px;
-  animation: missionCardBounce 2s ease-in-out infinite;
+  font-size: 64px;
+  animation: missionCardPulse 2.5s ease-in-out infinite;
   position: relative;
   z-index: 2;
 }
 
 .mission-check {
-  position: absolute;
-  top: 20%;
-  right: 20%;
-  font-size: 30px;
-  color: #10b981;
-  background: white;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: checkPop 1.5s ease-in-out infinite;
-  z-index: 3;
+  display: none;
 }
 
 .mission-progress {
   position: absolute;
-  bottom: 30%;
+  bottom: 35%;
   left: 50%;
   transform: translateX(-50%);
-  width: 120px;
-  height: 8px;
+  width: 100px;
+  height: 6px;
   background: #e5e7eb;
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
   z-index: 1;
 }
@@ -743,73 +730,21 @@
   width: 70%;
   height: 100%;
   background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-  border-radius: 4px;
-  animation: progressFill 2s ease-in-out infinite;
+  border-radius: 3px;
 }
 
 .mission-rewards {
-  position: absolute;
-  bottom: 10%;
-  display: flex;
-  gap: 8px;
-  z-index: 2;
+  display: none;
 }
 
-.reward-badge {
-  font-size: 24px;
-  animation: rewardFloat 2s ease-in-out infinite;
-}
-
-.reward-1 {
-  animation-delay: 0s;
-}
-
-.reward-2 {
-  animation-delay: 0.3s;
-}
-
-.reward-3 {
-  animation-delay: 0.6s;
-}
-
-@keyframes missionCardBounce {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-15px) scale(1.05);
-  }
-}
-
-@keyframes checkPop {
+@keyframes missionCardPulse {
   0%, 100% {
     transform: scale(1);
     opacity: 1;
   }
   50% {
-    transform: scale(1.2);
-    opacity: 0.8;
-  }
-}
-
-@keyframes progressFill {
-  0% {
-    width: 0%;
-  }
-  50% {
-    width: 70%;
-  }
-  100% {
-    width: 70%;
-  }
-}
-
-@keyframes rewardFloat {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-10px) rotate(10deg);
+    transform: scale(1.05);
+    opacity: 0.9;
   }
 }
 
