@@ -10,10 +10,10 @@ import { throttle, handleRateLimitError } from '../utils/rateLimitClient';
 
 // API Base URL - Use environment variable or default
 // In development, Vite proxy forwards /api/* to Vercel
-// In production, use the production URL
+// In production, use relative path (same domain) - no CORS issues!
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL 
   || (import.meta.env.PROD 
-    ? 'https://eco-rewards-wheat.vercel.app/api'
+    ? '/api' // Use relative path in production - same domain, no CORS!
     : '/api'); // Use relative path in dev - Vite proxy handles it
 
 /**

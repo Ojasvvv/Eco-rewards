@@ -1,12 +1,14 @@
 import { auth } from '../firebase/config';
 
 // In dev, try proxy first, fallback to direct URL if proxy fails
+// In production, use relative path (same domain) - no CORS issues!
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL 
   || (import.meta.env.PROD 
-    ? 'https://eco-rewards-wheat.vercel.app/api'
+    ? '/api' // Use relative path in production - same domain, no CORS!
     : '/api');
     
-const PRODUCTION_API_URL = 'https://eco-rewards-wheat.vercel.app/api';
+// Fallback for development only
+const PRODUCTION_API_URL = import.meta.env.VITE_API_BASE_URL || 'https://eco-rewards-wheat.vercel.app/api';
 
 /**
  * Send daily stats email
