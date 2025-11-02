@@ -224,6 +224,8 @@ export async function checkRateLimitFirestore(userId, endpoint) {
 // Helper to set CORS headers
 function setCORSHeaders(req, res) {
   const origin = req.headers.origin;
+  
+  // Always set standard CORS headers
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Cron-Secret');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -235,8 +237,10 @@ function setCORSHeaders(req, res) {
       res.setHeader('Access-Control-Allow-Origin', origin);
       return;
     }
-    // Allow if from the production domains
-    if (origin.includes('eco-rewards-wheat.vercel.app') || origin.includes('new-repo-seven-steel.vercel.app')) {
+    // Allow if from the production domains - check for exact match or includes
+    const isEcoRewards = origin === 'https://eco-rewards-wheat.vercel.app' || origin.includes('eco-rewards-wheat.vercel.app');
+    const isNewRepo = origin === 'https://new-repo-seven-steel.vercel.app' || origin.includes('new-repo-seven-steel.vercel.app');
+    if (isEcoRewards || isNewRepo) {
       res.setHeader('Access-Control-Allow-Origin', origin);
       return;
     }
@@ -248,22 +252,20 @@ function setCORSHeaders(req, res) {
       res.setHeader('Access-Control-Allow-Origin', origin);
       return;
     }
-  }
-  
-  // Fallback: if no origin matches but origin header exists, allow it (for development)
-  // This helps with CORS preflight requests
-  if (origin) {
+    // Fallback: if no origin matches but origin header exists, allow it
+    // This ensures CORS preflight requests always get a response
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
 }
 
 export function withRateLimitFirestore(endpoint, handler) {
   return async (req, res) => {
+    // Always set CORS headers FIRST, before any checks or try/catch
+    // This ensures CORS headers are always present, even if there's an error
+    setCORSHeaders(req, res);
+    
     try {
-      // Always set CORS headers first
-      setCORSHeaders(req, res);
-      
-      // Handle OPTIONS preflight requests - pass through to handler for CORS
+      // Handle OPTIONS preflight requests - return early with CORS headers already set
       if (req.method === 'OPTIONS') {
         return res.status(200).end();
       }
