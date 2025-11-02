@@ -235,8 +235,8 @@ function setCORSHeaders(req, res) {
       res.setHeader('Access-Control-Allow-Origin', origin);
       return;
     }
-    // Allow if from the production domain
-    if (origin.includes('eco-rewards-wheat.vercel.app')) {
+    // Allow if from the production domains
+    if (origin.includes('eco-rewards-wheat.vercel.app') || origin.includes('new-repo-seven-steel.vercel.app')) {
       res.setHeader('Access-Control-Allow-Origin', origin);
       return;
     }
