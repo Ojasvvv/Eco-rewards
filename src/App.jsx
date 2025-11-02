@@ -13,6 +13,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import PWAInstallPrompt from './components/PWAInstallPrompt/PWAInstallPrompt';
 import UniversalAchievementNotification from './components/AchievementNotification/UniversalAchievementNotification';
 import UniversalCongratsPopup from './components/CongratsPopup/UniversalCongratsPopup';
+import GlobalShortcuts from './components/GlobalShortcuts/GlobalShortcuts';
 
 // Wrapper component to handle onboarding within Router context
 function AppContent() {
@@ -90,6 +91,7 @@ function AppContent() {
       ) : (
         <AchievementsProvider>
           <PWAInstallPrompt />
+          <GlobalShortcuts />
           <UniversalCongratsPopup />
           <UniversalAchievementNotification />
           <Routes>

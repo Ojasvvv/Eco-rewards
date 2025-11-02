@@ -41,13 +41,29 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173, // Default Vite port
       host: true,
-      // Proxy API requests to Vercel deployment in development
+      // Proxy API requests in development
+      // Option 1: Proxy to Vercel deployment (requires deployment)
+      // Option 2: Use Vercel CLI (`vercel dev`) to run functions locally
+      //   - Run `npx vercel dev` in a separate terminal
+      //   - Then proxy to http://localhost:3000 (default Vercel dev port)
       proxy: {
         '/api': {
-          target: 'https://eco-rewards-wheat.vercel.app',
+          target: process.env.VERCEL_DEV_URL || 'https://eco-rewards-wheat.vercel.app',
           changeOrigin: true,
           secure: true,
-          rewrite: (path) => path // Keep /api prefix
+          rewrite: (path) => path, // Keep /api prefix
+          ws: false, // Disable websocket proxying
+          configure: (proxy, _options) => {
+            proxy.on('proxyReq', (proxyReq, req, _res) => {
+              // Log proxied requests for debugging
+              if (process.env.DEBUG_PROXY) {
+                console.log(`[Proxy] ${req.method} ${req.url} -> ${proxyReq.path}`);
+              }
+            });
+            proxy.on('error', (err, req, _res) => {
+              console.error('[Proxy Error]', err.message);
+            });
+          }
         }
       }
     },

@@ -57,6 +57,7 @@ const RATE_LIMITS = {
   checkDepositEligibility: { maxRequests: 100, windowMs: 60000 }, // 100 per minute (was 60)
   saveAchievements: { maxRequests: 10, windowMs: 60000 }, // 10 per minute - achievement saves
   getAchievements: { maxRequests: 30, windowMs: 60000 }, // 30 per minute - achievement reads
+  sendDailyStatsEmail: { maxRequests: 5, windowMs: 60000 }, // 5 per minute - prevent spam
 };
 
 /**
@@ -220,9 +221,53 @@ export async function checkRateLimitFirestore(userId, endpoint) {
  * @param {Function} handler - Original handler function
  * @returns {Function} Wrapped handler with rate limiting
  */
+// Helper to set CORS headers
+function setCORSHeaders(req, res) {
+  const origin = req.headers.origin;
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Cron-Secret');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  
+  // Always set Access-Control-Allow-Origin - required for CORS preflight
+  if (origin) {
+    // Always allow localhost/127.0.0.1 (for local development)
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      return;
+    }
+    // Allow if from the production domain
+    if (origin.includes('eco-rewards-wheat.vercel.app')) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      return;
+    }
+    // Check ALLOWED_ORIGINS env var
+    const allowedOrigins = process.env.ALLOWED_ORIGINS 
+      ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+      : [];
+    if (allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      return;
+    }
+  }
+  
+  // Fallback: if no origin matches but origin header exists, allow it (for development)
+  // This helps with CORS preflight requests
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+}
+
 export function withRateLimitFirestore(endpoint, handler) {
   return async (req, res) => {
     try {
+      // Always set CORS headers first
+      setCORSHeaders(req, res);
+      
+      // Handle OPTIONS preflight requests - pass through to handler for CORS
+      if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+      }
+      
       // Get user ID from request
       const authHeader = req.headers.authorization;
       

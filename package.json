@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "vercel dev",
     "build": "vite build",
     "preview": "vite preview",
     "cleanup-rate-limits": "node scripts/cleanupRateLimits.js",
@@ -19,7 +20,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-leaflet": "^4.2.1",
-    "react-router-dom": "^6.26.0"
+    "react-router-dom": "^6.26.0",
+    "resend": "^6.4.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
