@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -48,6 +48,7 @@ const Dashboard = () => {
   const [isBinClosing, setIsBinClosing] = useState(false);
   const [binCountdown, setBinCountdown] = useState(10);
   const binCountdownRef = useRef(null);
+  const [remainingDeposits, setRemainingDeposits] = useState(null);
 
   // Check if this is first visit to dashboard EVER (not just this session)
   useEffect(() => {
@@ -100,6 +101,36 @@ const Dashboard = () => {
     
     loadRewards();
   }, [user]);
+
+  // Helper function to refresh remaining deposits
+  const refreshRemainingDeposits = useCallback(async () => {
+    if (user?.uid) {
+      try {
+        const eligibility = await checkDepositEligibility(user.uid);
+        if (eligibility && eligibility.remainingDeposits !== undefined) {
+          setRemainingDeposits(eligibility.remainingDeposits);
+        } else if (eligibility && eligibility.eligible === false && eligibility.reason === 'daily_limit_reached') {
+          // Limit reached
+          setRemainingDeposits(0);
+        }
+      } catch (error) {
+        console.error('Error loading remaining deposits:', error);
+        // Don't set to null on error - keep previous value or retry
+      }
+    }
+  }, [user]);
+
+  // Load remaining deposits on mount
+  useEffect(() => {
+    refreshRemainingDeposits();
+  }, [refreshRemainingDeposits]);
+
+  // Refresh remaining deposits when rewards are updated (deposit was made)
+  useEffect(() => {
+    if (rewardsRefreshTrigger > 0) {
+      refreshRemainingDeposits();
+    }
+  }, [rewardsRefreshTrigger, refreshRemainingDeposits]);
 
   // Refresh rewards when achievement rewards are claimed
   useEffect(() => {
@@ -302,11 +333,15 @@ const Dashboard = () => {
       return;
     }
 
-    // Show remaining deposits
-    if (eligibility.remainingDeposits !== undefined) {
-      setSuccess(`✅ Verified! You have ${eligibility.remainingDeposits} deposits remaining today.`);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-    }
+      // Show remaining deposits and update state
+      if (eligibility.remainingDeposits !== undefined) {
+        setRemainingDeposits(eligibility.remainingDeposits);
+        setSuccess(`✅ Verified! You have ${eligibility.remainingDeposits} deposits remaining today.`);
+        await new Promise(resolve => setTimeout(resolve, 1500));
+      } else {
+        // Refresh to get the latest count
+        await refreshRemainingDeposits();
+      }
 
     setCurrentStep('location');
 
@@ -341,8 +376,53 @@ const Dashboard = () => {
       setSuccess(`📍 ${t('locationVerified')}`);
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Step 2: Open dustbin
+      // Step 2: Connect to hardware and open dustbin
       setCurrentStep('opening');
+      setSuccess('🔌 Connecting to bin hardware...');
+      
+      // Import hardware service dynamically
+      const { 
+        connectToBin, 
+        openBin, 
+        closeBin, 
+        validateDeposit, 
+        validateWithRetry,
+        HardwareStatus,
+        HardwareError 
+      } = await import('../../services/hardwareService');
+      
+      // Connect to bin hardware
+      const connectionResult = await validateWithRetry(
+        () => connectToBin(validatedCode),
+        5000,
+        3
+      );
+      
+      if (!connectionResult.success) {
+        setError(`❌ Hardware connection failed: ${connectionResult.error || 'Unknown error'}`);
+        setLoading(false);
+        setCurrentStep('');
+        return;
+      }
+      
+      setSuccess(`✅ Connected to bin (Signal: ${connectionResult.data?.signalStrength || 0}%, Battery: ${connectionResult.data?.batteryLevel || 0}%)`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Send open command to hardware
+      setSuccess('📡 Sending open command to servo motor...');
+      const openResult = await validateWithRetry(
+        () => openBin(validatedCode),
+        5000,
+        2
+      );
+      
+      if (!openResult.success) {
+        setError(`❌ Failed to open bin: ${openResult.error || 'Servo motor error'}`);
+        setLoading(false);
+        setCurrentStep('');
+        return;
+      }
+      
       setIsBinOpen(true);
       setIsBinClosing(false);
       setBinCountdown(10);
@@ -362,9 +442,22 @@ const Dashboard = () => {
       // Wait 10 seconds, then close
       await new Promise(resolve => setTimeout(resolve, 10000));
       
-      // Close bin with smooth transition
+      // Send close command to hardware
       setIsBinClosing(true);
-      setSuccess('🔒 Bin closing...');
+      setSuccess('📡 Sending close command to servo motor...');
+      
+      const closeResult = await validateWithRetry(
+        () => closeBin(validatedCode),
+        5000,
+        2
+      );
+      
+      if (!closeResult.success) {
+        console.warn(`[Hardware] Close command failed but continuing: ${closeResult.error}`);
+        // Continue anyway - bin might have closed manually
+      }
+      
+      setSuccess('🔒 Bin closed');
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Reset bin states
@@ -375,12 +468,32 @@ const Dashboard = () => {
         clearInterval(binCountdownRef.current);
       }
       
-      // Step 3: Validate trash deposit
+      // Step 3: Validate trash deposit using weight sensor
       setCurrentStep('validating');
-      setSuccess('🔍 Validating trash deposit...');
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      setSuccess('🔍 Reading weight sensor...');
       
-      setSuccess('✅ Trash validated successfully!');
+      const validationResult = await validateWithRetry(
+        () => validateDeposit(validatedCode),
+        3000,
+        2
+      );
+      
+      if (!validationResult.success) {
+        setError(`❌ Sensor error: ${validationResult.error || 'Weight sensor not responding'}`);
+        setLoading(false);
+        setCurrentStep('');
+        return;
+      }
+      
+      if (!validationResult.validated) {
+        setError('❌ No trash deposit detected. Please try again.');
+        setLoading(false);
+        setCurrentStep('');
+        return;
+      }
+      
+      const depositWeight = validationResult.weight || 0;
+      setSuccess(`✅ Trash validated! Deposit weight: ${depositWeight}g`);
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Step 4: Credit rewards FOR THIS SPECIFIC OUTLET (via Firestore)
@@ -419,6 +532,9 @@ const Dashboard = () => {
         
         // Record deposit for achievements
         recordDeposit(dustbinInfo.outletId);
+        
+        // Refresh remaining deposits count in real-time
+        await refreshRemainingDeposits();
         
         setSuccess(`🎉 ${t('success')}! ${t('earnedPoints')} ${pointsEarned} ${t('points')}!`);
         setDustbinCode('');
@@ -881,6 +997,11 @@ const Dashboard = () => {
                 </div>
                 <p className="usage-limit-text">
                   {t('usageLimitDesc')}
+                  {remainingDeposits !== null && (
+                    <span className="remaining-chances">
+                      <strong>Deposits remaining today: {remainingDeposits} / 5</strong>
+                    </span>
+                  )}
                 </p>
               </div>
             </div>
@@ -922,7 +1043,7 @@ const Dashboard = () => {
                     <span className="leaderboard-percentage">76%</span>
                   </div>
                   <div className="progress-bar">
-                    <div className="progress-fill" style={{width: '76%', background: 'linear-gradient(90deg, #4F46E5 0%, #7C3AED 100%)'}}></div>
+                    <div className="progress-fill" style={{width: '76%'}}></div>
                   </div>
                   <p className="leaderboard-description">
                     Vijaywada 76% {t('participation')}! 1,890 kg {t('wasteDiverted')}. ♻️
@@ -938,7 +1059,7 @@ const Dashboard = () => {
                     <span className="leaderboard-percentage">68%</span>
                   </div>
                   <div className="progress-bar">
-                    <div className="progress-fill" style={{width: '68%', background: 'linear-gradient(90deg, #F59E0B 0%, #EF4444 100%)'}}></div>
+                    <div className="progress-fill" style={{width: '68%'}}></div>
                   </div>
                   <p className="leaderboard-description">
                     Guntur 68% {t('participation')}! 1,530 kg {t('wasteDiverted')}. 🌍

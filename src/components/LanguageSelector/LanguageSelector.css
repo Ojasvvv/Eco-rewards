@@ -123,6 +123,10 @@
   color: #f9fafb;
 }
 
+.language-selector.dark .language-name {
+  color: #ffffff;
+}
+
 .language-selector.dark .language-option:hover {
   background: rgba(255, 255, 255, 0.1);
 }

@@ -47,27 +47,64 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - network first, fall back to cache, then offline page
 self.addEventListener('fetch', (event) => {
+  const requestUrl = event.request.url;
+  
+  // CRITICAL: Completely disable service worker in development
+  // Check if we're running on localhost (development environment)
+  const isDevelopment = self.location.hostname === 'localhost' || 
+                        self.location.hostname === '127.0.0.1' ||
+                        self.location.hostname.includes('localhost') ||
+                        requestUrl.includes('localhost') ||
+                        requestUrl.includes('127.0.0.1');
+  
+  if (isDevelopment) {
+    // Don't intercept ANY requests in development - let browser handle everything
+    // Returning without event.respondWith() means service worker won't handle it
+    return;
+  }
+  
+  // CRITICAL: Skip ALL Vite dev server requests - additional safety check
+  // This prevents service worker from interfering with HMR and dev server
+  if (requestUrl.includes('/@vite/') || 
+      requestUrl.includes('/@fs/') ||
+      requestUrl.includes('/@id/') ||
+      requestUrl.includes('/@react-refresh') ||
+      requestUrl.includes('/@hmr') ||
+      requestUrl.includes('?v=') ||
+      requestUrl.includes('&v=') ||
+      requestUrl.includes('?import') ||
+      requestUrl.includes('?t=')) {
+    // Don't intercept - let browser handle these requests normally
+    return;
+  }
+  
   // Skip caching for POST, PUT, DELETE requests
   if (event.request.method !== 'GET') {
     return;
   }
 
   // Skip caching for external requests (Firebase, Google, etc.)
-  if (!event.request.url.startsWith(self.location.origin)) {
+  if (!requestUrl.startsWith(self.location.origin)) {
     return;
   }
 
-  // Skip caching during development (Vite HMR, node_modules, etc.)
-  if (event.request.url.includes('/@vite/') || 
-      event.request.url.includes('/node_modules/') ||
-      event.request.url.includes('/@fs/') ||
-      event.request.url.includes('/@id/') ||
-      event.request.url.includes('.js?v=') ||
-      event.request.url.includes('.ts?v=') ||
-      event.request.url.includes('.jsx?v=') ||
-      event.request.url.includes('.tsx?v=')) {
-    // Just fetch, don't cache
-    event.respondWith(fetch(event.request));
+  // Skip caching for API requests (let them go through without interception)
+  if (requestUrl.includes('/api/')) {
+    return;
+  }
+
+  // Skip other dev server specific requests
+  if (requestUrl.includes('/node_modules/') ||
+      requestUrl.includes('/src/') ||
+      requestUrl.includes('.js?v=') ||
+      requestUrl.includes('.ts?v=') ||
+      requestUrl.includes('.jsx?v=') ||
+      requestUrl.includes('.tsx?v=') ||
+      requestUrl.includes('.css?v=') ||
+      requestUrl.includes('?v=') ||
+      requestUrl.includes('&v=') ||
+      requestUrl.includes('?import') ||
+      requestUrl.includes('?t=')) {
     return;
   }
 
@@ -87,7 +124,9 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       })
-      .catch(() => {
+      .catch((error) => {
+        // Log error but don't throw - handle gracefully
+        console.warn('Network request failed, trying cache:', error);
         // If network fails, try cache
         return caches.match(event.request)
           .then((cachedResponse) => {
@@ -98,7 +137,28 @@ self.addEventListener('fetch', (event) => {
             if (event.request.mode === 'navigate') {
               return caches.match(OFFLINE_URL);
             }
+            // Return error response instead of throwing
+            return new Response('Network error and no cache available', {
+              status: 503,
+              statusText: 'Service Unavailable'
+            });
+          })
+          .catch((cacheError) => {
+            // Even cache matching failed - return error response instead of throwing
+            console.error('Cache match failed:', cacheError);
+            return new Response('Service Unavailable', {
+              status: 503,
+              statusText: 'Service Unavailable'
+            });
           });
+      })
+      .catch((finalError) => {
+        // Final safety net - never let errors propagate unhandled
+        console.error('Unhandled fetch error:', finalError);
+        return new Response('Service Unavailable', {
+          status: 503,
+          statusText: 'Service Unavailable'
+        });
       })
   );
 });
