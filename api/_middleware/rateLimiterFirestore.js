@@ -262,11 +262,30 @@ export function withRateLimitFirestore(endpoint, handler) {
   return async (req, res) => {
     // Always set CORS headers FIRST, before any checks or try/catch
     // This ensures CORS headers are always present, even if there's an error
-    setCORSHeaders(req, res);
+    try {
+      setCORSHeaders(req, res);
+    } catch (corsError) {
+      // If CORS header setting fails, set basic headers manually
+      console.error('Error setting CORS headers:', corsError);
+      const origin = req.headers.origin || '*';
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Cron-Secret');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
     
     try {
       // Handle OPTIONS preflight requests - return early with CORS headers already set
       if (req.method === 'OPTIONS') {
+        // Explicitly ensure all CORS headers are set for OPTIONS
+        const origin = req.headers?.origin || '*';
+        if (!res.getHeader('Access-Control-Allow-Origin')) {
+          res.setHeader('Access-Control-Allow-Origin', origin);
+        }
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Cron-Secret');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Max-Age', '86400');
         return res.status(200).end();
       }
       
@@ -323,6 +342,17 @@ export function withRateLimitFirestore(endpoint, handler) {
     } catch (error) {
       console.error('Rate limiter middleware error:', error);
       console.error('⚠️  RATE LIMITER MIDDLEWARE FAILURE - Allowing request (fail open strategy)');
+      
+      // Ensure CORS headers are still set even on error
+      try {
+        const origin = req.headers?.origin || '*';
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Cron-Secret');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+      } catch (headerError) {
+        console.error('Failed to set CORS headers in catch block:', headerError);
+      }
       
       // SECURITY DECISION: Fail open
       // If rate limiter middleware fails, still allow the request to reach the handler
