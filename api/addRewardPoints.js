@@ -65,7 +65,7 @@ async function addRewardPointsHandler(req, res) {
     }
 
     // Get request data
-    const { pointsToAdd, reason, depositData, dustbinCode, userLocation } = req.body;
+    const { pointsToAdd, reason, depositData, dustbinCode, userLocation, userLocalTime } = req.body;
 
     // Validate input
     if (!pointsToAdd || typeof pointsToAdd !== 'number' || pointsToAdd <= 0) {
@@ -79,7 +79,7 @@ async function addRewardPointsHandler(req, res) {
       }
       
       // Only allow specific whitelisted fields
-      const allowedDepositFields = ['outlet', 'outletId', 'timestamp', 'type'];
+      const allowedDepositFields = ['outlet', 'outletId', 'timestamp', 'type', 'localHour'];
       const depositKeys = Object.keys(depositData);
       const invalidKeys = depositKeys.filter(key => !allowedDepositFields.includes(key));
       
@@ -251,9 +251,30 @@ async function addRewardPointsHandler(req, res) {
           // Auto-create stats document if it doesn't exist
           const now = new Date();
           const outletId = depositData?.outletId || 'unknown';
-          const hour = now.getHours(); // 0-23
           
-          // Early Bird: Before 8 AM (hours 0-7)
+          // Use user's local time if provided, otherwise fall back to server time
+          // userLocalTime should be the hour (0-23) in the user's local timezone
+          let hour;
+          if (userLocalTime !== undefined && typeof userLocalTime === 'number' && userLocalTime >= 0 && userLocalTime <= 23) {
+            hour = userLocalTime;
+          } else if (depositData?.localHour !== undefined && typeof depositData.localHour === 'number' && depositData.localHour >= 0 && depositData.localHour <= 23) {
+            hour = depositData.localHour;
+          } else {
+            // Fallback: try to parse from timestamp if it exists
+            if (depositData?.timestamp) {
+              try {
+                const clientDate = new Date(depositData.timestamp);
+                hour = clientDate.getHours();
+              } catch (e) {
+                // If parsing fails, use server time
+                hour = now.getHours();
+              }
+            } else {
+              hour = now.getHours();
+            }
+          }
+          
+          // Early Bird: Before 8 AM (hours 0-7, i.e., 12:00 AM to 7:59 AM)
           // Night Owl: After 8 PM (hours 20-23, i.e., 8:00 PM to 11:59 PM)
           const isEarlyBird = hour >= 0 && hour < 8;
           const isNightOwl = hour >= 20 && hour <= 23;
@@ -275,7 +296,29 @@ async function addRewardPointsHandler(req, res) {
         } else {
           const currentStats = statsDoc.data();
           const now = new Date();
-          const hour = now.getHours(); // 0-23
+          
+          // Use user's local time if provided, otherwise fall back to server time
+          // userLocalTime should be the hour (0-23) in the user's local timezone
+          let hour;
+          if (userLocalTime !== undefined && typeof userLocalTime === 'number' && userLocalTime >= 0 && userLocalTime <= 23) {
+            hour = userLocalTime;
+          } else if (depositData?.localHour !== undefined && typeof depositData.localHour === 'number' && depositData.localHour >= 0 && depositData.localHour <= 23) {
+            hour = depositData.localHour;
+          } else {
+            // Fallback: try to parse from timestamp if it exists
+            if (depositData?.timestamp) {
+              try {
+                const clientDate = new Date(depositData.timestamp);
+                hour = clientDate.getHours();
+              } catch (e) {
+                // If parsing fails, use server time
+                hour = now.getHours();
+              }
+            } else {
+              hour = now.getHours();
+            }
+          }
+          
           const day = now.getDay(); // 0 = Sunday, 6 = Saturday
           const today = now.toISOString().split('T')[0]; // YYYY-MM-DD
           

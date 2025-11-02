@@ -146,7 +146,7 @@ export const getUserRewards = async (userId) => {
  * @param {string} dustbinCode - Dustbin code (REQUIRED for deposits)
  * @param {object} userLocation - User's GPS location { lat, lng } (REQUIRED for deposits)
  */
-export const addRewardPoints = async (userId, pointsToAdd, reason = 'deposit', depositData = null, dustbinCode = null, userLocation = null) => {
+export const addRewardPoints = async (userId, pointsToAdd, reason = 'deposit', depositData = null, dustbinCode = null, userLocation = null, userLocalTime = null) => {
   try {
     // Use different throttle keys and times for different operations
     const throttleKey = reason === 'achievement' 
@@ -162,7 +162,8 @@ export const addRewardPoints = async (userId, pointsToAdd, reason = 'deposit', d
       reason,
       depositData,
       dustbinCode,  // Server will validate this
-      userLocation  // Server will validate proximity
+      userLocation,  // Server will validate proximity
+      userLocalTime  // User's local hour (0-23) for time-based achievements
     }, throttleKey, throttleMs);
     
     if (result.success) {

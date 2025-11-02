@@ -329,6 +329,9 @@ const Dashboard = () => {
       
       try {
         // Add points to Firestore (server-controlled with location validation)
+        // Get user's local hour for time-based achievements
+        const userLocalHour = new Date().getHours();
+        
         await addRewardPoints(
           user.uid, 
           pointsEarned, 
@@ -336,10 +339,12 @@ const Dashboard = () => {
           {
             outlet: dustbinInfo.outlet,
             outletId: dustbinInfo.outletId,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            localHour: userLocalHour
           },
           validatedCode,  // Server validates dustbin code exists in database
-          location        // Server validates user is within 100m of dustbin
+          location,       // Server validates user is within 100m of dustbin
+          userLocalHour   // User's local hour (0-23) for time-based achievements
         );
         
         // Update local state to reflect the change
