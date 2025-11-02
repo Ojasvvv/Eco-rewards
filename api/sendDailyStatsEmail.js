@@ -402,20 +402,21 @@ async function sendDailyStatsEmailHandler(req, res) {
             .bin-card {
               padding: 15px !important;
               margin: 15px 0 !important;
-              overflow-x: auto !important;
             }
             .bin-card h3 {
               font-size: 18px !important;
             }
             table {
               font-size: 12px !important;
-              display: block !important;
-              overflow-x: auto !important;
-              white-space: nowrap !important;
+              table-layout: fixed !important;
+              word-wrap: break-word !important;
             }
             th, td {
               padding: 8px !important;
               font-size: 11px !important;
+              word-wrap: break-word !important;
+              overflow-wrap: break-word !important;
+              max-width: 120px !important;
             }
             th {
               font-size: 10px !important;
