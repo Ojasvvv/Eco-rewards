@@ -304,6 +304,89 @@ export default async function handler(req, res) {
             font-size: 48px;
             margin-bottom: 10px;
           }
+          @media only screen and (max-width: 600px) {
+            body {
+              padding: 10px !important;
+            }
+            .container {
+              max-width: 100% !important;
+              border-radius: 8px !important;
+            }
+            .header {
+              padding: 25px 20px !important;
+            }
+            .header h1 {
+              font-size: 24px !important;
+            }
+            .header p {
+              font-size: 14px !important;
+            }
+            .content {
+              padding: 20px 15px !important;
+            }
+            .section {
+              margin-bottom: 30px !important;
+            }
+            .section h2 {
+              font-size: 20px !important;
+              padding-bottom: 8px !important;
+              margin-bottom: 15px !important;
+            }
+            .summary-grid {
+              grid-template-columns: 1fr !important;
+              gap: 10px !important;
+            }
+            .stat-card {
+              padding: 15px !important;
+            }
+            .stat-label {
+              font-size: 12px !important;
+            }
+            .stat-value {
+              font-size: 28px !important;
+            }
+            .bin-card {
+              padding: 15px !important;
+              margin: 15px 0 !important;
+              overflow-x: auto !important;
+            }
+            .bin-card h3 {
+              font-size: 18px !important;
+            }
+            table {
+              font-size: 12px !important;
+              display: block !important;
+              overflow-x: auto !important;
+              white-space: nowrap !important;
+            }
+            th, td {
+              padding: 8px !important;
+              font-size: 11px !important;
+            }
+            th {
+              font-size: 10px !important;
+            }
+            .pickup-card {
+              padding: 12px !important;
+              margin: 12px 0 !important;
+            }
+            .pickup-card h4 {
+              font-size: 16px !important;
+            }
+            .pickup-card table {
+              font-size: 12px !important;
+            }
+            .footer {
+              padding: 15px !important;
+              font-size: 12px !important;
+            }
+            .empty-state {
+              padding: 30px 20px !important;
+            }
+            .empty-state-icon {
+              font-size: 36px !important;
+            }
+          }
         </style>
       </head>
       <body>
