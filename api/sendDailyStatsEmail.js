@@ -27,7 +27,12 @@ async function sendDailyStatsEmailHandler(req, res) {
     'http://127.0.0.1:3000',
     'http://127.0.0.1:5174'
   ];
-  const ALL_ALLOWED_ORIGINS = [...new Set([...ALLOWED_ORIGINS, ...LOCALHOST_ORIGINS])];
+  // Production frontend origins
+  const PRODUCTION_ORIGINS = [
+    'https://new-repo-seven-steel.vercel.app',
+    'https://eco-rewards-wheat.vercel.app'
+  ];
+  const ALL_ALLOWED_ORIGINS = [...new Set([...ALLOWED_ORIGINS, ...LOCALHOST_ORIGINS, ...PRODUCTION_ORIGINS])];
 
   // Always set CORS headers
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');

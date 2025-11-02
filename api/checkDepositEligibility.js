@@ -19,7 +19,13 @@ const LOCALHOST_ORIGINS = [
   'http://127.0.0.1:5174'
 ];
 
-const ALL_ALLOWED_ORIGINS = [...new Set([...ALLOWED_ORIGINS, ...LOCALHOST_ORIGINS])];
+// Production frontend origins
+const PRODUCTION_ORIGINS = [
+  'https://new-repo-seven-steel.vercel.app',
+  'https://eco-rewards-wheat.vercel.app'
+];
+
+const ALL_ALLOWED_ORIGINS = [...new Set([...ALLOWED_ORIGINS, ...LOCALHOST_ORIGINS, ...PRODUCTION_ORIGINS])];
 
 // Daily deposit limit per user
 const DAILY_DEPOSIT_LIMIT = 5;
