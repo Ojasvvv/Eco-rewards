@@ -97,6 +97,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
+  min-height: 0;
 }
 
 .notification-title {
@@ -136,6 +137,8 @@
   flex-direction: column;
   gap: 0.875rem;
   margin-top: 1.25rem;
+  min-height: 120px;
+  flex-shrink: 0;
 }
 
 .reward-badge {
@@ -147,16 +150,32 @@
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   border-radius: 12px;
   border: 1px solid #fbbf24;
+  min-height: 60px;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+  transition: none;
+  transform: none;
+  animation: none;
 }
 
 .reward-icon {
   font-size: 1.75rem;
+  flex-shrink: 0;
+  transition: none;
+  transform: none;
+  animation: none;
 }
 
 .reward-amount {
   font-size: 1.25rem;
   font-weight: 700;
   color: #d97706;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: none;
+  transform: none;
+  animation: none;
 }
 
 .claim-btn {
@@ -170,15 +189,21 @@
   cursor: pointer;
   transition: background-color 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+  width: 100%;
+  min-height: 48px;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .claim-btn:hover {
   background: #059669;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+  transform: none;
 }
 
 .claim-btn:active {
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+  transform: none;
 }
 
 .close-notification-btn {
@@ -192,6 +217,10 @@
   cursor: pointer;
   transition: background-color 0.2s;
   margin-top: 0.5rem;
+  width: 100%;
+  min-height: 48px;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .close-notification-btn:hover {
@@ -297,11 +326,13 @@
   .notification-reward {
     gap: 0.75rem;
     margin-top: 1rem;
+    min-height: 110px;
   }
 
   .reward-badge {
     padding: 0.875rem 1rem;
     gap: 0.5rem;
+    min-height: 56px;
   }
 
   .reward-icon {
@@ -316,6 +347,7 @@
   .close-notification-btn {
     padding: 0.8rem 1.5rem;
     font-size: 0.95rem;
+    min-height: 44px;
   }
 }
 
@@ -341,8 +373,13 @@
     font-size: 0.9rem;
   }
 
+  .notification-reward {
+    min-height: 100px;
+  }
+
   .reward-badge {
     padding: 0.75rem 0.875rem;
+    min-height: 52px;
   }
 
   .reward-icon {
@@ -357,6 +394,7 @@
   .close-notification-btn {
     padding: 0.75rem 1.25rem;
     font-size: 0.9rem;
+    min-height: 42px;
   }
 }
 

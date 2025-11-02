@@ -2804,12 +2804,13 @@
   border-radius: 50px;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: none;
+  transform: none;
 }
 
 .reward-badge:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  transform: none;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .dark-theme .reward-badge {
@@ -2817,11 +2818,11 @@
 }
 
 .dark-theme .reward-badge:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .reward-badge:active {
-  transform: scale(0.98);
+  transform: none;
 }
 
 .reward-emoji {
