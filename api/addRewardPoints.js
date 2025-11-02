@@ -251,11 +251,17 @@ async function addRewardPointsHandler(req, res) {
           // Auto-create stats document if it doesn't exist
           const now = new Date();
           const outletId = depositData?.outletId || 'unknown';
+          const hour = now.getHours(); // 0-23
+          
+          // Early Bird: Before 8 AM (hours 0-7)
+          // Night Owl: After 8 PM (hours 20-23, i.e., 8:00 PM to 11:59 PM)
+          const isEarlyBird = hour >= 0 && hour < 8;
+          const isNightOwl = hour >= 20 && hour <= 23;
           
           transaction.set(statsRef, {
             totalDeposits: 1,
-            earlyBirdDeposits: now.getHours() < 8 ? 1 : 0,
-            nightOwlDeposits: now.getHours() >= 20 ? 1 : 0,
+            earlyBirdDeposits: isEarlyBird ? 1 : 0,
+            nightOwlDeposits: isNightOwl ? 1 : 0,
             weekendDeposits: (now.getDay() === 0 || now.getDay() === 6) ? 1 : 0,
             outletsVisited: { [outletId]: 1 },
             rewardsRedeemed: 0,
@@ -269,7 +275,7 @@ async function addRewardPointsHandler(req, res) {
         } else {
           const currentStats = statsDoc.data();
           const now = new Date();
-          const hour = now.getHours();
+          const hour = now.getHours(); // 0-23
           const day = now.getDay(); // 0 = Sunday, 6 = Saturday
           const today = now.toISOString().split('T')[0]; // YYYY-MM-DD
           
@@ -303,12 +309,19 @@ async function addRewardPointsHandler(req, res) {
             [outletId]: (currentOutlets[outletId] || 0) + 1
           };
           
+          // Time-based achievement checks with explicit ranges
+          // Early Bird: Before 8 AM (hours 0-7, i.e., 12:00 AM to 7:59 AM)
+          // Night Owl: After 8 PM (hours 20-23, i.e., 8:00 PM to 11:59 PM)
+          const isEarlyBird = hour >= 0 && hour < 8;
+          const isNightOwl = hour >= 20 && hour <= 23;
+          const isWeekend = day === 0 || day === 6;
+          
           // Update all stats server-side
           transaction.update(statsRef, {
             totalDeposits: (currentStats.totalDeposits || 0) + 1,
-            earlyBirdDeposits: hour < 8 ? (currentStats.earlyBirdDeposits || 0) + 1 : (currentStats.earlyBirdDeposits || 0),
-            nightOwlDeposits: hour >= 20 ? (currentStats.nightOwlDeposits || 0) + 1 : (currentStats.nightOwlDeposits || 0),
-            weekendDeposits: (day === 0 || day === 6) ? (currentStats.weekendDeposits || 0) + 1 : (currentStats.weekendDeposits || 0),
+            earlyBirdDeposits: isEarlyBird ? (currentStats.earlyBirdDeposits || 0) + 1 : (currentStats.earlyBirdDeposits || 0),
+            nightOwlDeposits: isNightOwl ? (currentStats.nightOwlDeposits || 0) + 1 : (currentStats.nightOwlDeposits || 0),
+            weekendDeposits: isWeekend ? (currentStats.weekendDeposits || 0) + 1 : (currentStats.weekendDeposits || 0),
             outletsVisited: updatedOutlets,
             currentStreak: newStreak,
             longestStreak: Math.max(currentStats.longestStreak || 0, newStreak),
