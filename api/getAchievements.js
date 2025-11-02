@@ -1,19 +1,59 @@
 import { adminDb, adminAuth, ensureInitialized } from './_middleware/firebaseAdmin.js';
 import { withRateLimitFirestore as withRateLimit } from './_middleware/rateLimiterFirestore.js';
 
+// CORS Configuration - Include localhost for development
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
+
+// Always include localhost origins for development
+const LOCALHOST_ORIGINS = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5174',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5174'
+];
+
+const ALL_ALLOWED_ORIGINS = [...new Set([...ALLOWED_ORIGINS, ...LOCALHOST_ORIGINS])];
+
 /**
  * Get user achievements from Firestore
  * This endpoint retrieves which achievements the user has unlocked
  */
 async function getAchievementsHandler(req, res) {
+  // Check Firebase Admin initialization first
+  try {
+    ensureInitialized();
+  } catch (error) {
+    console.error('Firebase Admin not initialized:', error);
+    return res.status(500).json({ 
+      error: 'Server configuration error. Please contact support.',
+      details: error.message 
+    });
+  }
+
+  // Handle CORS
+  const origin = req.headers.origin;
+  if (origin && ALL_ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   // Only allow POST requests (for consistency with auth header)
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    // Check Firebase Admin initialization
-    ensureInitialized();
 
     // Verify Firebase token and get user ID
     const authHeader = req.headers.authorization;

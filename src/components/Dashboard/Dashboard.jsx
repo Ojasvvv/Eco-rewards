@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -8,6 +8,7 @@ import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import Footer from '../Footer/Footer';
 import KabadConnect from '../KabadConnect/KabadConnect';
 import SmartBinFinder from '../SmartBinFinder/SmartBinFinder';
+import SmartBinAnimation from './SmartBinAnimation';
 import { 
   initializeUserRewards, 
   getUserRewards, 
@@ -41,6 +42,12 @@ const Dashboard = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isFirstVisit, setIsFirstVisit] = useState(false);
   const [activeView, setActiveView] = useState('dashboard'); // 'dashboard' or 'kabadconnect'
+  
+  // Bin animation states
+  const [isBinOpen, setIsBinOpen] = useState(false);
+  const [isBinClosing, setIsBinClosing] = useState(false);
+  const [binCountdown, setBinCountdown] = useState(10);
+  const binCountdownRef = useRef(null);
 
   // Check if this is first visit to dashboard EVER (not just this session)
   useEffect(() => {
@@ -109,6 +116,15 @@ const Dashboard = () => {
     
     refreshRewards();
   }, [rewardsRefreshTrigger, user]);
+
+  // Cleanup countdown interval on unmount
+  useEffect(() => {
+    return () => {
+      if (binCountdownRef.current) {
+        clearInterval(binCountdownRef.current);
+      }
+    };
+  }, []);
 
 
   // Server-side eligibility check (email verification + daily limit)
@@ -271,6 +287,14 @@ const Dashboard = () => {
       setLoading(false);
       setCurrentStep('');
       
+      // Reset bin states if there's an error
+      setIsBinOpen(false);
+      setIsBinClosing(false);
+      setBinCountdown(10);
+      if (binCountdownRef.current) {
+        clearInterval(binCountdownRef.current);
+      }
+      
       // If email not verified, show special message
       if (eligibility.reason === 'email_not_verified') {
         alert('📧 Email Verification Required\n\nPlease verify your email address to earn rewards.\n\nCheck your inbox for a verification link from Firebase.');
@@ -303,6 +327,14 @@ const Dashboard = () => {
         setError(`❌ ${t('tooFar')} (${Math.round(distance * 1000)}m away). ${t('getCloser')}`);
         setLoading(false);
         setCurrentStep('');
+        
+        // Reset bin states if location is too far
+        setIsBinOpen(false);
+        setIsBinClosing(false);
+        setBinCountdown(10);
+        if (binCountdownRef.current) {
+          clearInterval(binCountdownRef.current);
+        }
         return;
       }
       
@@ -311,8 +343,37 @@ const Dashboard = () => {
       
       // Step 2: Open dustbin
       setCurrentStep('opening');
+      setIsBinOpen(true);
+      setIsBinClosing(false);
+      setBinCountdown(10);
       setSuccess(`🔓 Smart dustbin opened! Please deposit your trash.`);
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // Start countdown
+      binCountdownRef.current = setInterval(() => {
+        setBinCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(binCountdownRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+      // Wait 10 seconds, then close
+      await new Promise(resolve => setTimeout(resolve, 10000));
+      
+      // Close bin with smooth transition
+      setIsBinClosing(true);
+      setSuccess('🔒 Bin closing...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Reset bin states
+      setIsBinOpen(false);
+      setIsBinClosing(false);
+      setBinCountdown(10);
+      if (binCountdownRef.current) {
+        clearInterval(binCountdownRef.current);
+      }
       
       // Step 3: Validate trash deposit
       setCurrentStep('validating');
@@ -391,6 +452,14 @@ const Dashboard = () => {
       }
       console.error(err);
       setCurrentStep('');
+      
+      // Reset bin states on error
+      setIsBinOpen(false);
+      setIsBinClosing(false);
+      setBinCountdown(10);
+      if (binCountdownRef.current) {
+        clearInterval(binCountdownRef.current);
+      }
     } finally {
       setLoading(false);
     }
@@ -712,7 +781,7 @@ const Dashboard = () => {
 
           {/* Code Entry Form - Split Layout */}
           <section className="code-section-split animate-slideUp">
-            <div className="code-card-left">
+            <div className={`code-card-left ${isBinOpen ? 'bin-animation-active' : ''}`}>
               <div className="code-header">
                 <h3>🔑 {t('enterCode')}</h3>
                 <p>📱 {t('scanQRPrompt')} 🎯</p>
@@ -747,13 +816,22 @@ const Dashboard = () => {
                   </div>
                 )}
 
-                {success && (
+                {success && !isBinOpen && (
                   <div className="message success-msg animate-fadeIn">
                     <svg viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                     {success}
                   </div>
+                )}
+                
+                {/* Smart Bin Animation */}
+                {(isBinOpen || isBinClosing) && (
+                  <SmartBinAnimation 
+                    isOpen={isBinOpen} 
+                    isClosing={isBinClosing}
+                    countdown={binCountdown}
+                  />
                 )}
 
                 <button 

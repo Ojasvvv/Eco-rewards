@@ -8,9 +8,13 @@ import { throttle, handleRateLimitError } from '../utils/rateLimitClient';
  * This prevents ANY client-side manipulation of rewards
  */
 
-const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://eco-rewards-wheat.vercel.app/api'
-  : 'http://localhost:5173/api';
+// API Base URL - Use environment variable or default
+// In development, Vite proxy forwards /api/* to Vercel
+// In production, use the production URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL 
+  || (import.meta.env.PROD 
+    ? 'https://eco-rewards-wheat.vercel.app/api'
+    : '/api'); // Use relative path in dev - Vite proxy handles it
 
 /**
  * Helper function to make authenticated API calls with rate limiting

@@ -39,8 +39,17 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     server: {
-      port: 3000,
-      host: true
+      port: 5173, // Default Vite port
+      host: true,
+      // Proxy API requests to Vercel deployment in development
+      proxy: {
+        '/api': {
+          target: 'https://eco-rewards-wheat.vercel.app',
+          changeOrigin: true,
+          secure: true,
+          rewrite: (path) => path // Keep /api prefix
+        }
+      }
     },
     build: {
       rollupOptions: {

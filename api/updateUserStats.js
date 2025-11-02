@@ -3,10 +3,22 @@ import { withRateLimitFirestore as withRateLimit } from './_middleware/rateLimit
 
 const db = adminDb;
 
-// CORS Configuration - Load from environment variable only (no hardcoded URLs)
+// CORS Configuration - Include localhost for development
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
   : [];
+
+// Always include localhost origins for development
+const LOCALHOST_ORIGINS = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5174',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5174'
+];
+
+const ALL_ALLOWED_ORIGINS = [...new Set([...ALLOWED_ORIGINS, ...LOCALHOST_ORIGINS])];
 
 /**
  * SECURITY: This endpoint is now DEPRECATED and restricted

@@ -1020,10 +1020,24 @@
   flex-direction: column;
   gap: 20px;
   flex: 1;
+  position: relative;
 }
 
 .code-form.idle-state {
   justify-content: center;
+}
+
+/* Adjust layout when bin animation is active */
+.code-card-left.bin-animation-active .input-group,
+.code-card-left.bin-animation-active .submit-btn {
+  opacity: 0.4;
+  pointer-events: none;
+  transform: scale(0.95);
+  transition: all 0.3s ease;
+}
+
+.code-card-left.bin-animation-active .code-form {
+  gap: 30px;
 }
 
 .input-group {
@@ -1035,13 +1049,43 @@
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--text-secondary);
+  color: #000000 !important;
   pointer-events: none;
+  transition: color 0.3s ease;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 1;
+}
+
+.dark-theme .input-icon {
+  color: #ffffff !important;
 }
 
 .input-icon svg {
   width: 20px;
   height: 20px;
+  display: block;
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Keep icon black when input is focused - Light theme */
+.input-group:has(.code-input:focus) .input-icon,
+.code-input:focus ~ .input-icon {
+  color: #000000 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Keep icon white when input is focused - Dark theme */
+.dark-theme .input-group:has(.code-input:focus) .input-icon,
+.dark-theme .code-input:focus ~ .input-icon {
+  color: #ffffff !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .code-input {
