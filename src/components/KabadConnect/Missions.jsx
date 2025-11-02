@@ -232,24 +232,6 @@ const Missions = () => {
                 <h3>{mission.title}</h3>
                 <p>{mission.description}</p>
 
-                <div className="mission-progress">
-                  <div className="progress-info">
-                    <span className="progress-current">{mission.current} / {mission.target} {mission.unit}</span>
-                    <span className="progress-percent">{Math.round(progress)}%</span>
-                  </div>
-                  <div className="progress-bar">
-                    <div 
-                      className="progress-fill"
-                      style={{ 
-                        width: `${progress}%`,
-                        background: isCompleted 
-                          ? 'linear-gradient(90deg, #10b981 0%, #059669 100%)'
-                          : `linear-gradient(90deg, ${getDifficultyColor(mission.difficulty)} 0%, ${getDifficultyColor(mission.difficulty)}dd 100%)`
-                      }}
-                    />
-                  </div>
-                </div>
-
                 <div className="mission-footer">
                   <div className="mission-reward">
                     <span className="reward-icon">🎁</span>
