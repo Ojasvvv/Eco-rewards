@@ -287,14 +287,6 @@ export default async function handler(req, res) {
           .status-confirmed { background: #dbeafe; color: #2563eb; }
           .status-completed { background: #d1fae5; color: #059669; }
           .status-cancelled { background: #fee2e2; color: #dc2626; }
-          .footer { 
-            background: #f9fafb; 
-            padding: 20px; 
-            text-align: center; 
-            color: #6b7280; 
-            font-size: 14px; 
-            border-top: 1px solid #e5e7eb;
-          }
           .empty-state {
             text-align: center;
             padding: 40px;
@@ -375,10 +367,6 @@ export default async function handler(req, res) {
               font-size: 16px !important;
             }
             .pickup-card table {
-              font-size: 12px !important;
-            }
-            .footer {
-              padding: 15px !important;
               font-size: 12px !important;
             }
             .empty-state {
@@ -554,11 +542,6 @@ export default async function handler(req, res) {
             </div>
           </div>
 
-          <div class="footer">
-            <p><strong>EcoRewards System</strong></p>
-            <p>This is an automated daily stats report sent at 11:59 PM</p>
-            <p>Generated at ${new Date().toLocaleString()}</p>
-          </div>
         </div>
       </body>
       </html>

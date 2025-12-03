@@ -5,7 +5,6 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useAchievements } from '../../context/AchievementsContext';
 import { useNavigate } from 'react-router-dom';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
-import Footer from '../Footer/Footer';
 import KabadConnect from '../KabadConnect/KabadConnect';
 import SmartBinFinder from '../SmartBinFinder/SmartBinFinder';
 import SmartBinAnimation from './SmartBinAnimation';
@@ -1280,8 +1279,6 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

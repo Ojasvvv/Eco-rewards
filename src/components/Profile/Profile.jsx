@@ -6,7 +6,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { getSafeImageURL, sanitizeDisplayName, sanitizeEmail } from '../../utils/sanitize';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
-import Footer from '../Footer/Footer';
 import '../Dashboard/Dashboard.css';
 import './Profile.css';
 
@@ -607,8 +606,6 @@ const Profile = () => {
 
       </div>
 
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };
